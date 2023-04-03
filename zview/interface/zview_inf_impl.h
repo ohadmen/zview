@@ -5,7 +5,7 @@
 #include "zview_inf.h"
 class ZviewInfImpl: public ZviewInf
 {
-
+    using Buffer = std::array<std::uint8_t,32U>;
 public:
     ZviewInfImpl();
     ~ZviewInfImpl();
@@ -25,6 +25,7 @@ public:
     bool removeShape(int key) override;
     void destroy() override;
     int getHandleNumFromString(const char* name) override;
+    bool getClickedTarget(float* xyz) override;
 
     static constexpr size_t SHARED_MEMORY_SIZE_BYTES = size_t(1) << 26 ; //64Mbyte,to support RealSense XVGA depth buffer
     static constexpr char INTERFACE_TO_ZVIEW_SHARED_MEM_KEY[] = "zview_from_interface" ;
@@ -45,11 +46,12 @@ public:
         SET_CAM_LOOKAT,
         GET_LAST_KEYSTROKE,
         GET_HNUM_FROM_HSTR,
+        GET_TARGET_XYZ
     };
     struct ReadAck
 {
     ZviewInfImpl::Command cmd;
-    qint64 key;
+    Buffer buffer;
 };
 
     
@@ -60,7 +62,7 @@ private:
     QSystemSemaphore m_lock;
 
 
-    int privGetAck(Command expected);
+    bool privGetAck(Command expected,Buffer& buffer);
     void privResetAck();
     
 };

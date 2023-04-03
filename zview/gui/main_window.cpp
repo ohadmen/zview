@@ -129,7 +129,7 @@ void MainWindow::privAddMenuBar()
 
 
             QString aboutText(
-                "<b>Zview - a general 3d view (version 1.46)\n</b><br>"
+                "<b>Zview - a general 3d view (version 1.47)\n</b><br>"
                 "Zview was created as a tool to reflect the true state of 3d point cloud/mesh data stored in a file or on the heap.<br>"
                 "Implementation was written by modern c++ and OpenGL ES, with an effort to minimize cpu load and memory signiture.<br>"
                 "App can open a layered ply file - a ply file that contains multiple ply files, with hirarchical layer names.<br>"
@@ -248,6 +248,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(m_smm, &SharedMemoryManager::signal_setCamLookAt, this, &MainWindow::setCamLookAt);
     //get last pressed key
     QObject::connect(m_smm, &SharedMemoryManager::signal_getLastKeyStroke, this, &MainWindow::getLastKeyStroke);
+    //get select target XYZ
+    QObject::connect(m_smm, &SharedMemoryManager::signal_getTargetXyz, m_canvas, &Canvas::getLastRetargetPoint);
+    
 }
 void MainWindow::readFileList(const QStringList &files)
 {

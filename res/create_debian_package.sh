@@ -7,7 +7,7 @@
 # *zview/gui/main_window.cpp@129
 # *zview/gui/zview_main.cpp
 
-ver=1.46 
+ver=1.47 
 rm -rf pack
 mkdir pack 
 cd pack
@@ -36,7 +36,7 @@ target_dir=$taget_base/DEBIAN
 mkdir -p $target_dir
 control_file=$target_dir/control
 echo "Source: zview" >> $control_file
-echo "Version: 1.46" >> $control_file
+echo "Version: 1.47" >> $control_file
 echo "Section: visualization" >> $control_file
 echo "Priority: optional" >> $control_file
 echo "Maintainer: Ohad <ohad.men@gmail.com>" >> $control_file

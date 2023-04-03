@@ -73,7 +73,8 @@ public:
     void updatePmat();
 
     void input(QInputEvent *e);
-
+    void setLastRetargetPoint(const Types::VertData& v);
+    QVector3D getLastRetargetPoint() const;
 signals:
     void signal_canvasUpdate();
     void signal_setStatus(const QString &str);
@@ -84,4 +85,5 @@ private:
     int m_currentState;
     int m_prevState;
     VPmat m_vpmat;
+    QVector3D m_last_retarget_point;
 };
