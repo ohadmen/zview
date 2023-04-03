@@ -40,6 +40,9 @@
 
 ![Zview screenshot](/res/screenshot.png)
 
+## changelog version 1.47
+	* get target xyz
+
 ## changelog version 1.46
 	* cross platform support
 	* dead thread bugfix

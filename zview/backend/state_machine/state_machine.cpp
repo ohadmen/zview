@@ -80,3 +80,12 @@ QVector3D TrackStateMachine::xy2screen(const QPointF &xy)
 
     return m_vpmat.xy2screen(xy);
 }
+void TrackStateMachine::setLastRetargetPoint(const Types::VertData& v)
+{
+    m_last_retarget_point = v;
+}
+
+QVector3D TrackStateMachine::getLastRetargetPoint() const
+{
+    return m_last_retarget_point;
+}

@@ -112,3 +112,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 	m_stateMachine.input(e);
 	repaint();
 }
+
+QVector3D Canvas::getLastRetargetPoint() const
+{
+	return m_stateMachine.getLastRetargetPoint();
+}

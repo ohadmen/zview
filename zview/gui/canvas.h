@@ -32,7 +32,8 @@ public slots:
 	void setStatus(const QString& str);
 	void forceUpdate();
 	void resetView(int key=-1);
-	
+    QVector3D getLastRetargetPoint() const;
+
 
 signals:
 	void signal_setStatus(const QString& str);

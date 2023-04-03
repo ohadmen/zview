@@ -31,6 +31,7 @@ signals:
     
     void signal_setCamLookAt(const QVector3D& eye,const QVector3D& center,const QVector3D& up) const;
     int signal_getLastKeyStroke(bool reset) const;
+    QVector3D signal_getTargetXyz() const;
 
     
     

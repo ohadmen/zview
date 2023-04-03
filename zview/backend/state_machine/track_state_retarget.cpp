@@ -34,7 +34,7 @@ void TrackStateRetarget::input(const QPointF& xy)
 	vm_new(2, 3) -= 1;
 	m_machineP->setViewMatrix(vm_new);
     m_machineP->canvasUpdate();
-
+	m_machineP->setLastRetargetPoint(x);
     m_machineP->setStatus(stringFromVertData(x));
     
 }
