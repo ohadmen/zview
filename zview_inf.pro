@@ -30,10 +30,3 @@ SOURCES += \
 
 HEADERS += \
     zview/interface/zview_inf.h\
-    zview/interface/zview_inf_impl.h\
-    zview/io/read_file_list.h \
-    zview/io/readers/read_obj.h \
-    zview/io/readers/read_ply.h \
-    zview/io/readers/read_stl.h \
-    zview/io/write_shape_to_file.h \
-
