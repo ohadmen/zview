@@ -27,11 +27,9 @@ qint64 privReadShape(ConstMemStream &ms, ZviewInfImpl::Command cmd)
 {
     std::string name;
     size_t pclSz;
-    Types::VertData* pclDataPtr;
-    ms >> name >> pclSz >> pclDataPtr;
-    
-    std::vector<Types::VertData> pcl{pclDataPtr,pclDataPtr+pclSz};
-
+    ms >> name >> pclSz;
+    std::vector<Types::VertData> pcl(pclSz);
+    ms >> pcl;
 
     switch (cmd)
     {
@@ -46,10 +44,9 @@ qint64 privReadShape(ConstMemStream &ms, ZviewInfImpl::Command cmd)
     case ZviewInfImpl::Command::ADD_EDGES:
     {
         size_t edgesSz;
-        Types::EdgeIndx* edgesDataPtr;
-        ms >> edgesSz >> edgesDataPtr;
-        std::vector<Types::EdgeIndx> edges{edgesDataPtr,edgesDataPtr+edgesSz};
-        
+        ms >> edgesSz;
+        std::vector<Types::EdgeIndx> edges(edgesSz);
+        ms >> edges;
         Types::Edges obj(name);
         obj.v() = std::move(pcl);
         obj.e() = std::move(edges);
@@ -58,9 +55,9 @@ qint64 privReadShape(ConstMemStream &ms, ZviewInfImpl::Command cmd)
     case ZviewInfImpl::Command::ADD_MESH:
     {
         size_t facesSz;
-        Types::FaceIndx* faceIndexDataPtr;
-        ms >> facesSz >> faceIndexDataPtr;
-        std::vector<Types::FaceIndx> faces{faceIndexDataPtr,faceIndexDataPtr+facesSz};
+        ms >> facesSz;
+        std::vector<Types::FaceIndx> faces(facesSz);
+        ms >> faces;
         Types::Mesh obj(name);
         obj.v() = std::move(pcl);
         obj.f() = std::move(faces);
@@ -115,11 +112,10 @@ ZviewInfImpl::ReadAck SharedMemoryManager::privReadData() const
 
         qint64 key;
         size_t npoints;
-        Types::VertData* vertDataPtr;
-        ms >> key >> npoints >> vertDataPtr;
+        ms >> key >> npoints;
 
-        
-        ack.buffer[0] = drawablesBuffer.updateVertexBuffer(key, vertDataPtr, npoints);
+        const Types::VertData *v = ms.getMemPtr<const Types::VertData *>();
+        ack.buffer[0] = drawablesBuffer.updateVertexBuffer(key, v, npoints);
         return ack;
         
     }
