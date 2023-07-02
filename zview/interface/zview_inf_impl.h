@@ -10,12 +10,13 @@ public:
     ZviewInfImpl();
     ~ZviewInfImpl();
     int getLastKeyStroke() override;
-    std::array<std::uint8_t,3> getVersion() override;
+    virtual bool getVersion(std::uint8_t* ver) override;
     bool savePly(const char* fn) override;
     
     virtual bool setCameraLookAt(float ex,float ey,float ez,float cx,float cy,float cz,float ux,float uy,float uz) override;
     bool updatePoints(int key,size_t npoints,const float* xyz) override;
     bool updateColoredPoints(int key,size_t npoints,const void* xyzrgba) override;
+    int addPoints(const char *name, size_t npoints, const float *xyz) override;
     int addColoredPoints(const char* name,size_t npoints,const void* xyzrgba) override;
     int addMesh(const char* name,size_t npoints,const float* xyz,size_t nfaces,const void* indices) override;
     int addColoredMesh(const char* name,size_t npoints,const void* xyzrgba,size_t nfaces,const void* indices) override;
@@ -27,7 +28,7 @@ public:
     int getHandleNumFromString(const char* name) override;
     bool getClickedTarget(float* xyz) override;
 
-    
+    static constexpr size_t SHARED_MEMORY_SIZE_BYTES = size_t(1) << 26 ; //64Mbyte,to support RealSense XVGA depth buffer
     static constexpr char INTERFACE_TO_ZVIEW_SHARED_MEM_KEY[] = "zview_from_interface" ;
     static constexpr char ZVIEW_TO_INTERFACE_SHARED_MEM_KEY[] = "zview_to_interface" ;
     static constexpr char INTERFACE_LOCK_KEY[] = "zview_lock" ;

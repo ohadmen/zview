@@ -41,8 +41,6 @@
 ![Zview screenshot](/res/screenshot.png)
 
 ## changelog version 1.50
-	* reduce shared memory size, and remove limitation on max points
-	* deprecate add xyz, support adding xyzrgba only (for copy free communication)
 	* add getVersion to interface
 
 ## changelog version 1.47

@@ -30,8 +30,7 @@ int ZviewInfImpl::getLastKeyStroke()
     return *reinterpret_cast<int*>(buffer.begin());
 
 }
-
-std::array<std::uint8_t,3> ZviewInfImpl::getVersion()
+bool ZviewInfImpl::getVersion(std::uint8_t* ver)
 {
     m_data.lock();
     MemStream ms(m_data.data());
@@ -41,9 +40,16 @@ std::array<std::uint8_t,3> ZviewInfImpl::getVersion()
      Buffer buffer;
     if(!privGetAck(Command::GET_VERSION,buffer))
     {
-        return {0,0,0};
+        return false;
     }
-    return *reinterpret_cast<std::array<std::uint8_t,3>*>(buffer.begin());
+    
+    const std::array<std::uint8_t,3>& verData = *reinterpret_cast<const std::array<std::uint8_t,3>*>(buffer.begin());
+    for(std::size_t i{0U};i<verData.size();++i)
+    {
+        ver[i]=verData[i];
+        }
+
+    return true;
 
 }
 
@@ -122,7 +128,7 @@ void ZviewInfImpl::initSharedMem(QSharedMemory *data, QSharedMemory *ack)
     {
         //qDebug() << "Attached to data shared memory";
     }
-    else if (!data->create(sizeof(ZviewInfImpl::Command)+4*sizeof(std::size_t)))
+    else if (!data->create(ZviewInfImpl::SHARED_MEMORY_SIZE_BYTES))
     {
         qFatal("could not attach to data shared memory: %s", data->errorString().toStdString().c_str());
     }
@@ -138,62 +144,51 @@ void ZviewInfImpl::initSharedMem(QSharedMemory *data, QSharedMemory *ack)
     }
 }
 
-void privWritePointData(MemStream &ms, size_t nelems, const void *data)
+void privWritePoints(MemStream &ms, size_t nelems, const float *xyz)
 {
-    if (data == nullptr)
-    {
-        nelems=0;
-    }
+
     ms << nelems;
-    ms << *reinterpret_cast<const std::size_t*>(data);
-
+    if (xyz == nullptr)
+    {
+        ms.writeConstant(std::numeric_limits<float>::quiet_NaN(), nelems * 3);
+    }
+    else
+    {
+        for (size_t i = 0; i != nelems; ++i)
+        {
+            ms << xyz[i * 3 + 0]
+               << xyz[i * 3 + 1]
+               << xyz[i * 3 + 2]
+               << uint32_t(0xb02ab5e0);
  }
-// void privWritePoints(MemStream &ms, size_t nelems, const float *xyz)
-// {
+    }
+}
+void privWritePointsColor(MemStream &ms, size_t nelems, const void *xyzrgba)
+{
 
-//     ms << nelems;
-//     if (xyz == nullptr)
-//     {
-//         ms.writeConstant(std::numeric_limits<float>::quiet_NaN(), nelems * 3);
-//     }
-//     else
-//     {
-//         for (size_t i = 0; i != nelems; ++i)
-//         {
-//             ms << xyz[i * 3 + 0]
-//                << xyz[i * 3 + 1]
-//                << xyz[i * 3 + 2]
-//                << uint32_t(0xb02ab5e0);
-//         }
-//     }
-// }
-// void privWritePointsColor(MemStream &ms, size_t nelems, const void *xyzrgba)
-// {
-
-//     size_t sz = nelems * 4 * sizeof(float);
-//     ms << nelems;
-//     if (xyzrgba == nullptr)
-//     {
-//         ms.writeConstant(std::numeric_limits<float>::quiet_NaN(), nelems * 3);
-//     }
-//     else
-//     {
-//         ms.copyFrom(xyzrgba, sz);
-//     }
-// }
-// void privWriteEdges(MemStream &ms, size_t nelems, const void *edges)
-// {
-//     size_t sz = nelems * 2 * sizeof(int32_t);
-//     ms << nelems;
-//     ms.copyFrom(edges, sz);
-// }
-// void privWriteFaces(MemStream &ms, size_t nelems, const void *faces)
-// {
-//     size_t sz = nelems * 3 * sizeof(int32_t);
-//     ms << nelems;
-//     ms.copyFrom(faces, sz);
-// }
-
+    size_t sz = nelems * 4 * sizeof(float);
+    ms << nelems;
+    if (xyzrgba == nullptr)
+    {
+        ms.writeConstant(std::numeric_limits<float>::quiet_NaN(), nelems * 3);
+    }
+    else
+    {
+        ms.copyFrom(xyzrgba, sz);
+    }
+}
+void privWriteEdges(MemStream &ms, size_t nelems, const void *edges)
+{
+    size_t sz = nelems * 2 * sizeof(int32_t);
+    ms << nelems;
+    ms.copyFrom(edges, sz);
+}
+void privWriteFaces(MemStream &ms, size_t nelems, const void *faces)
+{
+    size_t sz = nelems * 3 * sizeof(int32_t);
+    ms << nelems;
+    ms.copyFrom(faces, sz);
+}
 void ZviewInfImpl::privResetAck()
 {
     m_ack.lock();
@@ -225,13 +220,27 @@ bool ZviewInfImpl::privGetAck(Command expectedAck,Buffer& buffer)
     return false;
 }
 
-
+int ZviewInfImpl::addPoints(const char *name, size_t npoints, const float *xyz)
+{
+    m_data.lock();
+    MemStream ms(m_data.data());
+    ms << Command::ADD_PCL << name;
+    privWritePoints(ms, npoints, xyz);
+    m_data.unlock();
+    m_lock.release();
+    Buffer buffer;
+    if(!privGetAck(Command::ADD_PCL,buffer))
+    {
+        return -1;
+    }
+    return *reinterpret_cast<int*>(buffer.begin());
+}
 int ZviewInfImpl::addColoredPoints(const char *name, size_t npoints, const void *xyzrgba)
 {
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::ADD_PCL << name;
-    privWritePointData(ms, npoints, xyzrgba);
+    privWritePointsColor(ms, npoints, xyzrgba);
     m_data.unlock();
     m_lock.release();
     Buffer buffer;
@@ -247,8 +256,8 @@ int ZviewInfImpl::addMesh(const char *name, size_t npoints, const float *xyz, si
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::ADD_MESH << name;
-    privWritePointData(ms, npoints, xyz);
-    privWritePointData(ms, nfaces, indices);
+    privWritePoints(ms, npoints, xyz);
+    privWriteFaces(ms, nfaces, indices);
     m_data.unlock();
     m_lock.release();
     Buffer buffer;
@@ -264,8 +273,8 @@ int ZviewInfImpl::addColoredMesh(const char *name, size_t npoints, const void *x
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::ADD_MESH << name;
-    privWritePointData(ms, npoints, xyzrgba);
-    privWritePointData(ms, nfaces, indices);
+    privWritePointsColor(ms, npoints, xyzrgba);
+    privWriteFaces(ms, nfaces, indices);
     m_data.unlock();
     m_lock.release();
 
@@ -282,8 +291,8 @@ int ZviewInfImpl::addEdges(const char *name, size_t npoints, const float *xyz, s
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::ADD_EDGES << name;
-    privWritePointData(ms, npoints, xyz);
-    privWritePointData(ms, nedges, indices);
+    privWritePoints(ms, npoints, xyz);
+    privWriteEdges(ms, nedges, indices);
     m_data.unlock();
     m_lock.release();
     Buffer buffer;
@@ -299,8 +308,8 @@ int ZviewInfImpl::addColoredEdges(const char *name, size_t npoints, const void *
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::ADD_EDGES << name;
-    privWritePointData(ms, npoints, xyzrgba);
-    privWritePointData(ms, nedges, indices);
+    privWritePointsColor(ms, npoints, xyzrgba);
+    privWriteEdges(ms, nedges, indices);
     m_data.unlock();
     m_lock.release();
     Buffer buffer;
@@ -333,7 +342,7 @@ bool ZviewInfImpl::updatePoints(int key, size_t npoints, const float *xyz)
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::UPDATE_PCL << qint64(key);
-    privWritePointData(ms, npoints, xyz);
+    privWritePoints(ms, npoints, xyz);
     m_data.unlock();
     m_lock.release();
     Buffer buffer;
@@ -349,7 +358,7 @@ bool ZviewInfImpl::updateColoredPoints(int key, size_t npoints, const void *xyzr
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::UPDATE_PCL << qint64(key);
-    privWritePointData(ms, npoints, xyzrgba);
+    privWritePointsColor(ms, npoints, xyzrgba);
     m_data.unlock();
     m_lock.release();
     Buffer buffer;

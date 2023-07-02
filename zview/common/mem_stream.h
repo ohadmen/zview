@@ -84,14 +84,14 @@ inline  ConstMemStream& operator>>(ConstMemStream &mem, std::string &val)
     mem.m_byteCounter += val.size() + 1;
     return mem;
 }
-// template <class T>
-// inline ConstMemStream& operator>>(ConstMemStream &mem, std::vector<T> &preallocVector)
-// {
+template <class T>
+inline ConstMemStream& operator>>(ConstMemStream &mem, std::vector<T> &preallocVector)
+{
     
-//     size_t sz = sizeof(T)*preallocVector.size();
-//     mem.copyTo(&preallocVector[0],sz);
-//     return mem;
-// }
+    size_t sz = sizeof(T)*preallocVector.size();
+    mem.copyTo(&preallocVector[0],sz);
+    return mem;
+}
 template <class T>
 inline ConstMemStream& operator>>(ConstMemStream &mem, T &val)
 {

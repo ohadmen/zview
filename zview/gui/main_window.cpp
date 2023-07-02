@@ -6,7 +6,6 @@
 #include <QtCore/QMimeData>
 #include <QtWidgets/QApplication>
 #include <QtCore/QSettings>
-#include <QString>
 #include <QtGui/QScreen>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QLayout>
