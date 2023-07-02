@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <array>
 
 
 class ZviewInf
@@ -8,6 +9,7 @@ public:
     virtual int getHandleNumFromString(const char* name)=0;
     virtual int getLastKeyStroke()=0;
     virtual bool getClickedTarget(float* xyz)=0;
+    virtual bool getVersion(std::uint8_t* ver)=0;
     virtual bool savePly(const char* fn)=0;
     virtual bool setCameraLookAt(float ex,float ey,float ez,float cx,float cy,float cz,float ux,float uy,float uz)=0;
     virtual bool updatePoints(int key,size_t npoints ,const float* xyz)=0;

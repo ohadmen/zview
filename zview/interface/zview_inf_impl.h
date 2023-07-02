@@ -10,6 +10,7 @@ public:
     ZviewInfImpl();
     ~ZviewInfImpl();
     int getLastKeyStroke() override;
+    virtual bool getVersion(std::uint8_t* ver) override;
     bool savePly(const char* fn) override;
     
     virtual bool setCameraLookAt(float ex,float ey,float ez,float cx,float cy,float cz,float ux,float uy,float uz) override;
@@ -27,7 +28,7 @@ public:
     int getHandleNumFromString(const char* name) override;
     bool getClickedTarget(float* xyz) override;
 
-    static constexpr size_t SHARED_MEMORY_SIZE_BYTES = size_t(1) << 26 ; //64Mbyte,to support RealSense XVGA depth buffer
+    
     static constexpr char INTERFACE_TO_ZVIEW_SHARED_MEM_KEY[] = "zview_from_interface" ;
     static constexpr char ZVIEW_TO_INTERFACE_SHARED_MEM_KEY[] = "zview_to_interface" ;
     static constexpr char INTERFACE_LOCK_KEY[] = "zview_lock" ;
@@ -46,7 +47,8 @@ public:
         SET_CAM_LOOKAT,
         GET_LAST_KEYSTROKE,
         GET_HNUM_FROM_HSTR,
-        GET_TARGET_XYZ
+        GET_TARGET_XYZ,
+        GET_VERSION
     };
     struct ReadAck
 {

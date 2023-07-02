@@ -150,7 +150,12 @@ ZviewInfImpl::ReadAck SharedMemoryManager::privReadData() const
         *reinterpret_cast<QVector3D*>(ack.buffer.begin())  = emit signal_getTargetXyz();
         return ack;
     }
+    case ZviewInfImpl::Command::GET_VERSION:
+    {
+        *reinterpret_cast<Version::DATA_TYPE*>(ack.buffer.begin())  = Params::VERSION.toArray();
+        return ack;
 
+    }
     default:
         qWarning() << "unknown command:" << size_t(cmd);
     }

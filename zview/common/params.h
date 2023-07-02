@@ -1,5 +1,6 @@
 #pragma once
 #include <QtGui/QVector3D>
+#include "version.h"
 
 
 #define paramsStaticParameter(paramName, paramType,paramDefaultValue,paramUnknownValue) \
@@ -15,7 +16,8 @@ static paramType paramName(paramType vin = paramUnknownValue) \
 class Params
 {
 public:
-
+    static constexpr Version VERSION{1,5,0};
+    static constexpr size_t SHARED_MEM_SIZE{(1U)<<27};
     paramsStaticParameter(drawablesTexture, int, 1,-1);
 	paramsStaticParameter(viewGrid, int, 1,-1);
     paramsStaticParameter(viewAxes, int, 1,-1);

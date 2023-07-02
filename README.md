@@ -40,6 +40,9 @@
 
 ![Zview screenshot](/res/screenshot.png)
 
+## changelog version 1.50
+	* add getVersion to interface
+
 ## changelog version 1.47
 	* get target xyz
 

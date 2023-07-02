@@ -1,5 +1,6 @@
 #include <QtWidgets/QApplication>
 #include "QtCore/QStringList"
+#include "zview/common/params.h"
 #include "zview/gui/main_window.h"
 QStringList getArgs(int argc, char **argv)
 {
@@ -16,7 +17,7 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
     app.setApplicationName("Zview");
-    app.setApplicationVersion("1.47");
+    app.setApplicationVersion(Params::VERSION.toQString());
 
     auto list = getArgs(argc,argv);
     
