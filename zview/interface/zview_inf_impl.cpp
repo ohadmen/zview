@@ -2,6 +2,7 @@
 #include <QtCore/QDebug>
 #include "zview/io/read_file_list.h"
 #include "zview/common/mem_stream.h"
+#include "zview/common/params.h"
 #include <iostream>
 
 ZviewInfImpl::ZviewInfImpl() : m_lock(ZviewInfImpl::INTERFACE_LOCK_KEY, 0, QSystemSemaphore::Create)
@@ -128,7 +129,7 @@ void ZviewInfImpl::initSharedMem(QSharedMemory *data, QSharedMemory *ack)
     {
         //qDebug() << "Attached to data shared memory";
     }
-    else if (!data->create(ZviewInfImpl::SHARED_MEMORY_SIZE_BYTES))
+    else if (!data->create(Params::MAX_SUPPORTED_POINTS*sizeof(float)*4U))
     {
         qFatal("could not attach to data shared memory: %s", data->errorString().toStdString().c_str());
     }
@@ -225,6 +226,10 @@ int ZviewInfImpl::addPoints(const char *name, size_t npoints, const float *xyz)
     m_data.lock();
     MemStream ms(m_data.data());
     ms << Command::ADD_PCL << name;
+    if(npoints>Params::MAX_SUPPORTED_POINTS)
+    {
+        return -1;
+    }
     privWritePoints(ms, npoints, xyz);
     m_data.unlock();
     m_lock.release();

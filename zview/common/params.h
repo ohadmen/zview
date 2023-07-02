@@ -17,6 +17,7 @@ class Params
 {
 public:
     static constexpr Version VERSION{1,5,0};
+    static constexpr size_t MAX_SUPPORTED_POINTS{8'388'608};
     paramsStaticParameter(drawablesTexture, int, 1,-1);
 	paramsStaticParameter(viewGrid, int, 1,-1);
     paramsStaticParameter(viewAxes, int, 1,-1);
