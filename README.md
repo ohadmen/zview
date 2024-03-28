@@ -18,6 +18,10 @@
 ![Zview screenshot](/res/screenshot.png)
 
 ## Compile from source
+refresh `compile_commands.json`: `bazel run @hedron_compile_commands//:refresh_all`
+`sudo apt-get install libglfw3-dev`
+`sudo apt-get install libglew-dev`
+
 ### Linux
 * Install qt:
     * sudo apt install qt5-default build-essential
