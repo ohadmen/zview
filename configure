@@ -1,1 +1,0 @@
-qmake CONFIG+=release zview.pro "DEFINES+=IDE_REVISION=$GIT_COMMIT" "QTC_PREFIX=zview" 
