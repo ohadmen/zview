@@ -35,6 +35,15 @@ def fetch_http_repositories():
         # When you first run this tool, it'll recommend a sha256 hash to put here with a message like: "DEBUG: Rule 'hedron_compile_commands' indicated that a canonical reproducible form can be obtained by modifying arguments sha256 = ..."
     )
 
+        # Eigen
+    http_archive(
+    name = "eigen",
+    sha256 = "8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72",
+    strip_prefix = "eigen-3.4.0",
+    url =    "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
+    build_file = "//third_party/eigen:eigen.BUILD",
+    )
+
     native.new_local_repository(
         name = "sysroot",
         build_file = "@//third_party/internals:internals.BUILD",

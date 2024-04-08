@@ -1,6 +1,5 @@
 #pragma once
-#include <QtGui/QVector3D>
-#include <QtGui/QVector4D>
+#include <Eigen/Dense>
 #include <vector>
 #include <array>
 #include <variant>
@@ -8,7 +7,9 @@
 
 namespace Types
 {
-
+using Vector3 = Eigen::Vector3f;
+using Vector4 = Eigen::Vector4f;
+using Matrix3x3 = Eigen::Matrix3f;
 class Roi3d
 {
 	std::array<float, 2> m_x;
@@ -34,7 +35,7 @@ public:
 	float midx() const { return (m_x[0] + m_x[1]) / 2; }
 	float midy() const { return (m_y[0] + m_y[1]) / 2; }
 	float midz() const { return (m_z[0] + m_z[1]) / 2; }
-	QVector3D mid() { return {midx(), midy(), midz()}; }
+	Vector3 mid() { return {midx(), midy(), midz()}; }
 
 	float minx() const { return m_x[0]; }
 	float maxx() const { return m_x[1]; }
@@ -56,10 +57,10 @@ struct VertData
 
 	VertData() : x(0), y(0), z(0), r(0), g(0), b(0), a(255) {}
 	VertData(float x_, float y_, float z_, uint8_t r_ = 0, uint8_t g_ = 0, uint8_t b_ = 0, uint8_t a_ = 255) : x(x_), y(y_), z(z_), r(r_), g(g_), b(b_), a(a_) {}
-	VertData(const QVector3D& xyz, const QVector4D& rgba):x(xyz[0]),y(xyz[1]),z(xyz[2]),r(rgba.x()),g(rgba.y()),b(rgba.z()),a(rgba.w()){}
+	VertData(const Vector3& xyz, const Vector4& rgba):x(xyz[0]),y(xyz[1]),z(xyz[2]),r(rgba.x()),g(rgba.y()),b(rgba.z()),a(rgba.w()){}
 
-	operator QVector3D() const { return QVector3D(x, y, z); }
-	operator QVector4D() const { return QVector4D(r, g, b,a); }
+	operator Vector3() const { return Vector3(x, y, z); }
+	operator Vector4() const { return Vector4(r, g, b,a); }
 	bool operator!=(const VertData &rhs) const
 	{
 		return x != rhs.x || y != rhs.y || z != rhs.z;
@@ -83,10 +84,10 @@ using EdgeIndx = std::array<int32_t, 2>;
 class Pcl
 {
 
-	static std::array<QVector3D,2> nanminmax(const std::vector<Types::VertData>& v)
+	static std::array<Vector3,2> nanminmax(const std::vector<Types::VertData>& v)
 	{
-		QVector3D mmin(std::numeric_limits<float>::max(),std::numeric_limits<float>::max(),std::numeric_limits<float>::max());
-		QVector3D mmax(std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest());
+		Vector3 mmin(std::numeric_limits<float>::max(),std::numeric_limits<float>::max(),std::numeric_limits<float>::max());
+		Vector3 mmax(std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest());
 		for(const auto& a:v)
 		{
 			float aa[] = {a.x,a.y,a.z};
