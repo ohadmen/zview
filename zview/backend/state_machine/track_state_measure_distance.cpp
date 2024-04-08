@@ -17,14 +17,14 @@ TrackStateMeasureDistance::TrackStateMeasureDistance(TrackStateMachine *machineP
 {
     privStateReset();
 }
-Types::VertData vecCol2vert(const QVector3D &v, const uint8_t *c)
+types::VertData vecCol2vert(const QVector3D &v, const uint8_t *c)
 {
     return {v.x(), v.y(), v.z(), c[0], c[1], c[2]};
 }
 
-Types::Edges makeEdgeShape(const Types::VertData &p0v, const Types::VertData &p1v)
+types::Edges makeEdgeShape(const types::VertData &p0v, const types::VertData &p1v)
 {
-    Types::Edges e(TrackStateMeasureDistance::measure_distance_object_name);
+    types::Edges e(TrackStateMeasureDistance::measure_distance_object_name);
     e.v().push_back(p0v);
     e.v().push_back(p1v);
     e.e().push_back({0, 1});

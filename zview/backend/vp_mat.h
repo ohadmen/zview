@@ -1,17 +1,13 @@
 #pragma  once
-
-#include <QtGui/QMatrix4x4>
-#include <QtGui/qvector2d.h>
-#include <QtGui/qquaternion.h>
-#include <QtCore/qdebug.h>
+#include "zview/common/common_types.h"
 
 
 
 
 class VPmat 
 {
-	QMatrix4x4 m_proj;
-	QMatrix4x4 m_view;
+	types::Matrix4x4 m_proj;
+	types::Matrix4x4 m_view;
 	int m_w;
 	int m_h;
 
@@ -21,21 +17,27 @@ class VPmat
 public:
 	VPmat();
 
-    QMatrix4x4 getVPmatrix() const;
+    types::Matrix4x4 getVPmatrix() const;
     void setWinSize(int w, int h);
 	void updatePmat();
 
     
-	QVector3D xy2screen(const QPointF& xy) const;
-	const std::pair<QVector3D,QVector3D> xy2ray(const QPointF& xy) const;
+	types::Vector3 xy2screen(const types::Vector2& xy) const;
+	const std::pair<types::Vector3,types::Vector3> xy2ray(const types::Vector2& xy) const;
 	
-	const QMatrix4x4& getViewMatrix() const ;
-	const QMatrix4x4& getProjMatrix() const ;
+	const types::Matrix4x4& getViewMatrix() const ;
+	const types::Matrix4x4& getProjMatrix() const ;
 	
-    void setViewMatrix(const QMatrix4x4& m);
+    void setViewMatrix(const types::Matrix4x4& m);
 
-    static QMatrix4x4 rotate(float a, const QVector3D& v);
-    static QMatrix4x4 scale(float       v);
-    static QMatrix4x4 translate(const QVector3D& v);
+	
+	// Returns a rotation matrix that rotates around the axis v by the angle a (in radians).
+    static types::Matrix4x4 rotate(float a, const types::Vector3& v);
+    
+	// Returns a scaling matrix that scales by the factor v.
+	static types::Matrix4x4 scale(float       v);
+
+	// Returns a translation matrix that translates by the vector v.
+    static types::Matrix4x4 translate(const types::Vector3& v);
 };
 

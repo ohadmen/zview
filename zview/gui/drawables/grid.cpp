@@ -17,13 +17,13 @@ void Grid::initializeGL()
     constexpr int n2 = n/2;
     static uint8_t col = 255;
     static uint8_t  alpha = 50;
-    std::array<Types::VertData, n * 4> vbuf;
+    std::array<types::VertData, n * 4> vbuf;
     for (int i = 0; i != n; ++i)
     {
-        vbuf[2 * i + 0] = Types::VertData(i - n2, +n2, 0, col, col, col,alpha);
-        vbuf[2 * i + 1] = Types::VertData(i - n2, -n2, 0, col, col, col,alpha);
-        vbuf[2 * i + 0 + 2 * n] = Types::VertData(n2, i - n / 2, 0, col, col, col,alpha);
-        vbuf[2 * i + 1 + 2 * n] = Types::VertData(-n2, i - n / 2, 0, col, col, col,alpha);
+        vbuf[2 * i + 0] = types::VertData(i - n2, +n2, 0, col, col, col,alpha);
+        vbuf[2 * i + 1] = types::VertData(i - n2, -n2, 0, col, col, col,alpha);
+        vbuf[2 * i + 0 + 2 * n] = types::VertData(n2, i - n / 2, 0, col, col, col,alpha);
+        vbuf[2 * i + 1 + 2 * n] = types::VertData(-n2, i - n / 2, 0, col, col, col,alpha);
     }
     if (m_verts.isCreated())
         m_verts.destroy();
@@ -77,11 +77,11 @@ void Grid::paintGL(const QMatrix4x4 &mvp)
 
     int vp = m_shader.attributeLocation("a_xyz");
     m_shader.enableAttributeArray(vp);
-    m_shader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(Types::VertData));
+    m_shader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(types::VertData));
 
     int vc = m_shader.attributeLocation("a_rgb");
     m_shader.enableAttributeArray(vc);
-    m_shader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(Types::VertData));
+    m_shader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(types::VertData));
 
     glDrawArrays(GL_LINES, 0, 4*n);
 

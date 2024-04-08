@@ -1,7 +1,6 @@
 #pragma once
-#include <QtGui/QVector3D>
 #include "version.h"
-
+#include "common_types.h"
 
 #define paramsStaticParameter(paramName, paramType,paramDefaultValue,paramUnknownValue) \
 static paramType paramName(paramType vin = paramUnknownValue) \
@@ -28,7 +27,7 @@ public:
     paramsStaticParameter(camFOV, float, 60.0f,-1);
     paramsStaticParameter(whiteBackground, int, 0,-1);
 	paramsStaticParameter(pointSize, float, 3,-1);
-    paramsStaticParameter(lightDir, QVector3D,QVector3D(0.4f, 0.48f, 0.51f),QVector3D(-1, -1, -1) );
+    paramsStaticParameter(lightDir, types::Vector3,types::Vector3(0.4f, 0.48f, 0.51f),types::Vector3(-1, -1, -1) );
     
     
 private:

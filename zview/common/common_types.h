@@ -5,11 +5,15 @@
 #include <variant>
 #include <cmath>
 
-namespace Types
+namespace types
 {
+using Vector2 = Eigen::Vector2f;
 using Vector3 = Eigen::Vector3f;
 using Vector4 = Eigen::Vector4f;
 using Matrix3x3 = Eigen::Matrix3f;
+using Matrix4x4 = Eigen::Matrix4f;
+
+
 class Roi3d
 {
 	std::array<float, 2> m_x;
@@ -84,7 +88,7 @@ using EdgeIndx = std::array<int32_t, 2>;
 class Pcl
 {
 
-	static std::array<Vector3,2> nanminmax(const std::vector<Types::VertData>& v)
+	static std::array<Vector3,2> nanminmax(const std::vector<types::VertData>& v)
 	{
 		Vector3 mmin(std::numeric_limits<float>::max(),std::numeric_limits<float>::max(),std::numeric_limits<float>::max());
 		Vector3 mmax(std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest());
@@ -103,7 +107,7 @@ class Pcl
 	}
 protected:
 	std::string m_name;
-	std::vector<Types::VertData> m_v;
+	std::vector<types::VertData> m_v;
 
 public:
 	Pcl(const std::string& name):m_name(name){}
@@ -117,17 +121,17 @@ public:
 		if (m_v.size() == 0)
 		{
             static const float e = 0.001f;
-			return Types::Roi3d(-e, e, -e, e, -e, e);
+			return types::Roi3d(-e, e, -e, e, -e, e);
 		}
 		else if (m_v.size() == 1)
 		{
             static const float e =  0.001f;
-			return Types::Roi3d(m_v[0].x - e, m_v[0].x + e, m_v[0].y - e, m_v[0].y + e, m_v[0].z - e, m_v[0].z + e);
+			return types::Roi3d(m_v[0].x - e, m_v[0].x + e, m_v[0].y - e, m_v[0].y + e, m_v[0].z - e, m_v[0].z + e);
 		}
 		else
 		{	
 			auto [mmin,mmax] = nanminmax(m_v);
-			return Types::Roi3d(mmin[0],mmax[0],mmin[1],mmax[1],mmin[2],mmax[2]);
+			return types::Roi3d(mmin[0],mmax[0],mmin[1],mmax[1],mmin[2],mmax[2]);
 		}
 	}
 };

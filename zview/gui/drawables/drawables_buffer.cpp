@@ -27,20 +27,20 @@ size_t DrawablesBuffer::size() const { return m_drawobjs.size(); }
 
 struct Shape2drawable
 {
-    std::unique_ptr<DrawableBase> operator()(Types::Pcl&& obj)
+    std::unique_ptr<DrawableBase> operator()(types::Pcl&& obj)
     {
         std::unique_ptr<DrawablePcl> dobjP(new DrawablePcl(getUniqueName(obj.getName())));
         dobjP.get()->v() = std::move(obj.v());
         return dobjP;
     }
-    std::unique_ptr<DrawableBase> operator()(Types::Edges&& obj)
+    std::unique_ptr<DrawableBase> operator()(types::Edges&& obj)
     {
         std::unique_ptr<DrawableEdges> dobjP(new DrawableEdges(getUniqueName(obj.getName())));
         dobjP.get()->v() = std::move(obj.v());
         dobjP.get()->e() = std::move(obj.e());
         return dobjP;
     }
-    std::unique_ptr<DrawableBase> operator()(Types::Mesh && obj)
+    std::unique_ptr<DrawableBase> operator()(types::Mesh && obj)
     {
         std::unique_ptr<DrawableMesh> dobjP(new DrawableMesh(getUniqueName(obj.getName())));
         dobjP.get()->v() = std::move(obj.v());
@@ -48,14 +48,14 @@ struct Shape2drawable
         return dobjP;
     }
 };
-Types::Roi3d DrawablesBuffer::get3dbbox(int key)
+types::Roi3d DrawablesBuffer::get3dbbox(int key)
 {
-    Types::Roi3d objsbbox;
+    types::Roi3d objsbbox;
     if (key == -1)
     {
         for (const auto &o : *this)
         {
-            Types::Roi3d bbox = o.second.get()->get3dbbox();
+            types::Roi3d bbox = o.second.get()->get3dbbox();
             objsbbox |= bbox;
         }
     }
@@ -80,7 +80,7 @@ bool DrawablesBuffer::exists(const std::string &name) const
     }
     return false;
 }
-qint64 DrawablesBuffer::addShape(Types::Shape&& objv)
+qint64 DrawablesBuffer::addShape(types::Shape&& objv)
 {
     m_drawobjs[m_uniqueKeyCounter] = std::visit(Shape2drawable(), std::move(objv));
     emit signal_shapeAdded(QString::fromStdString(m_drawobjs[m_uniqueKeyCounter]->getName()), m_uniqueKeyCounter);
@@ -88,9 +88,9 @@ qint64 DrawablesBuffer::addShape(Types::Shape&& objv)
     return m_uniqueKeyCounter++;
     
 }
-qint64 DrawablesBuffer::addShape(const Types::Shape &objv)
+qint64 DrawablesBuffer::addShape(const types::Shape &objv)
 {
-    Types::Shape objvCopy = objv;
+    types::Shape objvCopy = objv;
     return addShape(std::move(objvCopy));
 }
 
@@ -116,7 +116,7 @@ bool DrawablesBuffer::removeShape(qint64 key)
     return true;
 }
 
-bool DrawablesBuffer::updateVertexBuffer(size_t key, const Types::VertData *pcl, size_t n)
+bool DrawablesBuffer::updateVertexBuffer(size_t key, const types::VertData *pcl, size_t n)
 {
     auto it = m_drawobjs.find(key);
     if (it == m_drawobjs.end())

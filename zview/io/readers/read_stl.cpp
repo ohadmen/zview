@@ -21,9 +21,9 @@ bool privIsBinaryStl(std::ifstream* ifs)
     return std::string(buff)!="solid"; //if !=0 -> string are different --> binary --> return true
 }
 
-void privReadStlBin(std::ifstream* ifsP, Types::Mesh* meshP)
+void privReadStlBin(std::ifstream* ifsP, types::Mesh* meshP)
 {
-	Types::Mesh& m = *meshP;
+	types::Mesh& m = *meshP;
 	std::ifstream& ifs = *ifsP;
 	// get file size
 	ifs.seekg(0, std::ios::end);
@@ -88,18 +88,18 @@ void privReadStlBin(std::ifstream* ifsP, Types::Mesh* meshP)
 
 }
 
-[[ noreturn ]]  void privReadStlAscii(std::ifstream* ifsP, Types::Mesh* meshP)
+[[ noreturn ]]  void privReadStlAscii(std::ifstream* ifsP, types::Mesh* meshP)
 {
 	(void)ifsP; //silence missuse
 	(void)meshP; //silence missuse
 	throw std::runtime_error("ASCII STL are unsopported");
 }
 
-Types::Mesh io::readstl(const std::string& filename)
+types::Mesh io::readstl(const std::string& filename)
 {
 	auto pos =filename.find_last_of("/");
 	std::string name = pos==std::string::npos? filename:filename.substr(pos,std::string::npos);
-	Types::Mesh obj(name);
+	types::Mesh obj(name);
 	std::ifstream ifs(filename, std::ios::binary);
 
 	if (!ifs)

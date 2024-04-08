@@ -19,11 +19,11 @@ public:
 	DrawablesBuffer(DrawablesBuffer const &) = delete;
 	void operator=(DrawablesBuffer const &) = delete;
 
-	qint64 addShape(Types::Shape&& objv);
-	qint64 addShape(const Types::Shape &obj);
+	qint64 addShape(types::Shape&& objv);
+	qint64 addShape(const types::Shape &obj);
 	bool removeShape(qint64 key);
 
-	bool updateVertexBuffer(size_t key, const Types::VertData *pcl, size_t n);
+	bool updateVertexBuffer(size_t key, const types::VertData *pcl, size_t n);
 
 	BaseTypeVector::iterator begin();
 	BaseTypeVector::const_iterator begin() const;
@@ -32,7 +32,7 @@ public:
 	BaseTypeVector::const_iterator end() const;
 	BaseTypeVector::const_iterator cend() const;
 
-	Types::Roi3d get3dbbox(int handleNum=-1);
+	types::Roi3d get3dbbox(int handleNum=-1);
 	bool exists(const std::string& name) const;
 public slots:
 	bool setShapeVisability(qint64 key, bool isvis);

@@ -1,7 +1,7 @@
 #include "zview_inf_impl.h"
 #include <QtCore/QDebug>
 #include "zview/io/read_file_list.h"
-#include "zview/common/mem_stream.h"
+#include "zview/common/memstream.h"
 #include "zview/common/params.h"
 #include <iostream>
 
@@ -87,15 +87,15 @@ class ShapeAddVisitor
 
 public:
     ShapeAddVisitor(ZviewInfImpl *zv) : m_zv(zv) {}
-    int operator()(const Types::Pcl &obj)
+    int operator()(const types::Pcl &obj)
     {
         return m_zv->addColoredPoints(obj.getName().c_str(), obj.v().size(), &obj.v()[0]);
     }
-    int operator()(const Types::Edges &obj)
+    int operator()(const types::Edges &obj)
     {
         return m_zv->addColoredEdges(obj.getName().c_str(), obj.v().size(), &obj.v()[0], obj.e().size(), &obj.e()[0]);
     }
-    int operator()(const Types::Mesh &obj)
+    int operator()(const types::Mesh &obj)
     {
         return m_zv->addColoredMesh(obj.getName().c_str(), obj.v().size(), &obj.v()[0], obj.f().size(), &obj.f()[0]);
     }
@@ -105,7 +105,7 @@ bool ZviewInfImpl::loadFile(const char *filename)
 {
     QStringList list;
     list.push_back(filename);
-    std::vector<Types::Shape> objs = io::readFileList(list);
+    std::vector<types::Shape> objs = io::readFileList(list);
     if (objs.empty())
         return false;
     ShapeAddVisitor w(this);

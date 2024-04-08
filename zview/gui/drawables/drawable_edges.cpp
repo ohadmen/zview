@@ -3,7 +3,7 @@
 #include <cmath>
 
 DrawableEdges::DrawableEdges(const std::string &name) : Edges(name), m_eBuff(QOpenGLBuffer::IndexBuffer) {}
-Types::Shape DrawableEdges::getShape() const {	return *this;};
+types::Shape DrawableEdges::getShape() const {	return *this;};
 DrawableEdges::~DrawableEdges()
 {
     if (m_vBuff.isCreated())
@@ -22,13 +22,13 @@ void DrawableEdges::initializeGL()
 
     m_vBuff.bind();
 
-    m_vBuff.allocate(m_v.data(), int(m_v.size() * sizeof(Types::VertData)));
-    m_vBuff.write(0, m_v.data(), int(m_v.size() * sizeof(Types::VertData)));
+    m_vBuff.allocate(m_v.data(), int(m_v.size() * sizeof(types::VertData)));
+    m_vBuff.write(0, m_v.data(), int(m_v.size() * sizeof(types::VertData)));
     m_vBuff.release();
 
     m_eBuff.bind();
-    m_eBuff.allocate(m_e.data(), int(m_e.size() * sizeof(Types::EdgeIndx)));
-    m_eBuff.write(0, m_e.data(), int(m_e.size() * sizeof(Types::EdgeIndx)));
+    m_eBuff.allocate(m_e.data(), int(m_e.size() * sizeof(types::EdgeIndx)));
+    m_eBuff.write(0, m_e.data(), int(m_e.size() * sizeof(types::EdgeIndx)));
     m_eBuff.release();
 
     privInitShader("edges");
@@ -50,11 +50,11 @@ void DrawableEdges::paintGL(const QMatrix4x4 &mvp)
 
     int vp = m_meshShader.attributeLocation("a_xyz");
     m_meshShader.enableAttributeArray(vp);
-    m_meshShader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(Types::VertData));
+    m_meshShader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(types::VertData));
 
     int vc = m_meshShader.attributeLocation("a_rgb");
     m_meshShader.enableAttributeArray(vc);
-    m_meshShader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(Types::VertData));
+    m_meshShader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(types::VertData));
 
     m_meshShader.setUniformValue("u_txt", txt);
 
@@ -69,35 +69,35 @@ void DrawableEdges::paintGL(const QMatrix4x4 &mvp)
     m_meshShader.disableAttributeArray(vc);
 }
 
-Types::Roi3d DrawableEdges::get3dbbox() const
+types::Roi3d DrawableEdges::get3dbbox() const
 {
     if (m_v.size() == 0)
     {
         static const float e = 1e-3f;
-        return Types::Roi3d(-e, e, -e, e, -e, e);
+        return types::Roi3d(-e, e, -e, e, -e, e);
     }
     else if (m_v.size() == 1)
     {
         static const float e = 1e-3f;
-        return Types::Roi3d(m_v[0].x - e, m_v[0].x + e, m_v[0].y - e, m_v[0].y + e, m_v[0].z - e, m_v[0].z + e);
+        return types::Roi3d(m_v[0].x - e, m_v[0].x + e, m_v[0].y - e, m_v[0].y + e, m_v[0].z - e, m_v[0].z + e);
     }
     else
     {
-        auto xmm = std::minmax_element(m_v.begin(), m_v.end(), [](const Types::VertData &a, const Types::VertData &b) { return a.x < b.x; });
-        auto ymm = std::minmax_element(m_v.begin(), m_v.end(), [](const Types::VertData &a, const Types::VertData &b) { return a.y < b.y; });
-        auto zmm = std::minmax_element(m_v.begin(), m_v.end(), [](const Types::VertData &a, const Types::VertData &b) { return a.z < b.z; });
-        return Types::Roi3d(xmm.first->x, xmm.second->x, ymm.first->y, ymm.second->y, zmm.first->z, zmm.second->z);
+        auto xmm = std::minmax_element(m_v.begin(), m_v.end(), [](const types::VertData &a, const types::VertData &b) { return a.x < b.x; });
+        auto ymm = std::minmax_element(m_v.begin(), m_v.end(), [](const types::VertData &a, const types::VertData &b) { return a.y < b.y; });
+        auto zmm = std::minmax_element(m_v.begin(), m_v.end(), [](const types::VertData &a, const types::VertData &b) { return a.z < b.z; });
+        return types::Roi3d(xmm.first->x, xmm.second->x, ymm.first->y, ymm.second->y, zmm.first->z, zmm.second->z);
     }
 }
 
-Types::VertData DrawableEdges::picking(const QVector3D &p1, const QVector3D &n1) const
+types::VertData DrawableEdges::picking(const QVector3D &p1, const QVector3D &n1) const
 {
     static const float pi = std::acos(0.0)*2;
     static const float angularthresholt = std::tan(2.0 * pi / 180.0);
     static const float inf = std::numeric_limits<float>::infinity();
 
     float closestDistance = inf;
-    Types::VertData closestPoint(inf, inf, inf,0,0,0);
+    types::VertData closestPoint(inf, inf, inf,0,0,0);
     for (const auto &i : m_e)
     {
         const QVector3D &p2 = m_v[i[0]];
@@ -129,7 +129,7 @@ Types::VertData DrawableEdges::picking(const QVector3D &p1, const QVector3D &n1)
 
 
 
-bool DrawableEdges::updateVertexBuffer(const Types::VertData* data,size_t n)
+bool DrawableEdges::updateVertexBuffer(const types::VertData* data,size_t n)
 {
 	std::copy(data,data+n,m_v.begin());
 	return DrawableBase::updateVertexBuffer(data,n);

@@ -12,9 +12,9 @@ public:
 	DrawableBase();
 	virtual void initializeGL() = 0;
 	virtual void paintGL(const QMatrix4x4& mvp) = 0;
-	virtual Types::VertData picking(const QVector3D& p, const QVector3D& n) const = 0;
-	virtual Types::Roi3d get3dbbox()const=0;
-	virtual Types::Shape getShape() const =0;
+	virtual types::VertData picking(const QVector3D& p, const QVector3D& n) const = 0;
+	virtual types::Roi3d get3dbbox()const=0;
+	virtual types::Shape getShape() const =0;
 	virtual ~DrawableBase();
 
 	bool isActive() const;
@@ -22,7 +22,7 @@ public:
 	virtual const std::string& getName() const=0;
 
 
-	virtual bool updateVertexBuffer(const Types::VertData* data,size_t n);
+	virtual bool updateVertexBuffer(const types::VertData* data,size_t n);
 
 protected:
 	

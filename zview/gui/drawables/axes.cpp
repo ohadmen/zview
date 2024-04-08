@@ -13,14 +13,14 @@ void Axes::initializeGL()
     initializeOpenGLFunctions();
     DrawableCommon::initShadar(&m_shader, "edges");
 
-    std::array<Types::VertData, 6> vbuf;
+    std::array<types::VertData, 6> vbuf;
     vbuf = {
-        Types::VertData(0, 0, 0, 255, 000, 000),
-        Types::VertData(1, 0, 0, 255, 000, 000),
-        Types::VertData(0, 0, 0, 000, 255, 000),
-        Types::VertData(0, 1, 0, 000, 255, 000),
-        Types::VertData(0, 0, 0, 000, 000, 255),
-        Types::VertData(0, 0, 1, 000, 000, 255)};
+        types::VertData(0, 0, 0, 255, 000, 000),
+        types::VertData(1, 0, 0, 255, 000, 000),
+        types::VertData(0, 0, 0, 000, 255, 000),
+        types::VertData(0, 1, 0, 000, 255, 000),
+        types::VertData(0, 0, 0, 000, 000, 255),
+        types::VertData(0, 0, 1, 000, 000, 255)};
     if (m_verts.isCreated())
         m_verts.destroy();
 
@@ -46,11 +46,11 @@ void Axes::paintGL(const QMatrix4x4 &mvp)
 
     int vp = m_shader.attributeLocation("a_xyz");
     m_shader.enableAttributeArray(vp);
-    m_shader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(Types::VertData));
+    m_shader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(types::VertData));
 
     int vc = m_shader.attributeLocation("a_rgb");
     m_shader.enableAttributeArray(vc);
-    m_shader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(Types::VertData));
+    m_shader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(types::VertData));
 
     glDrawArrays(GL_LINES, 0, 6);
 

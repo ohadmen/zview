@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-Types::VertData TrackStateMachine::pickClosestObject(const QPointF &xy) const
+types::VertData TrackStateMachine::pickClosestObject(const QPointF &xy) const
 {
     static const float inf = std::numeric_limits<float>::infinity();
     QMatrix4x4 mat = getViewMatrix();
@@ -15,7 +15,7 @@ Types::VertData TrackStateMachine::pickClosestObject(const QPointF &xy) const
     auto ray = m_vpmat.xy2ray(xy);
     QVector2D pcam(mat * (ray.first + ray.second));
     float minLen = inf;
-    Types::VertData pt(inf, inf, inf,0,0,0);
+    types::VertData pt(inf, inf, inf,0,0,0);
 
     for (const auto &o : drawablesBuffer)
     {
@@ -23,7 +23,7 @@ Types::VertData TrackStateMachine::pickClosestObject(const QPointF &xy) const
             continue;
         if(o.second->getName()==TrackStateMeasureDistance::measure_distance_object_name)
             continue;
-        Types::VertData x = o.second.get()->picking(ray.first, ray.second);
+        types::VertData x = o.second.get()->picking(ray.first, ray.second);
         QVector2D xcam(mat * QVector3D(x));
         float xcamLen = (xcam - pcam).length();
         if (minLen > xcamLen)
@@ -80,7 +80,7 @@ QVector3D TrackStateMachine::xy2screen(const QPointF &xy)
 
     return m_vpmat.xy2screen(xy);
 }
-void TrackStateMachine::setLastRetargetPoint(const Types::VertData& v)
+void TrackStateMachine::setLastRetargetPoint(const types::VertData& v)
 {
     m_last_retarget_point = v;
 }

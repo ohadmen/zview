@@ -1,6 +1,6 @@
 #include "shared_memory_manager.h"
 #include "zview/gui/drawables/drawables_buffer.h"
-#include "zview/common/mem_stream.h"
+#include "zview/common/memstream.h"
 #include "cmd_query_thread.h"
 #include <QThread>
 #include <QDebug>
@@ -28,14 +28,14 @@ qint64 privReadShape(ConstMemStream &ms, ZviewInfImpl::Command cmd)
     std::string name;
     size_t pclSz;
     ms >> name >> pclSz;
-    std::vector<Types::VertData> pcl(pclSz);
+    std::vector<types::VertData> pcl(pclSz);
     ms >> pcl;
 
     switch (cmd)
     {
     case ZviewInfImpl::Command::ADD_PCL:
     {
-        Types::Pcl obj(name);
+        types::Pcl obj(name);
         obj.v() = std::move(pcl);
 
         return drawablesBuffer.addShape(std::move(obj));
@@ -45,9 +45,9 @@ qint64 privReadShape(ConstMemStream &ms, ZviewInfImpl::Command cmd)
     {
         size_t edgesSz;
         ms >> edgesSz;
-        std::vector<Types::EdgeIndx> edges(edgesSz);
+        std::vector<types::EdgeIndx> edges(edgesSz);
         ms >> edges;
-        Types::Edges obj(name);
+        types::Edges obj(name);
         obj.v() = std::move(pcl);
         obj.e() = std::move(edges);
         return drawablesBuffer.addShape(std::move(obj));
@@ -56,9 +56,9 @@ qint64 privReadShape(ConstMemStream &ms, ZviewInfImpl::Command cmd)
     {
         size_t facesSz;
         ms >> facesSz;
-        std::vector<Types::FaceIndx> faces(facesSz);
+        std::vector<types::FaceIndx> faces(facesSz);
         ms >> faces;
-        Types::Mesh obj(name);
+        types::Mesh obj(name);
         obj.v() = std::move(pcl);
         obj.f() = std::move(faces);
         return drawablesBuffer.addShape(std::move(obj));
@@ -114,7 +114,7 @@ ZviewInfImpl::ReadAck SharedMemoryManager::privReadData() const
         size_t npoints;
         ms >> key >> npoints;
 
-        const Types::VertData *v = ms.getMemPtr<const Types::VertData *>();
+        const types::VertData *v = ms.getMemPtr<const types::VertData *>();
         ack.buffer[0] = drawablesBuffer.updateVertexBuffer(key, v, npoints);
         return ack;
         

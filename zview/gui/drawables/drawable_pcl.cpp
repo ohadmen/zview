@@ -18,8 +18,8 @@ void DrawablePcl::initializeGL()
 
 	m_vBuff.bind();
 
-	m_vBuff.allocate(m_v.data(), int(m_v.size() * sizeof(Types::VertData)));
-	m_vBuff.write(0, m_v.data(), int(m_v.size() * sizeof(Types::VertData)));
+	m_vBuff.allocate(m_v.data(), int(m_v.size() * sizeof(types::VertData)));
+	m_vBuff.write(0, m_v.data(), int(m_v.size() * sizeof(types::VertData)));
 	m_vBuff.release();
 
 	privInitShader("point");
@@ -27,7 +27,7 @@ void DrawablePcl::initializeGL()
     
 
 }
-Types::Shape DrawablePcl::getShape() const {	return *this;};
+types::Shape DrawablePcl::getShape() const {	return *this;};
 
 void DrawablePcl::paintGL(const QMatrix4x4& mvp)
 {
@@ -53,11 +53,11 @@ void DrawablePcl::paintGL(const QMatrix4x4& mvp)
 
 	int vp = m_meshShader.attributeLocation("a_xyz");
 	m_meshShader.enableAttributeArray(vp);
-	m_meshShader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(Types::VertData));
+	m_meshShader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(types::VertData));
 
 	int vc = m_meshShader.attributeLocation("a_rgb");
 	m_meshShader.enableAttributeArray(vc);
-	m_meshShader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(Types::VertData));
+	m_meshShader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(types::VertData));
 
 
 	
@@ -80,7 +80,7 @@ void DrawablePcl::paintGL(const QMatrix4x4& mvp)
 }
 
 
-Types::Roi3d DrawablePcl::get3dbbox() const {return Types::Pcl::get3dbbox();}
+types::Roi3d DrawablePcl::get3dbbox() const {return types::Pcl::get3dbbox();}
 
 
 bool isnan(const QVector3D& v)
@@ -88,13 +88,13 @@ bool isnan(const QVector3D& v)
     return std::isnan(v[0]) | std::isnan(v[1]) | std::isnan(v[2]);
 }
 
-Types::VertData DrawablePcl::picking(const QVector3D& p, const QVector3D& n) const
+types::VertData DrawablePcl::picking(const QVector3D& p, const QVector3D& n) const
 {
     static const float pi = std::acos(0)*2;
     static const float angularthresholt = std::tan(2.0*pi/180.0);
     constexpr float inf = std::numeric_limits<float>::infinity();
 	float closestDistance = inf;
-	Types::VertData closestPoint(inf,inf,inf,0,0,0);
+	types::VertData closestPoint(inf,inf,inf,0,0,0);
 	for(const auto& pt:m_v)
 	{
 		QVector3D pt_(pt);
@@ -114,7 +114,7 @@ Types::VertData DrawablePcl::picking(const QVector3D& p, const QVector3D& n) con
 	return closestPoint;
 
 }
-bool DrawablePcl::updateVertexBuffer(const Types::VertData* data,size_t n)
+bool DrawablePcl::updateVertexBuffer(const types::VertData* data,size_t n)
 {
     if(n>m_v.size())
     {
