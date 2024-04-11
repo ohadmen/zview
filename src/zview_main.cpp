@@ -1,11 +1,15 @@
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "opengl_shader.h"
-#include "file_manager.h"
+#include "opengl_backend/imgui_impl_glfw.h"
+#include "opengl_backend/imgui_impl_opengl3.h"
+#include "opengl_backend/opengl_shader.h"
+
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <string.h>
+#include <sstream>
+#include <iostream>
+#include <fstream>
 
 #include <GL/glew.h> // Initialize with glewInit()
 
@@ -13,6 +17,22 @@
 #include <GLFW/glfw3.h>
 
 #define PI 3.14159265358979323846
+
+static std::string read_file(const std::string& filename) {
+    std::ifstream file;
+    file.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+	std::stringstream file_stream;
+	try {
+		file.open(filename.c_str());
+    	file_stream << file.rdbuf();
+		file.close();
+    }
+    catch (std::ifstream::failure e) {
+        std::cout << "Error reading Shader File!" << std::endl;
+    }
+	return file_stream.str();
+}
+
 
 static void glfw_error_callback(int error, const char *description)
 {
@@ -86,7 +106,7 @@ int main(int, char **)
 
 	// init shader
 	Shader triangle_shader;
-	triangle_shader.init(FileManager::read("test/assets/simple-shader.vs"), FileManager::read("test/assets/simple-shader.fs"));
+	triangle_shader.init(read_file("shaders/simple-shader.vs"), read_file("shaders/simple-shader.fs"));
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -117,6 +137,7 @@ int main(int, char **)
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+
 		
 
 		// render your GUI
