@@ -33,6 +33,7 @@ def fetch_http_repositories():
         url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/0e990032f3c5a866e72615cf67e5ce22186dcb97.tar.gz",
         strip_prefix = "bazel-compile-commands-extractor-0e990032f3c5a866e72615cf67e5ce22186dcb97",
         # When you first run this tool, it'll recommend a sha256 hash to put here with a message like: "DEBUG: Rule 'hedron_compile_commands' indicated that a canonical reproducible form can be obtained by modifying arguments sha256 = ..."
+        sha256="2b3ee8bba2df4542a508b0289727b031427162b4cd381850f89b406445c17578"
     )
 
         # Eigen

@@ -8,6 +8,8 @@ cc_binary(
     data = ["//shaders"],
 
     deps = [
-        "//src/opengl_backend"
+        "//src/opengl_backend",
+        "//src/io",
+        "//src/drawables"
     ],
 )
