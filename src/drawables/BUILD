@@ -20,12 +20,14 @@ cc_library(
 cc_library(
     name = "shape_interface",
     srcs = [
-        "shape_init.cpp"
+        "shape_init_visitor.cpp",
+        "shape_draw_visitor.cpp"
     ],
-    hdrs = ["shape_init.h"],
+    hdrs = ["shape_init_visitor.h","shape_draw_visitor.h"],
 
     deps = [
-        "//src/types"
+        "//src/types",
+        "//src/opengl_backend",
     ],
             visibility = ["//visibility:__pkg__"],
 

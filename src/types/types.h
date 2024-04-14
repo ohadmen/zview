@@ -108,8 +108,18 @@ class Pcl
 protected:
 	std::string m_name;
 	std::vector<types::VertData> m_v;
+	std::uint32_t m_vbo;
+	std::uint32_t m_vao;
+	std::uint32_t m_ebo;
 
 public:
+	std::uint32_t& vbo(){return m_vbo;}
+	std::uint32_t& vao(){return m_vao;}
+	std::uint32_t& ebo(){return m_ebo;}
+	std::uint32_t vbo()const {return m_vbo;}
+	std::uint32_t vao()const {return m_vao;}
+	std::uint32_t ebo()const {return m_ebo;}
+
 	Pcl(const std::string& name):m_name(name){}
 	const std::string& getName() const{return m_name;}
 	

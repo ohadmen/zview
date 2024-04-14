@@ -1,35 +1,35 @@
 #include "imgui.h"
-#include "opengl_backend/imgui_impl_glfw.h"
-#include "opengl_backend/imgui_impl_opengl3.h"
-#include "opengl_backend/opengl_shader.h"
-#include <stdio.h>
+#include "src/opengl_backend/imgui_impl_glfw.h"
+#include "src/opengl_backend/imgui_impl_opengl3.h"
+#include "src/opengl_backend/opengl_shader.h"
+#include "src/drawables/shape_buffer.h"
 #include "src/io/read_file.h"
 #include "src/io/read_ply.h"
-#include "src/drawables/shape_buffer.h"
 #include <GL/glew.h> // Initialize with glewInit()
+#include <stdio.h>
 // Include glfw3.h after our OpenGL definitions
 #include <GLFW/glfw3.h>
 
-
-
 #define PI 3.14159265358979323846
 
-static std::vector<std::string > get_args(int argc, char **argv) {
-  std::vector < std::string > list;
+static std::vector<std::string> get_args(int argc, char **argv) {
+  std::vector<std::string> list;
   for (int i = 1; i != argc; ++i)
     list.push_back(argv[i]);
 
   return list;
 }
 
-
-
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
 void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo) {
-
+ static const types::VertData tri_data[] = {
+      {0.0f,   0.25f,  0.0f,      255,   0,   0},
+      {0.25f,  -0.25f, 0.0f,      0,   255,   0},
+      {-0.25f, -0.25f, 0.0f,      0,   0,   255},
+      };
   // create the triangle
   float triangle_vertices[] = {
       0.0f,   0.25f,  0.0f, // position vertex 1
@@ -62,19 +62,8 @@ void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo) {
 int main(int argc, char *argv[]) {
   const auto args = get_args(argc, argv);
   ShapeBuffer buffer;
-  for(const auto& f:args)
-  {
-    
-	  const auto shape_vector = io::read_ply(f);
-    for(const auto& s:shape_vector)
-    {
-      buffer.push(s);
-    }
-    
-    
-  }
-
   
+
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit())
@@ -100,6 +89,13 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  for (const auto &f : args) {
+
+    const auto shape_vector = io::read_ply(f);
+    for (const auto &s : shape_vector) {
+      buffer.push(s);
+    }
+  }
   // int screen_width, screen_height;
   // glfwGetFramebufferSize(window, &screen_width, &screen_height);
   // glViewport(0, 0, screen_width, screen_height);
@@ -116,7 +112,7 @@ int main(int argc, char *argv[]) {
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-//   ImGuiIO &io = ImGui::GetIO();
+  //   ImGuiIO &io = ImGui::GetIO();
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
@@ -138,10 +134,8 @@ int main(int argc, char *argv[]) {
 
     // rendering our geometries
     triangle_shader.use();
-    for(const auto& s:buffer)
-    {
-      
-    }
+
+    buffer.draw();
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
