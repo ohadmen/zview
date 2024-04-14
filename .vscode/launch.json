@@ -11,7 +11,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main/src/zview",
             "args": ["${workspaceFolder}/models/horse.ply"],
-            "stopAtEntry": true,
+            "stopAtEntry": false,
+            
             "cwd": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main",
             "environment": [],
             "externalConsole": false,
@@ -20,9 +21,15 @@
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
-                    "ignoreFailures": false
+                    "ignoreFailures": false,
+                    
+
+
                 }
-            ]
+            ],
+            "sourceFileMap": { "/proc/self/cwd": "${workspaceFolder}" },
+            
+            
         },
     ]
 }
