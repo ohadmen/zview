@@ -26,9 +26,9 @@ static void glfw_error_callback(int error, const char *description) {
 
 void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo) {
  static const types::VertData tri_data[] = {
-      {0.0f,   0.25f,  0.0f,      255,   0,   0},
-      {0.25f,  -0.25f, 0.0f,      0,   255,   0},
-      {-0.25f, -0.25f, 0.0f,      0,   0,   255},
+      {0.0f,   0.25f,  0.0f,      255,   0,   0, 255},
+      {0.25f,  -0.25f, 0.0f,      0,   255,   0, 255},
+      {-0.25f, -0.25f, 0.0f,      0,   0,   255, 255},
       };
   // create the triangle
   float triangle_vertices[] = {
@@ -45,14 +45,14 @@ void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo) {
   glGenBuffers(1, &ebo);
   glBindVertexArray(vao);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices,
+  glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data,
                GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle_indices),
                triangle_indices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+  glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);

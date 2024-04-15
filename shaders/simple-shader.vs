@@ -1,7 +1,7 @@
 #version 330 core
 
 layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 color;
+layout (location = 1) in uvec4 color;
 
 out vec3 vertexColor;
 
@@ -14,5 +14,6 @@ void main()
 	rotated_pos.x = translation.x + position.x*cos(rotation) - position.y*sin(rotation);
 	rotated_pos.y = translation.y + position.x*sin(rotation) + position.y*cos(rotation);
     gl_Position = vec4(rotated_pos.x, rotated_pos.y, position.z, 1.0);
-	vertexColor = color;
+	vertexColor = vec3(float(color[0])/255.0f,float(color[1])/255.0f,float(color[2])/255.0f);
+	
 }
