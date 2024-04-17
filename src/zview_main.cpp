@@ -2,7 +2,9 @@
 #include "src/opengl_backend/imgui_impl_glfw.h"
 #include "src/opengl_backend/imgui_impl_opengl3.h"
 #include "src/opengl_backend/opengl_shader.h"
+#include "src/ui/input_device_handler.h"
 #include "src/drawables/shape_buffer.h"
+#include "src/drawables/vp_mat.h"
 #include "src/io/read_file.h"
 #include "src/io/read_ply.h"
 #include <GL/glew.h> // Initialize with glewInit()
@@ -25,27 +27,19 @@ static void glfw_error_callback(int error, const char *description) {
 }
 
 void create_triangle(unsigned int &vbo, unsigned int &vao, unsigned int &ebo) {
- static const types::VertData tri_data[] = {
-      {0.0f,   0.25f,  0.0f,      255,   0,   0, 255},
-      {0.25f,  -0.25f, 0.0f,      0,   255,   0, 255},
-      {-0.25f, -0.25f, 0.0f,      0,   0,   255, 255},
+ static constexpr std::array<types::VertData,3> tri_data {
+      types::VertData{0.0f,   0.25f,  0.0f,      255,   0,   0, 255},
+      types::VertData{0.25f,  -0.25f, 0.0f,      0,   255,   0, 255},
+      types::VertData{-0.25f, -0.25f, 0.0f,      0,   0,   255, 255}
       };
-  // create the triangle
-  float triangle_vertices[] = {
-      0.0f,   0.25f,  0.0f, // position vertex 1
-      1.0f,   0.0f,   0.0f, // color vertex 1
-      0.25f,  -0.25f, 0.0f, // position vertex 1
-      0.0f,   1.0f,   0.0f, // color vertex 1
-      -0.25f, -0.25f, 0.0f, // position vertex 1
-      0.0f,   0.0f,   1.0f, // color vertex 1
-  };
+
   unsigned int triangle_indices[] = {0, 1, 2};
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
   glGenBuffers(1, &ebo);
   glBindVertexArray(vao);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data,
+  glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data.data(),
                GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangle_indices),
@@ -83,7 +77,7 @@ int main(int argc, char *argv[]) {
     return 1;
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1); // Enable vsync
-
+  
   if (glewInit() != GLEW_OK) {
     fprintf(stderr, "Failed to initialize OpenGL loader!\n");
     return 1;
@@ -112,13 +106,14 @@ int main(int argc, char *argv[]) {
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  //   ImGuiIO &io = ImGui::GetIO();
+  ImGuiIO &io = ImGui::GetIO();
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
-
+  zview::VPmat vpmat;
+  InputDeviceHandler ui_input(window);
   while (!glfwWindowShouldClose(window)) {
     int display_w, display_h;
     glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -143,13 +138,25 @@ int main(int argc, char *argv[]) {
     // render your GUI
     ImGui::Begin("Triangle Position/Color");
     static float rotation = 0.0;
+    static float rotation_phi = 0.0;
+    static float rotation_theta = 0.0;
+    static float scale= 1.0;
+    
+    ImGui::SliderFloat("scale", &scale, 0.9, 1.1);
     ImGui::SliderFloat("rotation", &rotation, 0, 2 * PI);
-    static float translation[] = {0.0, 0.0};
-    ImGui::SliderFloat2("position", translation, -1.0, 1.0);
+    ImGui::SliderFloat("rotation_phi", &rotation_phi, 0, 1);
+    ImGui::SliderFloat("rotation_theta", &rotation_theta, 0, 1);
+    types::Vector3 n{rotation_phi,rotation_theta,1.0};
+    n.normalize();
+    vpmat.scale(scale);
+    vpmat.rotate(rotation, n);
+    static types::Vector3 translation = {0.0, 0.0,0.0};
+    ImGui::SliderFloat2("position", translation.data(), -1.0, 1.0);
+    vpmat.translate(translation);
     static float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
     // pass the parameters to the shader
-    triangle_shader.setUniform("rotation", rotation);
-    triangle_shader.setUniform("translation", translation[0], translation[1]);
+    const types::Matrix4x4 transformation=vpmat.getVPmatrix();
+    triangle_shader.setUniform("transformation",transformation.data());
     // color picker
     ImGui::ColorEdit3("color", color);
     // multiply triangle's color with this color

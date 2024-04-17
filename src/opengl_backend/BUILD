@@ -16,7 +16,8 @@ cc_library(
     deps = [
         "@imgui",
         "@sysroot//:libglew",
-        "@sysroot//:libglfw"
+        "@sysroot//:libglfw",
+        "//src/types"
 
     ],
     visibility = ["//visibility:public"],

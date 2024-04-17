@@ -59,8 +59,8 @@ struct VertData
 	std::uint8_t b;
 	std::uint8_t a;
 
-	VertData() : x(0), y(0), z(0), r(0), g(0), b(0), a(255) {}
-	VertData(float x_, float y_, float z_, uint8_t r_ = 0, uint8_t g_ = 0, uint8_t b_ = 0, uint8_t a_ = 255) : x(x_), y(y_), z(z_), r(r_), g(g_), b(b_), a(a_) {}
+	constexpr VertData() : x(0), y(0), z(0), r(0), g(0), b(0), a(255) {}
+	constexpr VertData(float x_, float y_, float z_, uint8_t r_ = 0, uint8_t g_ = 0, uint8_t b_ = 0, uint8_t a_ = 255) : x(x_), y(y_), z(z_), r(r_), g(g_), b(b_), a(a_) {}
 	VertData(const Vector3& xyz, const Vector4& rgba):x(xyz[0]),y(xyz[1]),z(xyz[2]),r(rgba.x()),g(rgba.y()),b(rgba.z()),a(rgba.w()){}
 
 	operator Vector3() const { return Vector3(x, y, z); }
@@ -82,8 +82,8 @@ struct VertData
 			return false;
 	}
 };
-using FaceIndx = std::array<int32_t, 3>;
-using EdgeIndx = std::array<int32_t, 2>;
+using FaceIndx = std::array<uint32_t, 3>;
+using EdgeIndx = std::array<uint32_t, 2>;
 
 class Pcl
 {

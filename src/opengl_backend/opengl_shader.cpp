@@ -5,6 +5,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "src/types/types.h"
 
 Shader::Shader() {
 }
@@ -54,12 +55,12 @@ void Shader::setUniform<bool>(const std::string& name, bool val) {
 }
 
 template<>
-void Shader::setUniform<float>(const std::string& name, float val) {
+void Shader::setUniform<const float>(const std::string& name, const float val) {
 	glUniform1f(glGetUniformLocation(id_, name.c_str()), val);
 }
 
 template<>
-void Shader::setUniform<float>(const std::string& name, float val1, float val2) {
+void Shader::setUniform<const float>(const std::string& name, const float val1, const float val2) {
 	glUniform2f(glGetUniformLocation(id_, name.c_str()), val1, val2);
 }
 
@@ -69,7 +70,7 @@ void Shader::setUniform<float>(const std::string& name, float val1, float val2, 
 }
 
 template<>
-void Shader::setUniform<float*>(const std::string& name, float* val) {
+void Shader::setUniform<const float*>(const std::string& name, const float* val) {
 	glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, val);
 }
 

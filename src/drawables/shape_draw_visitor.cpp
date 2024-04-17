@@ -13,7 +13,7 @@
         
 
            glBindVertexArray(obj.vao());
-    // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
+     glDrawElements(GL_TRIANGLES, obj.f().size()*3, GL_UNSIGNED_INT, NULL);
      glBindVertexArray(0);
 
         }

@@ -5,28 +5,25 @@
 #include <GL/glew.h> // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 
-
-
-    void ShapeInitVisitor::operator()(types::Pcl &obj){return;}
-    void ShapeInitVisitor::operator()(types::Edges &obj){return;}
-    void ShapeInitVisitor::operator()(types::Mesh &obj) {
-      const auto indices = obj.f();
-      const auto verts = obj.v();
-      glGenVertexArrays(1, &obj.vao());
-      glGenBuffers(1, &obj.vbo());
-      glGenBuffers(1, &obj.ebo());
-      glBindVertexArray(obj.vao());
-      glBindBuffer(GL_ARRAY_BUFFER, obj.vbo());
-      glBufferData(GL_ARRAY_BUFFER, verts.size(), verts.data(), GL_STATIC_DRAW);
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.ebo());
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(),
-                   GL_STATIC_DRAW);
-      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                            (void *)0);
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(1, 4, GL_UNSIGNED_INT8_NV, GL_FALSE,
-                            3 * sizeof(std::uint8_t), (void *)(3 * sizeof(float)));
-      glEnableVertexAttribArray(1);
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
-      glBindVertexArray(0);
-    }
+void ShapeInitVisitor::operator()(types::Pcl &obj) { return; }
+void ShapeInitVisitor::operator()(types::Edges &obj) { return; }
+void ShapeInitVisitor::operator()(types::Mesh &obj) {
+  const auto indices = obj.f();
+  const auto verts = obj.v();
+  glGenVertexArrays(1, &obj.vao());
+  glGenBuffers(1, &obj.vbo());
+  glGenBuffers(1, &obj.ebo());
+  glBindVertexArray(obj.vao());
+  glBindBuffer(GL_ARRAY_BUFFER, obj.vbo());
+  glBufferData(GL_ARRAY_BUFFER, verts.size()*sizeof(types::VertData), verts.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.ebo());
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(types::FaceIndx), indices.data(),
+               GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+}

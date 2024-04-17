@@ -9,9 +9,9 @@ public:
 	Shader();
 	void init(const std::string& vertex_code, const std::string& fragment_code);
 	void use();
-	template<typename T> void setUniform(const std::string& name, T val);
-	template<typename T> void setUniform(const std::string& name, T val1, T val2);
-	template<typename T> void setUniform(const std::string& name, T val1, T val2, T val3);
+	template<typename T> void setUniform(const std::string& name, const T val);
+	template<typename T> void setUniform(const std::string& name, const T val1, const T val2);
+	template<typename T> void setUniform(const std::string& name, const T val1, const T val2, const T val3);
 
 private:
 	void checkCompileErr();
