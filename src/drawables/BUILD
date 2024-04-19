@@ -32,20 +32,3 @@ cc_library(
             visibility = ["//visibility:__pkg__"],
 
 )
-
-
-cc_library(
-    name = "vp_mat",
-    srcs = [
-        "vp_mat.cpp"
-    ],
-    hdrs = [
-        "vp_mat.h",
-    ],
-    deps = ["//src/types","//src/params"],
-    visibility = ["//visibility:public"],
-    
-
-)
-
-

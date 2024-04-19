@@ -44,7 +44,7 @@ TrackStateRotate::TrackStateRotate(TrackStateMachine *machine) : TrackStateAbs(m
 void TrackStateRotate::setInitLocation(const QPointF &xy)
 {
 	m_hitview = m_machineP->getViewMatrix();
-	m_hitonscreen = sprivGetHitSphere(xy).normalized();
+	const auto hitlocation = sprivGetHitSphere(xy).normalized();
 }
 void TrackStateRotate::input(QMouseEvent *e)
 {

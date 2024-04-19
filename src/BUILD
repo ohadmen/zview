@@ -11,7 +11,6 @@ cc_binary(
         "//src/opengl_backend",
         "//src/io",
         "//src/drawables",
-        "//src/drawables:vp_mat",
         "//src/ui:input_device_handler"
     ],
 )

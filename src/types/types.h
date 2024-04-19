@@ -12,6 +12,7 @@ using Vector3 = Eigen::Vector3f;
 using Vector4 = Eigen::Vector4f;
 using Matrix3x3 = Eigen::Matrix3f;
 using Matrix4x4 = Eigen::Matrix4f;
+using Transform = Eigen::Transform<float, 3, Eigen::Affine>;
 
 
 class Roi3d
