@@ -1,29 +1,33 @@
 #pragma once
+#include "src/geometry/mvp_mat.h"
 #include "src/types/types.h"
 #include <GL/glew.h> // Initialize with glewInit()
 #include <GLFW/glfw3.h>
-#include "vp_mat.h"
-#include "imgui.h"
+
 namespace zview {
 
 
 class InputDeviceHandler
 {
-
-    types::Vector3 getHitOnScreen(const ImVec2& xy,const float tb_radius);
+    void fillHitScreenLut();
+    types::Vector3 getHitOnScreen(types::Vector3 u);
 public:
-    InputDeviceHandler();
-    void step();
+    InputDeviceHandler(MVPmat& mvp);
+    void step(const std::optional<types::Vector3>& hover_point);
     InputDeviceHandler(InputDeviceHandler &&) = default;
     InputDeviceHandler(const InputDeviceHandler &) = default;
     InputDeviceHandler &operator=(InputDeviceHandler &&) = default;
     InputDeviceHandler &operator=(const InputDeviceHandler &) = default;
     ~InputDeviceHandler();
-    types::Matrix4x4 getVPmatrix() const;
-    void setWinSize(int w, int h);
+
+    void setCameraToViewAll(types::Bbox3d bbox);
 private:
-    VPmat m_vp_mat;
-    types::Transform m_clickViewMatrix;
+    
+    Eigen::AngleAxisf m_clickedViewRotation;
+    Eigen::Translation3f m_clickedModelTranslation;
+    types::Vector3 m_click_ray;
+    std::array<std::array<float,2>,1024> m_hit_screen_lut;
+    MVPmat& m_mvp;
 };
 
 }

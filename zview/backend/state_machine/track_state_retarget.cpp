@@ -6,7 +6,7 @@
 #include <sstream>
 #include <iomanip>
 
-std::string stringFromVertData(const types::VertData& x)
+std::string stringFromVertData(const Types::VertData& x)
 {
     std::stringstream ss;
     ss <<"[" << std::setw(7) << std::setprecision(3) << x.x << ", " << x.y << ", " << x.z << " | " << int(x.r) <<"," << int(x.g) << "," << int(x.b) << "," << int(x.a) << "]";
@@ -17,7 +17,7 @@ std::string stringFromVertData(const types::VertData& x)
 TrackStateRetarget::TrackStateRetarget(TrackStateMachine* machine) :TrackStateAbs(machine) {}
 void TrackStateRetarget::input(const QPointF& xy)
 {
-    types::VertData x = m_machineP->pickClosestObject(xy);
+    Types::VertData x = m_machineP->pickClosestObject(xy);
 	if (std::isinf(x[0]))
 		return;
 	//drawableBasicShapes.insert({ p,p + n * 100 }, "view ray", { 0,1,0 });

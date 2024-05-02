@@ -14,10 +14,13 @@ cc_library(
     ],
     
     deps = [
+        "@eigen",
         "@imgui",
         "@sysroot//:libglew",
         "@sysroot//:libglfw",
-        "//src/types"
+                "//src/io:read_file",
+                
+
 
     ],
     visibility = ["//visibility:public"],

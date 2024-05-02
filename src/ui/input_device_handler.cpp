@@ -1,80 +1,130 @@
 #include "input_device_handler.h"
 
-
+#include "imgui.h"
+#include "src/params/params.h"
 #include <Eigen/Dense>
 #include <iostream>
-#include "src/params/params.h"
-namespace zview {
-types::Vector3 InputDeviceHandler::getHitOnScreen(const ImVec2 &xy,
-                                                  const float tb_radius) {
-  /*
-  hit area is represented by two function:
-  za(x) = sqrt(r*r-x*x)
-  zb(x) = a/(x+b) -1
-  the switch between the function happens on x0=alpha*r
-  a and b are calculated s.t. zb(x) passes through (x0,z0) and that the
-  derivative in this point is equal
-  */
 
-  static const float switch_p = 0.75;
-  float tbradius2 = tb_radius * tb_radius;
-  assert(tbradius2 < 1.0);
-  float x0 = tb_radius * switch_p;
-  float y0 = std::sqrt(tbradius2 - x0 * x0);
-  float parama = y0 * y0 * y0 / x0;
-  float paramb = y0 * y0 / x0 - x0;
-
-  auto hitonscreen = m_vp_mat.xy2screen(xy[0],xy[1]);
-
-  float xyr2 =
-      hitonscreen.x() * hitonscreen.x() + hitonscreen.y() * hitonscreen.y();
-  float xyr = std::sqrt(xyr2);
-  if (xyr >= x0)
-    // use za(x)
-    hitonscreen[2] = parama / (xyr + paramb) - 1;
-  else
-    // use za(x)
-    hitonscreen[2] = sqrt(tbradius2 - xyr2) - 1;
-  // substract (0,0,-1) to get the vector
-  hitonscreen[2] += 1;
-  return hitonscreen;
+std::complex<float> gaussianFunc(const float x) {
+  static constexpr float tb_sigma = 0.5F;
+  static constexpr float tb_height = +0.50F;
+  const float y = tb_height * std::exp(-0.5 * x * x / (tb_sigma * tb_sigma));
+  return {x, y};
 }
-InputDeviceHandler::InputDeviceHandler() {}
-void InputDeviceHandler::step() {
-  auto &io = ImGui::GetIO();
-  if (io.MouseClicked[0]) {
-    m_clickViewMatrix = m_vp_mat.getViewMatrix();
+namespace zview {
+void InputDeviceHandler::fillHitScreenLut() {
+
+  for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
+    const auto z = gaussianFunc(float(i) / m_hit_screen_lut.size() * 3.0);
+    m_hit_screen_lut[i] = {z.real(), z.imag()};
   }
-  if (io.MouseDown[0]) {
+}
+types::Vector3 InputDeviceHandler::getHitOnScreen(types::Vector3 u) {
+
+  u.normalize();
+  const auto u_xy = std::sqrt(u.x() * u.x() + u.y() * u.y());
+
+  auto it = std::find_if(m_hit_screen_lut.begin(), m_hit_screen_lut.end(),
+                         [&u_xy](const auto &c) { return c[0] > u_xy; });
+  if (it == m_hit_screen_lut.end()) {
+    return types::Vector3(0, 0, 0);
+  }
+  u.z() = (*it)[1];
+  u.normalize();
+  return u;
+
+  // }
+}
+InputDeviceHandler::InputDeviceHandler(MVPmat &mvp) : m_mvp{mvp} {
+  fillHitScreenLut();
+}
+void InputDeviceHandler::step(
+    const std::optional<types::Vector3> &hover_point) {
+  auto &io = ImGui::GetIO();
+
+  if (io.WantCaptureMouse)
+    return;
+
+  if (io.MouseClicked[0] || io.MouseClicked[1]) {
+    m_clickedViewRotation = m_mvp.getViewRotation();
+    m_clickedModelTranslation = m_mvp.getModelTranslation();
+    m_click_ray =
+        m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::SCREEN)[1];
+  }
+  if (io.MouseDoubleClicked[0]) {
+    if (hover_point) {
+
+      m_mvp.setModelTranslation(Eigen::Translation3f(-hover_point.value()));
+      m_clickedModelTranslation = m_mvp.getModelTranslation();
+    }
+    // std::cout << "double click" <<m_vp_mat.getViewMatrix().translation()<<
+    // std::endl;
+
+  } else if (io.MouseDown[0]) {
     {
       // rotating
-      const auto &tbradius = Params::i().trackball_radius;
-      auto hitClick =
-          getHitOnScreen(io.MouseClickedPos[0], tbradius).normalized();
-      auto hitnew = getHitOnScreen(io.MousePos, tbradius);
-      float angleScale = hitnew.norm() / tbradius;
-      hitnew.normalize();
-      const auto axis = hitnew.cross(hitClick).normalized();
+      const auto clickHit_normalized = getHitOnScreen(m_click_ray);
+      const auto ray =
+          m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::SCREEN)[1];
+      auto hitnew = getHitOnScreen(ray);
 
-      float phi = -std::acos(hitnew.dot(hitClick)) * angleScale;
-      
-      auto m = Eigen::AngleAxis(phi, axis);
-    //   m(0, 3) = m(0, 2);
-    //   m(1, 3) = m(1, 2);
-    //   m(2, 3) = m(2, 2) - 1;
-      m_vp_mat.setViewMatrix(m * m_clickViewMatrix);
+      const auto axis = hitnew.cross(clickHit_normalized).normalized();
+      const float cos_phi = std::min(hitnew.dot(clickHit_normalized), 1.0F);
+      const float phi = -std::acos(cos_phi);
 
-      auto res= m_vp_mat.getVPmatrix()*types::Vector4{0,0,-0.25,1};
-      std::cout << "phi: " << phi << " res"<<  std::endl << res<<  std::endl;
+      const auto m = Eigen::AngleAxis(phi, axis);
+      // rotate around the object center, so we need to shift,rotate,shift back
+
+      const auto t = m * m_clickedViewRotation;
+
+      m_mvp.setViewRotation(t);
+      // std::cout << "rotating" <<m_vp_mat.getViewMatrix().translation()<<
+      // std::endl;
     }
+  } else if (io.MouseDown[1]) {
+    // //translating
+    const float d = m_mvp.getViewDistance();
+    auto hitnew =
+        m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::SCREEN)[1];
+
+    const auto delta = m_clickedViewRotation.inverse() *
+                       (-hitnew / hitnew.z() + m_click_ray / m_click_ray.z()) *
+                       d;
+    m_mvp.setModelTranslation(Eigen::Translation3f(delta) *
+                              m_clickedModelTranslation);
+
+  } else if (io.MouseWheel != 0) {
+
+    static constexpr auto step_scale_up = 1.1f;
+    static constexpr auto step_scale_down = 1.0f/1.1f;
+    static constexpr auto eps = std::numeric_limits<float>::epsilon() * 1e3f;
+
+    const float d = std::max(eps, m_mvp.getViewDistance() *
+                                      (io.MouseWheel>0 ? step_scale_up : step_scale_down));
+
+    m_mvp.setViewDistance(d);
   }
 }
-types::Matrix4x4 InputDeviceHandler::getVPmatrix()  const
-{
-    return m_vp_mat.getVPmatrix();
 
+void InputDeviceHandler::setCameraToViewAll(types::Bbox3d bbox) {
+
+  const auto obj_center = (bbox.max() + bbox.min()) / 2.0F;
+  m_mvp.setModelTranslation(Eigen::Translation3f(-obj_center));
+  auto vm = m_mvp.getViewRotation();
+  const auto t = (vm * Eigen::Translation3f(-obj_center));
+  bbox.applyTransform(t);
+
+  const auto tan_h_fov_x = std::tan(Params::i().camera_fov_rad / 2);
+  const auto tan_h_fov_y = tan_h_fov_x / m_mvp.getAspect();
+  const auto req_distance_x =
+      std::max(std::abs(bbox.max().x()), std::abs(bbox.min().x())) /
+      tan_h_fov_x;
+  const auto req_distance_y =
+      std::max(std::abs(bbox.max().y()), std::abs(bbox.min().y())) /
+      tan_h_fov_y;
+  const auto req_distance = std::max(req_distance_x, req_distance_y);
+  m_mvp.setViewDistance(req_distance);
 }
-void InputDeviceHandler::setWinSize(int w, int h) { m_vp_mat.setWinSize(w, h); }
 
 InputDeviceHandler::~InputDeviceHandler() {}
 } // namespace zview

@@ -44,20 +44,21 @@ TrackStateRotate::TrackStateRotate(TrackStateMachine *machine) : TrackStateAbs(m
 void TrackStateRotate::setInitLocation(const QPointF &xy)
 {
 	m_hitview = m_machineP->getViewMatrix();
-	const auto hitlocation = sprivGetHitSphere(xy).normalized();
+	m_hitonscreen = sprivGetHitSphere(xy).normalized();
 }
 void TrackStateRotate::input(QMouseEvent *e)
 {
 	if (e->button() == Qt::MouseButton::NoButton && e->type() == QInputEvent::MouseMove && e->modifiers() == Qt::KeyboardModifier::NoModifier)
 	{
 
+		static const float rad2deg = 90.0F / std::acos(0.0F);
 		float tbradius = Params::trackBallRadius();
 		QVector3D hitnew = sprivGetHitSphere(e->localPos());
 		// when the scond hit is outside the sphere, scale by the length of the vector
 		float angleScale = hitnew.length() / tbradius;
 		hitnew.normalize();
 		QVector3D axis = QVector3D::crossProduct(hitnew, m_hitonscreen);
-		float phi = -std::acos(QVector3D::dotProduct(hitnew, m_hitonscreen))  * angleScale;
+		float phi = -std::acos(QVector3D::dotProduct(hitnew, m_hitonscreen)) * rad2deg * angleScale;
 		QMatrix4x4 m;
 		m.rotate(phi, axis);
 		m(0, 3) = m(0, 2);

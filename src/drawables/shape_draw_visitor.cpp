@@ -1,19 +1,50 @@
 #include "shape_draw_visitor.h"
-#include "src/opengl_backend/imgui_impl_glfw.h"
-#include "src/opengl_backend/imgui_impl_opengl3.h"
+
 #include "src/opengl_backend/opengl_shader.h"
+#include "src/params/params.h"
+
 #include <GL/glew.h> // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 #include <iostream>
+namespace zview {
+void ShapeDrawVisitor::operator()(const types::Pcl &obj,const float* tform) {
+  if (tform) {
+    obj.shader().use();
+    obj.shader().setUniform("u_transformation", tform);
+    obj.shader().setUniform("u_ptsize", zview::Params::i().point_size);
+    obj.shader().setUniform("u_light_dir", 0.4f, 0.48f, 0.51f);
+    obj.shader().setUniform("u_zfar", zview::Params::i().camera_z_far);
+    obj.shader().setUniform("u_znear", zview::Params::i().camera_z_near);
+    obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
+  }
+  glBindVertexArray(obj.vao());
+  glDrawArrays(GL_POINTS, 0, obj.v().size() );
+  glBindVertexArray(0);
+}
 
+void ShapeDrawVisitor::operator()(const types::Edges &obj,const float* tform) { 
 
-    void ShapeDrawVisitor::operator()(const types::Pcl &obj){return;}
-    void ShapeDrawVisitor::operator()(const types::Edges &obj){return;}
-    void ShapeDrawVisitor::operator()(const types::Mesh &obj) {
-        
+   if (tform) {
+    obj.shader().use();
+    obj.shader().setUniform("u_transformation", tform);
+  
+  }
+  glBindVertexArray(obj.vao());
+  glDrawElements(GL_LINES, obj.e().size() * 2, GL_UNSIGNED_INT, NULL);
+  glBindVertexArray(0);
+ }
 
-           glBindVertexArray(obj.vao());
-     glDrawElements(GL_TRIANGLES, obj.f().size()*3, GL_UNSIGNED_INT, NULL);
-     glBindVertexArray(0);
+void ShapeDrawVisitor::operator()(const types::Mesh &obj,const float* tform) {
 
-        }
+  // rendering our geometries
+  if (tform) {
+    obj.shader().use();
+    obj.shader().setUniform("u_transformation", tform);
+    obj.shader().setUniform("u_light_dir", 0.4f, 0.48f, 0.51f);
+    obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
+  }
+  glBindVertexArray(obj.vao());
+  glDrawElements(GL_TRIANGLES, obj.f().size() * 3, GL_UNSIGNED_INT, NULL);
+  glBindVertexArray(0);
+}
+} // namespace zview

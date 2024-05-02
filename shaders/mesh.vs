@@ -1,30 +1,23 @@
-#ifdef GL_ES
-// Set default precision to medium
-precision mediump int;
-precision mediump float;
-#endif
+#version 330 core
 
-uniform mat4 mvp_matrix;
+layout (location = 0) in vec3 a_xyz;
+layout (location = 1) in vec4 a_rgb;
 
-attribute vec4 a_xyz;
-attribute vec4 a_rgb;
+out vec4 vertexColor;
+uniform mat4 u_transformation;
 
-varying vec4 v_xyz;
-varying vec4 v_rgb;
-varying vec3 v_eyeDir;
-varying float v_z;
+varying vec3 v_xyz;
+varying vec3 v_eye_dir;
 
 
-//! [0]
 void main()
 {
-    // Calculate vertex position in screen space
-    gl_Position = mvp_matrix * a_xyz;
-	v_xyz = a_xyz;
-    v_rgb = a_rgb;
-	v_eyeDir  = -1.0 * normalize(vec3(mvp_matrix[0]));
-    v_z = gl_Position.z;
+    gl_Position = u_transformation*vec4(a_xyz, 1.0);
+	vertexColor = a_rgb/255.0f;
+    v_xyz = a_xyz;
+    v_eye_dir  =  -normalize(vec3(u_transformation[0]));
 
 
+	
+	
 }
-//! [0]

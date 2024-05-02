@@ -8,9 +8,11 @@ cc_binary(
     data = ["//shaders"],
 
     deps = [
+        "//src/ui:main_app",
         "//src/opengl_backend",
         "//src/io",
         "//src/drawables",
-        "//src/ui:input_device_handler"
+        "//src/ui:input_device_handler",
+        "//src/params"
     ],
 )

@@ -1,18 +1,13 @@
 #pragma once
-#include <Eigen/Dense>
+#include <QtGui/QVector3D>
+#include <QtGui/QVector4D>
 #include <vector>
 #include <array>
 #include <variant>
 #include <cmath>
 
-namespace types
+namespace Types
 {
-using Vector2 = Eigen::Vector2f;
-using Vector3 = Eigen::Vector3f;
-using Vector4 = Eigen::Vector4f;
-using Matrix3x3 = Eigen::Matrix3f;
-using Matrix4x4 = Eigen::Matrix4f;
-
 
 class Roi3d
 {
@@ -39,7 +34,7 @@ public:
 	float midx() const { return (m_x[0] + m_x[1]) / 2; }
 	float midy() const { return (m_y[0] + m_y[1]) / 2; }
 	float midz() const { return (m_z[0] + m_z[1]) / 2; }
-	Vector3 mid() { return {midx(), midy(), midz()}; }
+	QVector3D mid() { return {midx(), midy(), midz()}; }
 
 	float minx() const { return m_x[0]; }
 	float maxx() const { return m_x[1]; }
@@ -54,17 +49,17 @@ struct VertData
 	float x;
 	float y;
 	float z;
-	std::uint8_t r;
-	std::uint8_t g;
-	std::uint8_t b;
-	std::uint8_t a;
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t a;
 
 	VertData() : x(0), y(0), z(0), r(0), g(0), b(0), a(255) {}
 	VertData(float x_, float y_, float z_, uint8_t r_ = 0, uint8_t g_ = 0, uint8_t b_ = 0, uint8_t a_ = 255) : x(x_), y(y_), z(z_), r(r_), g(g_), b(b_), a(a_) {}
-	VertData(const Vector3& xyz, const Vector4& rgba):x(xyz[0]),y(xyz[1]),z(xyz[2]),r(rgba.x()),g(rgba.y()),b(rgba.z()),a(rgba.w()){}
+	VertData(const QVector3D& xyz, const QVector4D& rgba):x(xyz[0]),y(xyz[1]),z(xyz[2]),r(rgba.x()),g(rgba.y()),b(rgba.z()),a(rgba.w()){}
 
-	operator Vector3() const { return Vector3(x, y, z); }
-	operator Vector4() const { return Vector4(r, g, b,a); }
+	operator QVector3D() const { return QVector3D(x, y, z); }
+	operator QVector4D() const { return QVector4D(r, g, b,a); }
 	bool operator!=(const VertData &rhs) const
 	{
 		return x != rhs.x || y != rhs.y || z != rhs.z;
@@ -88,10 +83,10 @@ using EdgeIndx = std::array<int32_t, 2>;
 class Pcl
 {
 
-	static std::array<Vector3,2> nanminmax(const std::vector<types::VertData>& v)
+	static std::array<QVector3D,2> nanminmax(const std::vector<Types::VertData>& v)
 	{
-		Vector3 mmin(std::numeric_limits<float>::max(),std::numeric_limits<float>::max(),std::numeric_limits<float>::max());
-		Vector3 mmax(std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest());
+		QVector3D mmin(std::numeric_limits<float>::max(),std::numeric_limits<float>::max(),std::numeric_limits<float>::max());
+		QVector3D mmax(std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest(),std::numeric_limits<float>::lowest());
 		for(const auto& a:v)
 		{
 			float aa[] = {a.x,a.y,a.z};
@@ -107,7 +102,7 @@ class Pcl
 	}
 protected:
 	std::string m_name;
-	std::vector<types::VertData> m_v;
+	std::vector<Types::VertData> m_v;
 
 public:
 	Pcl(const std::string& name):m_name(name){}
@@ -121,17 +116,17 @@ public:
 		if (m_v.size() == 0)
 		{
             static const float e = 0.001f;
-			return types::Roi3d(-e, e, -e, e, -e, e);
+			return Types::Roi3d(-e, e, -e, e, -e, e);
 		}
 		else if (m_v.size() == 1)
 		{
             static const float e =  0.001f;
-			return types::Roi3d(m_v[0].x - e, m_v[0].x + e, m_v[0].y - e, m_v[0].y + e, m_v[0].z - e, m_v[0].z + e);
+			return Types::Roi3d(m_v[0].x - e, m_v[0].x + e, m_v[0].y - e, m_v[0].y + e, m_v[0].z - e, m_v[0].z + e);
 		}
 		else
 		{	
 			auto [mmin,mmax] = nanminmax(m_v);
-			return types::Roi3d(mmin[0],mmax[0],mmin[1],mmax[1],mmin[2],mmax[2]);
+			return Types::Roi3d(mmin[0],mmax[0],mmin[1],mmax[1],mmin[2],mmax[2]);
 		}
 	}
 };

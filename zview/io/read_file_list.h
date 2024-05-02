@@ -7,5 +7,5 @@
 
 namespace io
 {
-std::vector <types::Shape> readFileList(const QStringList &files);
+std::vector <Types::Shape> readFileList(const QStringList &files);
 }

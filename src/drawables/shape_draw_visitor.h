@@ -1,8 +1,10 @@
 #pragma once
 #include "src/types/types.h"
-struct ShapeDrawVisitor
-{
-    void operator()(const types::Pcl &obj);
-    void operator()(const types::Edges &obj);
-    void operator()(const types::Mesh &obj);
+namespace zview {
+
+struct ShapeDrawVisitor {
+  void operator()(const types::Pcl &obj, const float *tform);
+  void operator()(const types::Edges &obj, const float *tform);
+  void operator()(const types::Mesh &obj, const float *tform);
 };
+} // namespace zview

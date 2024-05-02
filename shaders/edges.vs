@@ -1,27 +1,17 @@
-#ifdef GL_ES
-// Set default precision to medium
-precision mediump int;
-precision mediump float;
-#endif
+#version 330 core
 
-uniform mat4 mvp_matrix;
-uniform vec4 u_col;
+layout (location = 0) in vec3 a_xyz;
+layout (location = 1) in vec4 a_rgb;
 
-attribute vec4 a_xyz;
-attribute vec4 a_rgb;
-
-varying vec4 v_xyz;
-varying vec4 v_col;
+out vec4 vertexColor;
+uniform mat4 u_transformation;
 
 
-//! [0]
 void main()
 {
-    gl_Position = mvp_matrix * a_xyz;
+    gl_Position = u_transformation*vec4(a_xyz, 1.0);
 
-    v_xyz = a_xyz;
-    v_col=a_rgb;
+	vertexColor = a_rgb/255.0f;
     
 	
 }
-//! [0]

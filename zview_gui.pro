@@ -32,7 +32,7 @@ SOURCES += \
     zview/backend/tree_model/tree_item.cpp \
     zview/backend/tree_model/tree_model.cpp \
     zview/backend/tree_model/tree_view_signaled.cpp \
-    zview/backend/vp_mat.cpp \
+    zview/backend/mvp_mat.cpp \
     zview/gui/canvas.cpp \
     zview/gui/drawables/axes.cpp \
     zview/gui/drawables/backdrop.cpp \
@@ -50,7 +50,7 @@ SOURCES += \
     zview/io/readers/read_stl.cpp \
     zview/io/write_shape_to_file.cpp \
     zview/gui/zview_main.cpp
-    zview/backend/vp_mat.cpp
+    zview/backend/mvp_mat.cpp
 
 HEADERS += \
     zview/interface/zview_inf_impl.h\
@@ -67,7 +67,7 @@ HEADERS += \
     zview/backend/tree_model/tree_item.h \
     zview/backend/tree_model/tree_model.h \
     zview/backend/tree_model/tree_view_signaled.h \
-    zview/backend/vp_mat.h \
+    zview/backend/mvp_mat.h \
     zview/common/common_types.h \
     zview/common/params.h \
     zview/gui/canvas.h \

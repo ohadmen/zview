@@ -5,5 +5,5 @@
 
 namespace io
 {
-    std::vector<types::Shape> readObj(const std::string& fn);
+    std::vector<Types::Shape> readObj(const std::string& fn);
 }

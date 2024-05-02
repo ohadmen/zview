@@ -22,10 +22,10 @@ void DrawableBase::privInitShader(const QString &shaderName)
 DrawableBase::~DrawableBase(){}
 
 
-bool DrawableBase::updateVertexBuffer(const types::VertData* data,size_t n)
+bool DrawableBase::updateVertexBuffer(const Types::VertData* data,size_t n)
 {
     m_vBuff.bind();
-    size_t nbytes = n*sizeof(types::VertData);
+    size_t nbytes = n*sizeof(Types::VertData);
     int vbufsz = m_vBuff.size();
     if(vbufsz<int(n))
         return false;

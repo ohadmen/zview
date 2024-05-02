@@ -1,8 +1,10 @@
 #pragma once
 #include "src/types/types.h"
+namespace zview {
 struct ShapeInitVisitor
 {
-    void operator()(types::Pcl &obj);
-    void operator()(types::Edges &obj);
-    void operator()(types::Mesh &obj);
+    bool operator()(types::Pcl &obj);
+    bool operator()(types::Edges &obj);
+    bool operator()(types::Mesh &obj);
 };
+} // namespace zview

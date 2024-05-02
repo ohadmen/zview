@@ -8,7 +8,7 @@ class TrackStateMeasureDistance : public TrackStateIdle {
     static constexpr char drawble_p1_key[] = "TrackStateMeasureDistance_p1";
     static constexpr char drawble_line_key[] = "TrackStateMeasureDistance_line";
 
-    types::VertData m_p[2];;
+    Types::VertData m_p[2];;
     qint64 m_drawObjHandle;
     void privSetMesuringEndPoint();
     void privStateReset();

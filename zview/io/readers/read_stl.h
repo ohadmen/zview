@@ -5,7 +5,7 @@
 
 namespace io
 {
-	types::Mesh readstl(const std::string& filename);
-	//void write3dd(const std::string& filename, std::vector<types::Mesh*> meshes, std::vector<types::Pcl*> pcls);
+	Types::Mesh readstl(const std::string& filename);
+	//void write3dd(const std::string& filename, std::vector<Types::Mesh*> meshes, std::vector<Types::Pcl*> pcls);
 };
 

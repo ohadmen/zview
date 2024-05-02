@@ -1,7 +1,7 @@
 #include "drawable_mesh.h"
 
 DrawableMesh::DrawableMesh(const std::string &name) : Mesh(name),  m_iBuff(QOpenGLBuffer::IndexBuffer) {}
-types::Shape DrawableMesh::getShape() const {	return *this;};
+Types::Shape DrawableMesh::getShape() const {	return *this;};
 DrawableMesh::~DrawableMesh()
 {
 	if (m_vBuff.isCreated())
@@ -20,13 +20,13 @@ void DrawableMesh::initializeGL()
 
 	m_vBuff.bind();
 
-	m_vBuff.allocate(m_v.data(), int(m_v.size() * sizeof(types::VertData)));
-	m_vBuff.write(0, m_v.data(), int(m_v.size() * sizeof(types::VertData)));
+	m_vBuff.allocate(m_v.data(), int(m_v.size() * sizeof(Types::VertData)));
+	m_vBuff.write(0, m_v.data(), int(m_v.size() * sizeof(Types::VertData)));
 	m_vBuff.release();
 
 	m_iBuff.bind();
-	m_iBuff.allocate(m_f.data(), int(m_f.size() * sizeof(types::FaceIndx)));
-	m_iBuff.write(0, m_f.data(), int(m_f.size() * sizeof(types::FaceIndx)));
+	m_iBuff.allocate(m_f.data(), int(m_f.size() * sizeof(Types::FaceIndx)));
+	m_iBuff.write(0, m_f.data(), int(m_f.size() * sizeof(Types::FaceIndx)));
 	m_iBuff.release();
 
 	privInitShader("mesh");
@@ -49,11 +49,11 @@ void DrawableMesh::paintGL(const QMatrix4x4 &mvp)
 
 	int vp = m_meshShader.attributeLocation("a_xyz");
 	m_meshShader.enableAttributeArray(vp);
-	m_meshShader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(types::VertData));
+	m_meshShader.setAttributeBuffer(vp, GL_FLOAT, 0 * sizeof(float), 3, sizeof(Types::VertData));
 
 	int vc = m_meshShader.attributeLocation("a_rgb");
 	m_meshShader.enableAttributeArray(vc);
-	m_meshShader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(types::VertData));
+	m_meshShader.setAttributeBuffer(vc, GL_UNSIGNED_BYTE, 3 * sizeof(float), 4, sizeof(Types::VertData));
 
 	
 
@@ -68,10 +68,10 @@ void DrawableMesh::paintGL(const QMatrix4x4 &mvp)
 	m_meshShader.disableAttributeArray(vc);
 }
 
-std::pair<float, types::VertData> sprivRayTriangleIntersection(const QVector3D &rp, const QVector3D &rn, const types::VertData &v0, const types::VertData &v1, const types::VertData &v2)
+std::pair<float, Types::VertData> sprivRayTriangleIntersection(const QVector3D &rp, const QVector3D &rn, const Types::VertData &v0, const Types::VertData &v1, const Types::VertData &v2)
 {
 	
-	static const auto inf = std::make_pair(std::numeric_limits<float>::infinity(), types::VertData());
+	static const auto inf = std::make_pair(std::numeric_limits<float>::infinity(), Types::VertData());
 	QVector3D v0_(v0);
 	QVector3D u = v1 - v0_;
 	QVector3D v = v2 - v0_;
@@ -121,14 +121,14 @@ std::pair<float, types::VertData> sprivRayTriangleIntersection(const QVector3D &
 	float distSum = std::accumulate(dist.begin(),dist.end(),0.0f);
 	std::for_each(dist.begin(),dist.end(),[&distSum](float& v){v=v/distSum;});
 	QVector4D col = QVector4D(v0)*dist[0]+QVector4D(v1)*dist[1]+QVector4D(v2)*dist[2];
-	return std::make_pair(r, types::VertData{pt,col});
+	return std::make_pair(r, Types::VertData{pt,col});
 }
 
-types::VertData DrawableMesh::picking(const QVector3D &p, const QVector3D &n) const
+Types::VertData DrawableMesh::picking(const QVector3D &p, const QVector3D &n) const
 {
 	float r = std::numeric_limits<float>::infinity();
 	static const float inf = std::numeric_limits<float>::infinity();
-	types::VertData pt(inf, inf, inf,0,0,0);
+	Types::VertData pt(inf, inf, inf,0,0,0);
 	for (const auto &i : m_f)
 	{
 		auto rp = sprivRayTriangleIntersection(p, n, m_v[i[0]], m_v[i[1]], m_v[i[2]]);
@@ -141,10 +141,10 @@ types::VertData DrawableMesh::picking(const QVector3D &p, const QVector3D &n) co
 
 	return pt;
 }
-types::Roi3d DrawableMesh::get3dbbox() const {return types::Mesh::get3dbbox();}
+Types::Roi3d DrawableMesh::get3dbbox() const {return Types::Mesh::get3dbbox();}
 
 
-bool DrawableMesh::updateVertexBuffer(const types::VertData* data,size_t n)
+bool DrawableMesh::updateVertexBuffer(const Types::VertData* data,size_t n)
 {
 	std::copy(data,data+n,m_v.begin());
 	return DrawableBase::updateVertexBuffer(data,n);

@@ -16,7 +16,7 @@ namespace
     }
     
 }
-std::vector<types::Shape> io::readObj(const std::string& fn)
+std::vector<Types::Shape> io::readObj(const std::string& fn)
 {
         std::ifstream ifs(fn, std::ios::in | std::ios::binary);
     if (ifs.fail()) throw
@@ -26,11 +26,11 @@ std::vector<types::Shape> io::readObj(const std::string& fn)
 	std::string filename = pos==std::string::npos? fn:fn.substr(pos,std::string::npos);
 
 
-    types::Mesh mesh(filename+"/mesh");
-    types::Edges edges(filename+"/edges");
+    Types::Mesh mesh(filename+"/mesh");
+    Types::Edges edges(filename+"/edges");
     
 
-    std::vector<types::VertData> allpoints;
+    std::vector<Types::VertData> allpoints;
     while (true)
     {   
         if (ifs.eof())
@@ -43,7 +43,7 @@ std::vector<types::Shape> io::readObj(const std::string& fn)
         
         if(type=="v")
         {
-            types::VertData v;
+            Types::VertData v;
             float rgb[3];
             line >> v.x;
             line >> v.y;
@@ -77,7 +77,7 @@ std::vector<types::Shape> io::readObj(const std::string& fn)
         }
         else if(type=="e")
         {
-            types::EdgeIndx e;
+            Types::EdgeIndx e;
             line >> e[0];
             line >> e[1];
             edges.e().push_back(e);
@@ -104,11 +104,11 @@ std::vector<types::Shape> io::readObj(const std::string& fn)
     }
 
 
-    std::vector<types::Shape> container;
+    std::vector<Types::Shape> container;
     size_t unused = std::accumulate(usedPoint.begin(),usedPoint.end(),size_t(0),[](size_t s,bool v){return s+(v==0);});
     if(unused!=0)
     {
-        types::Pcl pcl(filename+"/pcl");;
+        Types::Pcl pcl(filename+"/pcl");;
         for(size_t i=0;i!=usedPoint.size();++i)
             if(!usedPoint[i])
                 pcl.v().push_back(allpoints[i]);

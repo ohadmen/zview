@@ -1,100 +1,124 @@
 #include "opengl_shader.h"
 
-#include <fstream>
-#include <sstream>
+
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "src/types/types.h"
+#include "src/io/read_file.h"
 
 Shader::Shader() {
 }
-
-void Shader::init(const std::string& vertex_code, const std::string& fragment_code) {
-	vertex_code_ = vertex_code;
-	fragment_code_ = fragment_code;
-	compile();
-	link();
+std::int32_t Shader::getLocation(const std::string& name) const
+{
+	const auto ret = m_location_key.find(name);
+	if (ret != m_location_key.end()) {
+		return ret->second;
+	}
+	const auto location = glGetUniformLocation(m_id, name.c_str());
+	m_location_key[name] = location;
+	return location;
 }
 
-void Shader::compile() {
-	const char* vcode = vertex_code_.c_str();
-	vertex_id_ = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex_id_, 1, &vcode, NULL);
-	glCompileShader(vertex_id_);
+bool Shader::init(const std::string& shader_name) {
+	const std::string vertex_code = readFile("shaders/" + shader_name + ".vs");
+    const std::string fragment_code = readFile("shaders/" + shader_name + ".fs");
+	m_vertex_code = vertex_code;
+	m_fragment_code = fragment_code;
+	bool fail = !compile() || !link();
 
-	const char* fcode = fragment_code_.c_str();
-	fragment_id_ = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment_id_, 1, &fcode, NULL);
-	glCompileShader(fragment_id_);
-	checkCompileErr();
+	return !fail;
 }
 
-void Shader::link() {
-	id_ = glCreateProgram();
-	glAttachShader(id_, vertex_id_);
-	glAttachShader(id_, fragment_id_);
-	glLinkProgram(id_);
-	checkLinkingErr();
-	glDeleteShader(vertex_id_);
-	glDeleteShader(fragment_id_);
+bool Shader::compile() {
+	const char* vcode = m_vertex_code.c_str();
+	m_vertex_id = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(m_vertex_id, 1, &vcode, NULL);
+	glCompileShader(m_vertex_id);
+
+	const char* fcode = m_fragment_code.c_str();
+	m_fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(m_fragment_id, 1, &fcode, NULL);
+	glCompileShader(m_fragment_id);
+	return checkCompileErr();
 }
 
-void Shader::use() {
-    glUseProgram(id_);
+bool Shader::link() {
+	m_id = glCreateProgram();
+	glAttachShader(m_id, m_vertex_id);
+	glAttachShader(m_id, m_fragment_id);
+	glLinkProgram(m_id);
+	bool ok = checkLinkingErr();
+	glDeleteShader(m_vertex_id);
+	glDeleteShader(m_fragment_id);
+	return ok;
 }
 
-template<>
-void Shader::setUniform<int>(const std::string& name, int val) {
-	glUniform1i(glGetUniformLocation(id_, name.c_str()), val);
-}
-
-template<>
-void Shader::setUniform<bool>(const std::string& name, bool val) {
-	glUniform1i(glGetUniformLocation(id_, name.c_str()), val);
-}
-
-template<>
-void Shader::setUniform<const float>(const std::string& name, const float val) {
-	glUniform1f(glGetUniformLocation(id_, name.c_str()), val);
-}
-
-template<>
-void Shader::setUniform<const float>(const std::string& name, const float val1, const float val2) {
-	glUniform2f(glGetUniformLocation(id_, name.c_str()), val1, val2);
+void Shader::use()const {
+    glUseProgram(m_id);
+	
 }
 
 template<>
-void Shader::setUniform<float>(const std::string& name, float val1, float val2, float val3) {
-	glUniform3f(glGetUniformLocation(id_, name.c_str()), val1, val2, val3);
+void Shader::setUniform<int>(const std::string& name, int val) const{
+	glUniform1i(getLocation(name), val);
+}
+template<>
+void Shader::setUniform<std::uint32_t>(const std::string& name,std::uint32_t val) const{
+	glUniform1ui(getLocation(name), val);
+}
+
+
+template<>
+void Shader::setUniform<bool>(const std::string& name, bool val) const{
+	glUniform1i(getLocation(name), val);
 }
 
 template<>
-void Shader::setUniform<const float*>(const std::string& name, const float* val) {
-	glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, val);
+void Shader::setUniform<float>(const std::string& name,  float  val) const{
+	glUniform1f(getLocation(name), val);
 }
 
-void Shader::checkCompileErr() {
+template<>
+void Shader::setUniform<const float>(const std::string& name, const float val1, const float val2) const{
+	glUniform2f(getLocation(name), val1, val2);
+}
+
+template<>
+void Shader::setUniform<float>(const std::string& name, float val1, float val2, float val3) const{
+	glUniform3f(getLocation(name), val1, val2, val3);
+}
+
+template<>
+void Shader::setUniform<const float*>(const std::string& name, const float* val) const{
+	glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, val);
+}
+
+bool Shader::checkCompileErr() {
     int success;
     char infoLog[1024];
-    glGetShaderiv(vertex_id_, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(m_vertex_id, GL_COMPILE_STATUS, &success);
     if (!success) {
-        glGetShaderInfoLog(vertex_id_, 1024, NULL, infoLog);
+        glGetShaderInfoLog(m_vertex_id, 1024, NULL, infoLog);
         std::cout << "Error compiling Vertex Shader:\n" << infoLog << std::endl;
+		return false;
     }
-	glGetShaderiv(fragment_id_, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(m_fragment_id, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		glGetShaderInfoLog(fragment_id_, 1024, NULL, infoLog);
+		glGetShaderInfoLog(m_fragment_id, 1024, NULL, infoLog);
 		std::cout << "Error compiling Fragment Shader:\n" << infoLog << std::endl;
+		return false;
 	}
+	return true;
 }
 
-void Shader::checkLinkingErr() {
+bool Shader::checkLinkingErr() {
 	int success;
 	char infoLog[1024];
-	glGetProgramiv(id_, GL_LINK_STATUS, &success);
+	glGetProgramiv(m_id, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetProgramInfoLog(id_, 1024, NULL, infoLog);
+		glGetProgramInfoLog(m_id, 1024, NULL, infoLog);
 		std::cout << "Error Linking Shader Program:\n" << infoLog << std::endl;
+		return false;
 	}
+	return true;
 }

@@ -1,9 +1,7 @@
 #pragma once
-#include <vector>
 #include "src/types/types.h"
+#include <vector>
 
-
-namespace io
-{
-    std::vector <types::Shape> read_ply(const std::string& fn);
+namespace zview::io {
+std::vector<types::Shape> read_ply(const std::string &fn);
 }

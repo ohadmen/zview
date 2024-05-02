@@ -10,7 +10,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main/src/zview",
-            "args": ["${workspaceFolder}/models/horse.ply"],
+             "args": ["${workspaceFolder}/models/horse.ply"],
+            //"args": ["${workspaceFolder}/models/lucy_pcl.ply"],
+            //"args": ["/home/omenashe/temp/dbg.ply"],
             "stopAtEntry": false,
             
             "cwd": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main",

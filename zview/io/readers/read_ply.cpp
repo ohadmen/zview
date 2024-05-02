@@ -12,7 +12,7 @@
 
 namespace
 {
-    using ElemData = std::variant<std::vector<types::VertData>, std::vector<types::FaceIndx>, std::vector<types::EdgeIndx>>;
+    using ElemData = std::variant<std::vector<Types::VertData>, std::vector<Types::FaceIndx>, std::vector<Types::EdgeIndx>>;
 
     using ReaderFunc = std::function<ElemData(std::ifstream &ss, size_t count)>;
 
@@ -22,14 +22,14 @@ namespace
         //xyzrgba
         map["vertexpropertyfloatxpropertyfloatypropertyfloatzpropertyucharrpropertyuchargpropertyucharbpropertyuchara"] =
             [](std::ifstream &ss, size_t count) -> ElemData {
-            std::vector<types::VertData> v(count);
+            std::vector<Types::VertData> v(count);
             ss.read((char *)(&v[0]), sizeof(v[0]) * count);
             return v;
         };
         //xyz
         map["vertexpropertyfloatxpropertyfloatypropertyfloatz"] =
             [](std::ifstream &ss, size_t count) -> ElemData {
-            std::vector<types::VertData> v(count);
+            std::vector<Types::VertData> v(count);
             for (size_t i = 0; i != count; ++i)
                 ss.read((char *)(&v[i]), sizeof(float) * 3);
             return v;
@@ -37,7 +37,7 @@ namespace
         //edge
         map["edgepropertyintvertex1propertyintvertex2"] =
             [](std::ifstream &ss, size_t count) -> ElemData {
-            std::vector<types::EdgeIndx> v(count);
+            std::vector<Types::EdgeIndx> v(count);
             for (size_t i = 0; i != count; ++i)
                 ss.read((char *)&v[i], 2 * sizeof(int32_t));
             return v;
@@ -47,7 +47,7 @@ namespace
         //face
         map["facepropertylistucharintvertex_indices"] =
             [](std::ifstream &ss, size_t count) -> ElemData {
-            std::vector<types::FaceIndx> v(count);
+            std::vector<Types::FaceIndx> v(count);
             uint8_t listsz;
 
             for (size_t i = 0; i != count; ++i)
@@ -136,32 +136,32 @@ namespace
         return name;
     }
 
-    types::Shape elemArrayToshape(const std::vector<ElemData> &elems, const std::string &name)
+    Types::Shape elemArrayToshape(const std::vector<ElemData> &elems, const std::string &name)
     {
 
-        const std::vector<types::VertData> *verticesP = nullptr;
-        const std::vector<types::FaceIndx> *faceP = nullptr;
-        const std::vector<types::EdgeIndx> *edgesP = nullptr;
+        const std::vector<Types::VertData> *verticesP = nullptr;
+        const std::vector<Types::FaceIndx> *faceP = nullptr;
+        const std::vector<Types::EdgeIndx> *edgesP = nullptr;
 
         for (const ElemData &a : elems)
         {
-            if (std::holds_alternative<std::vector<types::VertData>>(a))
+            if (std::holds_alternative<std::vector<Types::VertData>>(a))
             {
                 if (verticesP)
                     throw std::runtime_error("data holds more than a single vertex data");
-                verticesP = &std::get<std::vector<types::VertData>>(a);
+                verticesP = &std::get<std::vector<Types::VertData>>(a);
             }
-            else if (std::holds_alternative<std::vector<types::FaceIndx>>(a))
+            else if (std::holds_alternative<std::vector<Types::FaceIndx>>(a))
             {
                 if (faceP)
                     throw std::runtime_error("data holds more than a single face data");
-                faceP = &std::get<std::vector<types::FaceIndx>>(a);
+                faceP = &std::get<std::vector<Types::FaceIndx>>(a);
             }
-            else if (std::holds_alternative<std::vector<types::EdgeIndx>>(a))
+            else if (std::holds_alternative<std::vector<Types::EdgeIndx>>(a))
             {
                 if (edgesP)
                     throw std::runtime_error("data holds more than a single edge data");
-                edgesP = &std::get<std::vector<types::EdgeIndx>>(a);
+                edgesP = &std::get<std::vector<Types::EdgeIndx>>(a);
             }
         }
         if (!verticesP)
@@ -171,21 +171,21 @@ namespace
 
         if (faceP)
         {
-            types::Mesh obj(name);
+            Types::Mesh obj(name);
             obj.v() = std::move(*verticesP);
             obj.f() = std::move(*faceP);
             return obj;
         }
         else if (edgesP)
         {
-            types::Edges obj(name);
+            Types::Edges obj(name);
             obj.v() = std::move(*verticesP);
             obj.e() = std::move(*edgesP);
             return obj;
         }
         else
         {
-            types::Pcl obj(name);
+            Types::Pcl obj(name);
             obj.v() = std::move(*verticesP);
             return obj;
         }
@@ -208,14 +208,14 @@ namespace
 
 } // namespace
 
-std::vector<types::Shape> io::readPly(const std::string &fn)
+std::vector<Types::Shape> io::readPly(const std::string &fn)
 {
 
     std::ifstream ss(fn, std::ios::in | std::ios::binary);
     if (ss.fail())
         throw std::runtime_error("failed to open " + std::string(fn));
 
-    std::vector<types::Shape> container;
+    std::vector<Types::Shape> container;
 
     while (!ss.eof())
     {
@@ -242,7 +242,7 @@ std::vector<types::Shape> io::readPly(const std::string &fn)
 
         }
             auto elems = readElems(elemHeaders, ss);
-            types::Shape obj = elemArrayToshape(elems, name);
+            Types::Shape obj = elemArrayToshape(elems, name);
             container.emplace_back(obj);
         }
         return container;

@@ -5,9 +5,9 @@
 #include "read_file_list.h"
 #include <QtWidgets/QFileDialog>
 #include <QtCore/QDebug>
-std::vector <types::Shape> io::readFileList(const QStringList &files)
+std::vector <Types::Shape> io::readFileList(const QStringList &files)
 {
-    std::vector <types::Shape> objlist;
+    std::vector <Types::Shape> objlist;
 
     for (const auto &s : files)
     {
@@ -22,12 +22,12 @@ std::vector <types::Shape> io::readFileList(const QStringList &files)
         
         if (finfo.suffix().toLower() == "stl")
         {
-            types::Mesh obj = io::readstl(finfo.absoluteFilePath().toStdString());
+            Types::Mesh obj = io::readstl(finfo.absoluteFilePath().toStdString());
             objlist.push_back(obj);
         }
         else if (finfo.suffix().toLower() == "ply")
         {
-            std::vector <types::Shape> shapes = io::readPly(finfo.absoluteFilePath().toStdString().c_str());
+            std::vector <Types::Shape> shapes = io::readPly(finfo.absoluteFilePath().toStdString().c_str());
             for(auto& obj:shapes)
             {
                 
@@ -37,7 +37,7 @@ std::vector <types::Shape> io::readFileList(const QStringList &files)
         }
         else if (finfo.suffix().toLower() == "obj")
         {
-            std::vector <types::Shape> shapes = io::readObj(finfo.absoluteFilePath().toStdString().c_str());
+            std::vector <Types::Shape> shapes = io::readObj(finfo.absoluteFilePath().toStdString().c_str());
             for(auto& obj:shapes)
             {
                     objlist.push_back(obj);

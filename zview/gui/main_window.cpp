@@ -59,10 +59,10 @@ void MainWindow::setCamLookAt(const QVector3D& eye,const QVector3D& center,const
 
 void MainWindow::savePly(const QString &filename) const
 {
-    std::vector<types::Shape> shapes;
+    std::vector<Types::Shape> shapes;
     for (const auto &a : drawablesBuffer)
     {
-        types::Shape s = a.second->getShape();
+        Types::Shape s = a.second->getShape();
         shapes.push_back(s);
     }
 

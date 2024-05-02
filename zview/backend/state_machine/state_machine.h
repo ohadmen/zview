@@ -39,7 +39,7 @@ class TrackStateMachine : public QObject
     }
 
 public:
-    types::VertData pickClosestObject(const QPointF &xy) const;
+    Types::VertData pickClosestObject(const QPointF &xy) const;
 
     template <class T>
     void setCurrentState()
@@ -73,7 +73,7 @@ public:
     void updatePmat();
 
     void input(QInputEvent *e);
-    void setLastRetargetPoint(const types::VertData& v);
+    void setLastRetargetPoint(const Types::VertData& v);
     QVector3D getLastRetargetPoint() const;
 signals:
     void signal_canvasUpdate();
