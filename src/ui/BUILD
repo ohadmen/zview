@@ -12,7 +12,8 @@ cc_library(
         "//src/params",
         "//src/drawables:backdrop",
         "//src/drawables:grid",
-        "//src/drawables:axis"
+        "//src/drawables:axis",
+        "//src/ui:tree_view"
     ],
 
     srcs = ["main_app.cpp"],
@@ -28,6 +29,21 @@ cc_library(
         "input_device_handler.h",
     ],
     deps = ["@imgui","//src/geometry:mvp_mat","//src/params"],
+    visibility = ["//visibility:public"],
+    
+
+)
+
+
+cc_library(
+    name = "tree_view",
+    srcs = [
+        "tree_view.cpp"
+    ],
+    hdrs = [
+        "tree_view.h",
+    ],
+    deps = ["@imgui"],
     visibility = ["//visibility:public"],
     
 

@@ -8,7 +8,7 @@ public:
   Backdrop();
   
 
-  bool init();
+  bool init(std::uint8_t background_color);
   void draw() const;
 };
 } // namespace zview

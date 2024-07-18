@@ -1,7 +1,7 @@
 #include "src/drawables/backdrop.h"
 #include "src/drawables/shape_draw_visitor.h"
 #include "src/drawables/shape_init_visitor.h"
-#include "src/params/params.h"
+
 
 
 #include <GL/glew.h> // Initialize with glewInit()
@@ -9,11 +9,11 @@
 namespace zview {
 
 Backdrop::Backdrop(): Mesh("backdrop") {}
-bool zview::Backdrop::init() {
+bool zview::Backdrop::init(std::uint8_t background_color) {
   static const float zval = 1 - std::numeric_limits<float>::epsilon() * 1e3;
   auto f = [](float x) -> std::uint8_t { return std::uint8_t(x * 255); };
   
-  switch (Params::i().background_color) {
+  switch (background_color) {
     {
     case 0:
       m_v = {{-1.0f, -1.0f, zval, f(0.00), f(0.10), f(0.15)},

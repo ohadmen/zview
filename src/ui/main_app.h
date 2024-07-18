@@ -6,6 +6,7 @@
 #include "src/drawables/shape_buffer.h"
 #include "src/ui/input_device_handler.h"
 #include "src/drawables/grid.h"
+#include "src/ui/tree_view.h"
 #include <GL/glew.h> // Initialize with glewInit()
 namespace zview {
 class MainApp {
@@ -16,6 +17,7 @@ class MainApp {
   Grid m_grid;
   Axis m_axis;
   InputDeviceHandler m_idh;
+  TreeView m_tree_view;
   GLFWwindow *m_window;
   std::optional<types::Vector3> m_hover_point;
 
@@ -25,7 +27,7 @@ class MainApp {
 
   void drawParamsMenu();
   void drawStatusBar();
-  void drawObjectTree();
+  
   
 
 public:

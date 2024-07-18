@@ -1,6 +1,7 @@
 #include "src/ui/main_app.h"
 
 #include "src/io/read_ply.h"
+
 #include "src/opengl_backend/imgui_impl_glfw.h"
 #include "src/opengl_backend/imgui_impl_opengl3.h"
 #include "src/params/params.h"
@@ -19,15 +20,19 @@ std::array<int, 2> MainApp::getWinSize() const {
   return size;
 }
 
-MainApp::MainApp():m_axis(m_mvp),m_idh{m_mvp} {}
+MainApp::MainApp()
+    : m_axis(m_mvp), m_idh{m_mvp},
+      m_tree_view{std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
+                            std::placeholders::_1)} {}
 bool MainApp::init() {
 
-  // Setup window
+
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit()) {
     std::cerr << "Failed to initialize glfw" << std::endl;
     return false;
   }
+  
 
   // GL 3.0 + GLSL 130
   const char *glsl_version = "#version 330";
@@ -37,7 +42,7 @@ bool MainApp::init() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
 
   // Create window with graphics context
-  m_window = glfwCreateWindow(1280, 720, "Zview", nullptr, nullptr);
+  m_window = glfwCreateWindow(1280, 720, "ZVIEW", nullptr, nullptr);
   if (m_window == nullptr) {
     std::cerr << "Failed to create window" << std::endl;
     return false;
@@ -50,13 +55,22 @@ bool MainApp::init() {
     std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
     return false;
   }
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST); // draw object back tp front
   glEnable(GL_LINE_SMOOTH);
-  glClearColor(0.5f, 0.5f, 0.5f, 1.00f);
+  
+  glEnable(GL_MULTISAMPLE);
+  glEnable(GL_POLYGON_SMOOTH);
+  
+
+  glEnable(GL_BLEND);
+
+
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+  
 
   glDepthFunc(GL_LESS);
 
@@ -80,7 +94,7 @@ bool MainApp::init() {
     return false;
   }
 
-  if (!m_backdrop.init()) {
+  if (!m_backdrop.init(Params::i().background_color)) {
     std::cerr << "Failed to init backdrop" << std::endl;
     return false;
   }
@@ -102,46 +116,19 @@ bool MainApp::init() {
 
   // }
 
+
   return true;
 }
 
-void MainApp::drawObjectTree() {
-  ImGui::Begin("Object Tree");
-  ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen|ImGuiTreeNodeFlags_Leaf|ImGuiTreeNodeFlags_Framed;
-  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 0, 1));
-  bool it= (ImGui::TreeNodeEx("root", flag));
-  ImGui::PopStyleColor();
-  if(it) {
-    if (ImGui::IsItemClicked()) {
-      std::cout << "clicked" << std::endl;
-    }
-
-    if (ImGui::TreeNodeEx("sub1", flag)) {
-      if (ImGui::IsItemClicked()) {
-        std::cout << "clicked" << std::endl;
-      }
-      // Call ImGui::TreeNodeEx() recursively to populate each level of children
-      ImGui::TreePop(); // This is required at the end of the if block
-    }
-    if (ImGui::TreeNodeEx("sub2", flag)) {
-      if (ImGui::IsItemClicked()) {
-        std::cout << "clicked" << std::endl;
-      }
-      // Call ImGui::TreeNodeEx() recursively to populate each level of children
-      ImGui::TreePop(); // This is required at the end of the if block
-    }
-
-    // Call ImGui::TreeNodeEx() recursively to populate each level of children
-    ImGui::TreePop(); // This is required at the end of the if block
-  }
-  ImGui::End();
-}
 
 void MainApp::loadFiles(const std::vector<std::string> &files) {
   for (const auto &f : files) {
-    const auto shape_vector = io::read_ply(f);
+    auto shape_vector = io::read_ply(f);
+
     for (const auto &s : shape_vector) {
-      m_buffer.push(s);
+      const auto key = m_buffer.push(s);
+      m_tree_view.push(std::visit([](const auto& v){return v.getName();},s), key);
+
     }
   }
   const auto bbox = m_buffer.getBbox();
@@ -157,9 +144,9 @@ bool MainApp::winResize(const std::array<int, 2> &wh) {
 }
 
 void MainApp::loop() {
-  
+
   while (!glfwWindowShouldClose(m_window)) {
-    
+
     const auto wh = getWinSize();
     if (wh != m_mvp.getWinSize()) {
       m_mvp.setWinSize(wh);
@@ -178,7 +165,8 @@ void MainApp::loop() {
     ImGui::NewFrame();
     drawParamsMenu();
     drawStatusBar();
-    drawObjectTree();
+    
+    m_tree_view.draw();
 
     m_idh.step(m_hover_point);
 
@@ -195,7 +183,6 @@ void MainApp::loop() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(m_window);
-    
   }
 
   // Cleanup
@@ -209,13 +196,11 @@ void MainApp::loop() {
 
 void MainApp::renderPhase(const types::Matrix4x4 &mvp) const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  for (unsigned int object_index{0}; object_index < m_buffer.size();
-       ++object_index) {
-    m_buffer.draw(mvp.data(), object_index);
-  }
+  
+  m_buffer.draw(mvp.data());
   m_backdrop.draw();
-  m_grid.draw(mvp,
-              m_mvp.getModelTranslation().translation(),m_mvp.getViewDistance());
+  m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
+              m_mvp.getViewDistance());
   m_axis.draw();
 }
 std::optional<types::Vector3>
@@ -224,12 +209,11 @@ MainApp::pickingPhase(const types::Matrix4x4 &mvp) {
   m_picking.enableWriting();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_picking.setTransform(mvp);
-  for (unsigned int object_index{0}; object_index < m_buffer.size();
-       ++object_index) {
-
-    m_picking.setObjectIndex(object_index);
-    m_buffer.draw(nullptr, object_index);
-  }
+  auto& picking = m_picking;
+  const auto preDrawFunction = [&picking](std::pair<std::uint32_t, types::Shape> s) {
+      picking.setObjectIndex(s.first);
+  };
+  m_buffer.draw(nullptr, preDrawFunction);
   m_picking.disableWriting();
 
   const auto pix = m_picking.readPixel(io.MousePos.x, io.MousePos.y);
@@ -261,30 +245,34 @@ void MainApp::drawStatusBar() {
   ImGui::Text("FPS:%4.1f", ImGui::GetIO().Framerate);
   ImGui::SameLine(70);
   if (m_hover_point.has_value()) {
-    ImGui::Text("[%5.3f,%5.3f,%5.3f]", m_hover_point.value().x(),
+    ImGui::Text("[% 8.3f,% 8.3f,% 8.3f]", m_hover_point.value().x(),
                 m_hover_point.value().y(), m_hover_point.value().z());
+  } else {
+    { ImGui::Text("[  No point under cursor   ]"); }
   }
 
   ImGui::End();
 }
 void MainApp::drawParamsMenu() {
-  
+
   // render your GUI
   ImGui::Begin("Parameters");
   auto &params = zview::Params::i();
   const float object_distance = m_mvp.getViewDistance();
-  params.camera_z_near = object_distance*0.1;
-  params.camera_z_far = object_distance*10;
+  params.camera_z_near = object_distance * 1e-3;
+  params.camera_z_far = object_distance * 1e3;
 
   static constexpr float deg2rad = M_PIf / 180.0f;
-  float cam_fov_deg = params.camera_fov_rad/deg2rad;
+  float cam_fov_deg = params.camera_fov_rad / deg2rad;
 
   if (ImGui::SliderFloat("Field of view", &cam_fov_deg, 10, 90)) {
     params.camera_fov_rad = cam_fov_deg * deg2rad;
-
   }
-  
-  ImGui::SliderInt("background color", &params.background_color, 0, 3);
+
+  if(ImGui::SliderInt("background color", &params.background_color, 0, 3))
+  {
+    m_backdrop.init(params.background_color);
+  }
   ImGui::SliderInt("Texture type", &params.texture_type, 0, 4);
   ImGui::SliderFloat("Point size", &params.point_size, 0.1, 10.0);
   m_mvp.updatePmat();

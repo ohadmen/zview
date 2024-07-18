@@ -40,7 +40,7 @@ void Grid::draw(const types::Matrix4x4 &mvp,
                        std::floor(-model_loc.y() / q) * q, 0};
   
   Eigen::Affine3f m{Eigen::Matrix4f::Identity()};
-  std::cout << "q: "<<q << " d: " << d  << std::endl;
+  
   m.scale(q);
   m.pretranslate(shift);
 

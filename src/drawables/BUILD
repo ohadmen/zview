@@ -58,7 +58,6 @@ cc_library(
     hdrs = ["backdrop.h"],
 
     deps = [
-        "//src/params",
         "//src/types",
         "//src/drawables:shape_interface"
         

@@ -87,8 +87,9 @@ using EdgeIndx = std::array<uint32_t, 2>;
 
 class Pcl {
 
+std::string m_name{};
 protected:
-  std::string m_name{};
+  
   std::vector<types::VertData> m_v{};
   std::uint32_t m_vbo{0};
   std::uint32_t m_vao{0};
@@ -105,6 +106,7 @@ public:
 
   Pcl(const std::string &name) : m_name(name) {}
   const std::string &getName() const { return m_name; }
+  void setName(const std::string &name) { m_name = name; }
 
   std::vector<VertData> &v() { return m_v; }
   const std::vector<VertData> &v() const { return m_v; }
@@ -114,9 +116,10 @@ public:
   virtual std::optional<types::Vector3>
   get3dLocation(const std::uint32_t &prim_index,
                 const std::array<types::Vector3, 2> &ray) const;
-  bool isEnabled() const { return m_enabled; }
-  void enable() { m_enabled = true; }
-  void disable() { m_enabled = false; }
+  
+  bool& enabled() { return m_enabled;}
+  bool enabled() const { return m_enabled;}
+  
 };
 
 class Mesh : public Pcl {

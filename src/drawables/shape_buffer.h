@@ -10,17 +10,27 @@ class ShapeDrawVisitor; // fwddecl
 
 
 class ShapeBuffer {
-  using BaseTypeVector = std::vector<types::Shape>;
+  using BaseTypeVector = std::unordered_map<std::uint32_t,types::Shape>;
 
 public:
   ShapeBuffer();
   ~ShapeBuffer();
 
-  void push(const types::Shape &s);
+  /*
+  * @brief push a shape to the buffer
+  * @param s the shape to push
+  * @return the key of the pushed shape
+  */
+  std::uint32_t push(const types::Shape &s);
 
-  void draw(const float* tform, std::uint32_t object_index)const;
+  /*
+  * @brief draw all shapes in the shape buffer
+  * @param tform the transformation matrix
+  * @param preDrawFunction a function that is called before drawing each shape, recieving the shape key and the shape object
+  */
+  void draw(const float* tform, const std::function<void(const std::pair<std::uint32_t,types::Shape>&)>& preDrawFunction=[](const auto& s) {})const;
   
-  std::optional<types::Vector3> get3dLocation(const std::uint32_t& object_index,const std::uint32_t& prim_index, const std::array<types::Vector3,2>& ray)const;
+  std::optional<types::Vector3> get3dLocation(const std::uint32_t& object_key,const std::uint32_t& prim_index, const std::array<types::Vector3,2>& ray)const;
   types::Bbox3d getBbox() const;
   BaseTypeVector::iterator begin();
   BaseTypeVector::const_iterator begin() const;
@@ -29,10 +39,13 @@ public:
   BaseTypeVector::const_iterator end() const;
   BaseTypeVector::const_iterator cend() const;
   std::size_t size() const;
+  bool& shapeVisibility(const std::uint32_t& object_key);
+  
   void writeBufferToFile(const std::string &f) const;
 
 private:
   BaseTypeVector m_buffer;
+  std::uint32_t m_next_key{1000};
   
   
 

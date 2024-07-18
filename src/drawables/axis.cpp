@@ -10,8 +10,6 @@ Axis::Axis(MVPmat &mvp)
           Eigen::Affine3f{Eigen::Translation3f(-0.90, -0.8, 0)}.matrix()} {}
 bool Axis::init() {
 
-  static constexpr float d{0.1f};
-  static constexpr float s{0.01f};
   static constexpr std::uint8_t c{255U};
 
   m_v = {
@@ -55,7 +53,7 @@ bool Axis::init() {
 void Axis::draw() const {
   
   Eigen::Affine3f r{m_mvp.getViewRotation()};
-  const float distance = Params::i().camera_z_near+0.1f;
+  const float distance = Params::i().camera_z_near+d;
   r.pretranslate(types::Vector3{0, 0, -distance});
   r.scale(distance);
   types::Matrix4x4 axisRotation = m_mvp.getProjectiveMatrix() * r.matrix();

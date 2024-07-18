@@ -1,4 +1,10 @@
 #version 330 core
+#ifdef GL_ES
+// Set default precision to medium
+precision mediump int;
+precision mediump float;
+#endif
+
 
 out vec4 fragColor;
 
@@ -64,6 +70,14 @@ void main()
   	    spec = pow(spec, 8.0) * specularFactor2;
   		color += spec * specularColor2;
   		fragColor = min(color, vec4(1.0));
+		
+		
+		break;
+	}
+	
+	default:
+	{
+		fragColor = vec4(0.0,0.0,0.0,1.0);
 		break;
 	}
 	}
