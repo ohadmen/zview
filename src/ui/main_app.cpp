@@ -35,9 +35,9 @@ bool MainApp::init() {
   
 
   // GL 3.0 + GLSL 130
-  const char *glsl_version = "#version 330";
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  const char *glsl_version = "#version 460";
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
 
@@ -60,15 +60,16 @@ bool MainApp::init() {
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST); // draw object back tp front
   glEnable(GL_LINE_SMOOTH);
+
   
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_POLYGON_SMOOTH);
   
 
-  glEnable(GL_BLEND);
+   glEnable(GL_BLEND);
 
 
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   
 
@@ -144,7 +145,7 @@ bool MainApp::winResize(const std::array<int, 2> &wh) {
 }
 
 void MainApp::loop() {
-
+  glClearColor(0, 1, 0, 1);
   while (!glfwWindowShouldClose(m_window)) {
 
     const auto wh = getWinSize();
@@ -177,7 +178,7 @@ void MainApp::loop() {
     m_hover_point = pickingPhase(transformation);
 
     renderPhase(transformation);
-
+    
     // Render dear imgui into screen
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -197,11 +198,13 @@ void MainApp::loop() {
 void MainApp::renderPhase(const types::Matrix4x4 &mvp) const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-  m_buffer.draw(mvp.data());
   m_backdrop.draw();
-  m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
+    m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
               m_mvp.getViewDistance());
   m_axis.draw();
+
+  m_buffer.draw(mvp.data());
+  
 }
 std::optional<types::Vector3>
 MainApp::pickingPhase(const types::Matrix4x4 &mvp) {

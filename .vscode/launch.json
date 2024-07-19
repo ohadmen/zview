@@ -11,7 +11,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main/src/zview",
              "args": ["${workspaceFolder}/models/horse.ply","${workspaceFolder}/models/lucy_pcl.ply","${workspaceFolder}/models/lucy_mesh.ply"],
-            // "args": ["${workspaceFolder}/models/lucy_pcl.ply"],
+             //"args": ["${workspaceFolder}/models/lucy_pcl.ply"],
             //"args": ["/home/omenashe/temp/dbg.ply"],
             "stopAtEntry": false,
             

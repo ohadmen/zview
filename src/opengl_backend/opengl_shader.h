@@ -9,6 +9,7 @@ public:
 	Shader();
 	bool init(const std::string& shader_name);
 	void use()const;
+	void setUniform(const std::string& name, const std::array<float,3U>& val) const;
 	template<typename T> void setUniform(const std::string& name, const T val) const;
 	template<typename T> void setUniform(const std::string& name, const T val1, const T val2)const;
 	template<typename T> void setUniform(const std::string& name, const T val1, const T val2, const T val3)const;

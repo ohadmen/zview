@@ -12,7 +12,7 @@ void ShapeDrawVisitor::operator()(const types::Pcl &obj,const float* tform) {
     obj.shader().use();
     obj.shader().setUniform("u_transformation", tform);
     obj.shader().setUniform("u_ptsize", zview::Params::i().point_size);
-    obj.shader().setUniform("u_light_dir", 0.4f, 0.48f, 0.51f);
+    obj.shader().setUniform("u_lightDir", zview::Params::i().light_dir);
     obj.shader().setUniform("u_zfar", zview::Params::i().camera_z_far);
     obj.shader().setUniform("u_znear", zview::Params::i().camera_z_near);
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
@@ -40,7 +40,7 @@ void ShapeDrawVisitor::operator()(const types::Mesh &obj,const float* tform) {
   if (tform) {
     obj.shader().use();
     obj.shader().setUniform("u_transformation", tform);
-    obj.shader().setUniform("u_light_dir", 0.4f, 0.48f, 0.51f);
+    obj.shader().setUniform("u_lightDir", zview::Params::i().light_dir);
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
   }
   glBindVertexArray(obj.vao());

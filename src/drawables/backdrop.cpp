@@ -54,7 +54,7 @@ bool zview::Backdrop::init(std::uint8_t background_color) {
 void Backdrop::draw() const {
   m_shader.use();
   m_shader.setUniform("u_txt", 1);
-  m_shader.setUniform("u_transformation", m_tformEye);
+  m_shader.setUniform("u_transformation", m_tformEye.data());
   ShapeDrawVisitor()(*this, nullptr);
 }
 } // namespace zview

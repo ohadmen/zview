@@ -59,37 +59,32 @@ void Shader::use()const {
 }
 
 template<>
-void Shader::setUniform<int>(const std::string& name, int val) const{
+void Shader::setUniform<>(const std::string& name,const int val) const{
 	glUniform1i(getLocation(name), val);
 }
 template<>
-void Shader::setUniform<std::uint32_t>(const std::string& name,std::uint32_t val) const{
+void Shader::setUniform<>(const std::string& name,const  std::uint32_t val) const{
 	glUniform1ui(getLocation(name), val);
 }
 
 
 template<>
-void Shader::setUniform<bool>(const std::string& name, bool val) const{
+void Shader::setUniform<>(const std::string& name, const  bool val) const{
 	glUniform1i(getLocation(name), val);
 }
 
 template<>
-void Shader::setUniform<float>(const std::string& name,  float  val) const{
+void Shader::setUniform<>(const std::string& name, const  float  val) const{
 	glUniform1f(getLocation(name), val);
 }
 
-template<>
-void Shader::setUniform<const float>(const std::string& name, const float val1, const float val2) const{
-	glUniform2f(getLocation(name), val1, val2);
+
+void Shader::setUniform(const std::string& name,const  std::array<float,3U>& val) const{
+	glUniform3f(getLocation(name), val[0], val[1], val[2]);
 }
 
 template<>
-void Shader::setUniform<float>(const std::string& name, float val1, float val2, float val3) const{
-	glUniform3f(getLocation(name), val1, val2, val3);
-}
-
-template<>
-void Shader::setUniform<const float*>(const std::string& name, const float* val) const{
+void Shader::setUniform<>(const std::string& name,  const float* val) const{
 	glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, val);
 }
 

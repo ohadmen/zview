@@ -8,7 +8,7 @@ uniform int u_txt;
 uniform vec3 u_light_dir;
 
 varying vec3 v_xyz;
-varying vec3 v_eye_dir;
+varying vec3 v_eyeDir;
 
 void main()
 {	
@@ -27,13 +27,13 @@ void main()
 			const float specFactor = 1.1;
 			//calc normal
 			vec3 ec_pos=v_xyz.xyz;
-			vec3 light_dir = normalize(u_light_dir+v_eye_dir);
+			vec3 light_dir = normalize(u_light_dir+v_eyeDir);
 			vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
 			//calc diffuse
 			float diffuse = max(0.0,dot(ec_normal, light_dir));
 			//calc specularity
 			vec3 reflectDir = -reflect(light_dir, ec_normal);
-			float spec = pow(max(dot(v_eye_dir, reflectDir), 0.0),2.0);
+			float spec = pow(max(dot(v_eyeDir, reflectDir), 0.0),2.0);
 			vec3 result = vertexColor.xyz*(lightColor*ambientFactor+diffuse*diffuseFactor+spec*specFactor);
 			fragColor = vec4(result.xyz,vertexColor.w); 
 			break;
@@ -56,7 +56,7 @@ void main()
   		vec3 ec_pos=v_xyz.xyz;
 		vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
   	    vec3 reflect_dir = -reflect(u_light_dir, ec_normal);
-  	    float spec = max(dot(v_eye_dir, reflect_dir), 0.0);
+  	    float spec = max(dot(v_eyeDir, reflect_dir), 0.0);
   	    spec = spec * spec;
   		vec4 color = glassColor + specularFactor1 * spec * specularColor1;
   	    spec = pow(spec, 8.0) * specularFactor2;
@@ -65,25 +65,7 @@ void main()
 		
 		break;
 	}
-	case 4:
-	{
-		vec4 specularColor1=vec4 (0.1,0.08,0.05,1.0);
-  		vec4 specularColor2=vec4 (0.1,0.1,0.05,1.0);
-  		vec4 glassColor=vec4(0.5,0.5,0.6,0.15);
-  		float specularFactor1=2.0;
-  		float specularFactor2=2.0;
-  		vec3 ec_pos=vec3(v_xyz[0],v_xyz[1],v_xyz[2]);
-  		vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
-  	    vec3 reflectDir = -reflect(u_light_dir, ec_normal);
-  	    float spec = max(dot(v_eye_dir, reflectDir), 0.0);
-  	    spec = spec * spec;
-  		vec4 color = glassColor + specularFactor1 * spec * specularColor1;
-  	    spec = pow(spec, 8.0) * specularFactor2;
-  		color += spec * specularColor2;
-  		fragColor = min(color, vec4(1.0));
-		
-		break;
-	}
+
 
 		default:
 		{

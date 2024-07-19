@@ -10,7 +10,7 @@ uniform float u_zfar;
 uniform float u_znear;
 
 varying vec3 v_xyz;
-varying vec3 v_eye_dir;
+varying vec3 v_eyeDir;
 
 
 void main()
@@ -22,7 +22,7 @@ void main()
     gl_PointSize = max(0.1f,u_ptsize*(u_zfar-z)/(u_zfar-u_znear));
 
     v_xyz = a_xyz;
-    v_eye_dir  =  -normalize(vec3(u_transformation[0]));
+    v_eyeDir  =  -normalize(vec3(u_transformation[0]));
 
 
 	
