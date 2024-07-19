@@ -106,25 +106,6 @@ void InputDeviceHandler::step(
   }
 }
 
-void InputDeviceHandler::setCameraToViewAll(types::Bbox3d bbox) {
-
-  const auto obj_center = (bbox.max() + bbox.min()) / 2.0F;
-  m_mvp.setModelTranslation(Eigen::Translation3f(-obj_center));
-  auto vm = m_mvp.getViewRotation();
-  const auto t = (vm * Eigen::Translation3f(-obj_center));
-  bbox.applyTransform(t);
-
-  const auto tan_h_fov_x = std::tan(Params::i().camera_fov_rad / 2);
-  const auto tan_h_fov_y = tan_h_fov_x / m_mvp.getAspect();
-  const auto req_distance_x =
-      std::max(std::abs(bbox.max().x()), std::abs(bbox.min().x())) /
-      tan_h_fov_x;
-  const auto req_distance_y =
-      std::max(std::abs(bbox.max().y()), std::abs(bbox.min().y())) /
-      tan_h_fov_y;
-  const auto req_distance = std::max(req_distance_x, req_distance_y);
-  m_mvp.setViewDistance(req_distance);
-}
 
 InputDeviceHandler::~InputDeviceHandler() {}
 } // namespace zview

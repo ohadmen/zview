@@ -31,7 +31,7 @@ public:
   void draw(const float* tform, const std::function<void(const std::pair<std::uint32_t,types::Shape>&)>& preDrawFunction=[](const auto& s) {})const;
   
   std::optional<types::Vector3> get3dLocation(const std::uint32_t& object_key,const std::uint32_t& prim_index, const std::array<types::Vector3,2>& ray)const;
-  types::Bbox3d getBbox() const;
+  types::Bbox3d getBbox(std::vector<std::uint32_t> keys) const;
   BaseTypeVector::iterator begin();
   BaseTypeVector::const_iterator begin() const;
   BaseTypeVector::const_iterator cbegin() const;

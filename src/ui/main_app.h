@@ -22,6 +22,7 @@ class MainApp {
   std::optional<types::Vector3> m_hover_point;
 
   std::array<int, 2> getWinSize() const;
+  void setCameraToViewSelectedKey(const std::vector<std::uint32_t>& keys);
   void renderPhase(const types::Matrix4x4 &mvp) const;
   std::optional<types::Vector3> pickingPhase(const types::Matrix4x4 &mvp) ;
 

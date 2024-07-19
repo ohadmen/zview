@@ -20,7 +20,7 @@ public:
     InputDeviceHandler &operator=(const InputDeviceHandler &) = default;
     ~InputDeviceHandler();
 
-    void setCameraToViewAll(types::Bbox3d bbox);
+    
 private:
     
     Eigen::AngleAxisf m_clickedViewRotation;

@@ -6,8 +6,10 @@
 namespace zview {
 TreeView::TreeView(
 
-    std::function<bool &(const std::uint32_t &)> set_shape_visibility)
-    : m_shape_visibility(set_shape_visibility) {}
+    std::function<bool &(const std::uint32_t &)> set_shape_visibility,
+    std::function<void(const std::vector<std::uint32_t> &)> zoom_to_selection)
+    : m_shape_visibility{set_shape_visibility},
+    m_zoom_to_selection{zoom_to_selection} {}
 void TreeView::push(std::string name, const std::uint32_t object_key) {
   // sanizing the string: make sure doesn't end with "/", and if it does - omit
   // it
@@ -77,6 +79,21 @@ std::int32_t TreeView::getChildrenVisibility(const TreeNode &node) const {
       
   return v;
 }
+
+void TreeView::getEnabledObjectsKeys(const TreeNode &node, std::vector<std::uint32_t> &selected_objects_keys) const {
+  /*
+  * This function is used to get all the object keys that are enabled in the tree view and are children of node
+  */
+  if(node.object_key != 0){
+    if(m_shape_visibility(node.object_key)){
+      selected_objects_keys.push_back(node.object_key);
+    }
+  }
+  for (const auto &child : node.children) {
+    getEnabledObjectsKeys(child, selected_objects_keys);
+  }
+}
+
 void TreeView::drawTree(const TreeNode &node) const {
   static constexpr ImGuiTreeNodeFlags flag =
       ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf;
@@ -105,7 +122,9 @@ void TreeView::drawTree(const TreeNode &node) const {
       }
     }
     else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-     std::cout << "todo: zoom to object" << std::endl;
+     std::vector<std::uint32_t> selected_objects_keys;
+     getEnabledObjectsKeys(node, selected_objects_keys);
+     m_zoom_to_selection(selected_objects_keys);
     }
 
     for (const auto &child : node.children) {

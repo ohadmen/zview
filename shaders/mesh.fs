@@ -35,18 +35,38 @@ void main()
 			vec3 reflectDir = -reflect(light_dir, ec_normal);
 			float spec = pow(max(dot(v_eyeDir, reflectDir), 0.0),2.0);
 			vec3 result = vertexColor.xyz*(lightColor*ambientFactor+diffuse*diffuseFactor+spec*specFactor);
-			fragColor = vec4(result.xyz,vertexColor.w); 
+			fragColor = vec4(result,vertexColor.w); 
 			break;
 		}
 		case 2:
 		{
 			vec3 ec_pos=v_xyz.xyz;
 			vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
-			fragColor = vec4((1.0-ec_normal)*0.5,vertexColor.w);
+			fragColor = vec4((1.0-ec_normal)*0.5,1.0);
 			break;
 
 		}
 		case 3:
+		{
+			const vec3 lightColor=vec3(1,1,1);
+			const float ambientFactor = 0.5;
+			const float diffuseFactor =0.8;
+			const float specFactor = 1.1;
+						vec3 ec_pos=v_xyz.xyz;
+			vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
+			vec3 norm_color = (1.0-ec_normal)*0.5;
+
+			vec3 light_dir = normalize(u_light_dir+v_eyeDir);
+			//calc diffuse
+			float diffuse = max(0.0,dot(ec_normal, light_dir));
+			//calc specularity
+			vec3 reflectDir = -reflect(light_dir, ec_normal);
+			float spec = pow(max(dot(v_eyeDir, reflectDir), 0.0),2.0);
+			vec3 result = norm_color*(lightColor*ambientFactor+diffuse*diffuseFactor+spec*specFactor);
+			fragColor = vec4(result,1.0); 
+			break;
+		}
+		case 4:
 		{
 			const vec4 specularColor1=vec4 (0.1,0.08,0.05,1.0);
   		const  vec4 specularColor2=vec4 (0.1,0.1,0.05,1.0);

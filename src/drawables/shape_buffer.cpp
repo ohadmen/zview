@@ -89,16 +89,22 @@ void ShapeBuffer::draw(
   }
 }
 
-types::Bbox3d ShapeBuffer::getBbox() const {
+types::Bbox3d ShapeBuffer::getBbox(std::vector<std::uint32_t> keys) const {
+  if(keys.empty()){
+    keys.reserve(m_buffer.size());
+    for(const auto& s:m_buffer){
+      keys.push_back(s.first);
+    }
+  }
   types::Bbox3d bbox;
-  for (const auto &s : m_buffer) {
+  for (const auto &s : keys) {
     bool enabled =
-        std::visit([](const auto &v) { return v.enabled(); }, s.second);
+        std::visit([](const auto &v) { return v.enabled(); }, m_buffer.at(s));
     if (!enabled) {
       continue;
     }
     const auto this_bbox =
-        std::visit([](const auto &v) { return v.getBbox(); }, s.second);
+        std::visit([](const auto &v) { return v.getBbox(); }, m_buffer.at(s));
     bbox |= this_bbox;
   }
   return bbox;

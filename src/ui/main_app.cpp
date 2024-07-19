@@ -23,16 +23,16 @@ std::array<int, 2> MainApp::getWinSize() const {
 MainApp::MainApp()
     : m_axis(m_mvp), m_idh{m_mvp},
       m_tree_view{std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
+                            std::placeholders::_1),
+                  std::bind(&MainApp::setCameraToViewSelectedKey, this,
                             std::placeholders::_1)} {}
 bool MainApp::init() {
-
 
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit()) {
     std::cerr << "Failed to initialize glfw" << std::endl;
     return false;
   }
-  
 
   // GL 3.0 + GLSL 130
   const char *glsl_version = "#version 460";
@@ -55,23 +55,17 @@ bool MainApp::init() {
     std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
     return false;
   }
-  
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST); // draw object back tp front
   glEnable(GL_LINE_SMOOTH);
 
-  
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_POLYGON_SMOOTH);
-  
 
-   glEnable(GL_BLEND);
+  glEnable(GL_BLEND);
 
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
-  
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glDepthFunc(GL_LESS);
 
@@ -117,10 +111,8 @@ bool MainApp::init() {
 
   // }
 
-
   return true;
 }
-
 
 void MainApp::loadFiles(const std::vector<std::string> &files) {
   for (const auto &f : files) {
@@ -128,12 +120,12 @@ void MainApp::loadFiles(const std::vector<std::string> &files) {
 
     for (const auto &s : shape_vector) {
       const auto key = m_buffer.push(s);
-      m_tree_view.push(std::visit([](const auto& v){return v.getName();},s), key);
-
+      m_tree_view.push(std::visit([](const auto &v) { return v.getName(); }, s),
+                       key);
     }
   }
-  const auto bbox = m_buffer.getBbox();
-  m_idh.setCameraToViewAll(bbox);
+
+  setCameraToViewSelectedKey({});
 }
 bool MainApp::winResize(const std::array<int, 2> &wh) {
   m_mvp.setWinSize(wh);
@@ -142,6 +134,27 @@ bool MainApp::winResize(const std::array<int, 2> &wh) {
     return false;
   }
   return true;
+}
+
+void MainApp::setCameraToViewSelectedKey(
+    const std::vector<std::uint32_t> &keys) {
+  auto bbox = m_buffer.getBbox(keys);
+  const auto obj_center = (bbox.max() + bbox.min()) / 2.0F;
+  m_mvp.setModelTranslation(Eigen::Translation3f(-obj_center));
+  auto vm = m_mvp.getViewRotation();
+  const auto t = (vm * Eigen::Translation3f(-obj_center));
+  bbox.applyTransform(t);
+
+  const auto tan_h_fov_x = std::tan(Params::i().camera_fov_rad / 2);
+  const auto tan_h_fov_y = tan_h_fov_x / m_mvp.getAspect();
+  const auto req_distance_x =
+      std::max(std::abs(bbox.max().x()), std::abs(bbox.min().x())) /
+      tan_h_fov_x;
+  const auto req_distance_y =
+      std::max(std::abs(bbox.max().y()), std::abs(bbox.min().y())) /
+      tan_h_fov_y;
+  const auto req_distance = std::max(req_distance_x, req_distance_y);
+  m_mvp.setViewDistance(req_distance);
 }
 
 void MainApp::loop() {
@@ -166,7 +179,7 @@ void MainApp::loop() {
     ImGui::NewFrame();
     drawParamsMenu();
     drawStatusBar();
-    
+
     m_tree_view.draw();
 
     m_idh.step(m_hover_point);
@@ -178,7 +191,7 @@ void MainApp::loop() {
     m_hover_point = pickingPhase(transformation);
 
     renderPhase(transformation);
-    
+
     // Render dear imgui into screen
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -197,14 +210,13 @@ void MainApp::loop() {
 
 void MainApp::renderPhase(const types::Matrix4x4 &mvp) const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
+
   m_backdrop.draw();
-    m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
+  m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
               m_mvp.getViewDistance());
   m_axis.draw();
 
   m_buffer.draw(mvp.data());
-  
 }
 std::optional<types::Vector3>
 MainApp::pickingPhase(const types::Matrix4x4 &mvp) {
@@ -212,10 +224,11 @@ MainApp::pickingPhase(const types::Matrix4x4 &mvp) {
   m_picking.enableWriting();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_picking.setTransform(mvp);
-  auto& picking = m_picking;
-  const auto preDrawFunction = [&picking](std::pair<std::uint32_t, types::Shape> s) {
-      picking.setObjectIndex(s.first);
-  };
+  auto &picking = m_picking;
+  const auto preDrawFunction =
+      [&picking](std::pair<std::uint32_t, types::Shape> s) {
+        picking.setObjectIndex(s.first);
+      };
   m_buffer.draw(nullptr, preDrawFunction);
   m_picking.disableWriting();
 
@@ -272,8 +285,7 @@ void MainApp::drawParamsMenu() {
     params.camera_fov_rad = cam_fov_deg * deg2rad;
   }
 
-  if(ImGui::SliderInt("background color", &params.background_color, 0, 3))
-  {
+  if (ImGui::SliderInt("background color", &params.background_color, 0, 3)) {
     m_backdrop.init(params.background_color);
   }
   ImGui::SliderInt("Texture type", &params.texture_type, 0, 4);
