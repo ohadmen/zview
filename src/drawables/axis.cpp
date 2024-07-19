@@ -2,6 +2,7 @@
 #include "src/drawables/axis.h"
 #include "src/drawables/shape_draw_visitor.h"
 #include "src/drawables/shape_init_visitor.h"
+#include <iostream>
 
 namespace zview {
 Axis::Axis(MVPmat &mvp)

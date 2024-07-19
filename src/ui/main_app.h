@@ -20,13 +20,34 @@ class MainApp {
   TreeView m_tree_view;
   GLFWwindow *m_window;
   std::optional<types::Vector3> m_hover_point;
-
+  /*
+  @brief get the window size
+  @return the window size
+  */
   std::array<int, 2> getWinSize() const;
+  /*
+  @brief move the camera to view the selected keys
+  @param keys the keys to view
+  */
   void setCameraToViewSelectedKey(const std::vector<std::uint32_t>& keys);
+  /*
+  @brief render the scene
+  @param mvp the model view projection matrix
+  */
   void renderPhase(const types::Matrix4x4 &mvp) const;
+  /*
+  @brief perform the picking phase
+  @param mvp the model view projection matrix
+  @return the 3d point that was picked (if any)
+  */
   std::optional<types::Vector3> pickingPhase(const types::Matrix4x4 &mvp) ;
-
+  /*
+  @brief draw the parameters menu
+  */
   void drawParamsMenu();
+  /*
+  @brief draw the status bar
+  */
   void drawStatusBar();
   
   

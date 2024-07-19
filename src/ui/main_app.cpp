@@ -69,6 +69,8 @@ bool MainApp::init() {
 
   glDepthFunc(GL_LESS);
 
+  glClearColor(0, 1, 0, 1);
+
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -138,13 +140,13 @@ bool MainApp::winResize(const std::array<int, 2> &wh) {
 
 void MainApp::setCameraToViewSelectedKey(
     const std::vector<std::uint32_t> &keys) {
+  auto vm = m_mvp.getViewRotation();
   auto bbox = m_buffer.getBbox(keys);
   const auto obj_center = (bbox.max() + bbox.min()) / 2.0F;
   m_mvp.setModelTranslation(Eigen::Translation3f(-obj_center));
-  auto vm = m_mvp.getViewRotation();
-  const auto t = (vm * Eigen::Translation3f(-obj_center));
-  bbox.applyTransform(t);
+  bbox.applyTransform(vm);
 
+ 
   const auto tan_h_fov_x = std::tan(Params::i().camera_fov_rad / 2);
   const auto tan_h_fov_y = tan_h_fov_x / m_mvp.getAspect();
   const auto req_distance_x =
@@ -158,9 +160,9 @@ void MainApp::setCameraToViewSelectedKey(
 }
 
 void MainApp::loop() {
-  glClearColor(0, 1, 0, 1);
+  
   while (!glfwWindowShouldClose(m_window)) {
-
+    
     const auto wh = getWinSize();
     if (wh != m_mvp.getWinSize()) {
       m_mvp.setWinSize(wh);

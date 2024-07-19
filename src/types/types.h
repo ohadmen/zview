@@ -32,7 +32,8 @@ public:
   types::Vector3 max() const { return m_max; }
   types::Vector3 &min() { return m_min; }
   types::Vector3 &max() { return m_max; }
-  void applyTransform(const types::Transform &t) {
+  template<typename T>
+  void applyTransform(const T &t) {
     m_min = t * m_min;
     m_max = t * m_max;
   }
