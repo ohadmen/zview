@@ -2,8 +2,8 @@
 
 #include "src/io/read_ply.h"
 
-#include "src/opengl_backend/imgui_impl_glfw.h"
-#include "src/opengl_backend/imgui_impl_opengl3.h"
+#include "src/graphics_backend/imgui_impl_glfw.h"
+#include "src/graphics_backend/imgui_impl_opengl3.h"
 #include "src/params/params.h"
 #include <iostream>
 // Include glfw3.h after our OpenGL definitions

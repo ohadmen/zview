@@ -1,5 +1,5 @@
 #pragma once
-#include "src/opengl_backend/opengl_shader.h"
+#include "src/graphics_backend/opengl_shader.h"
 #include "src/types/types.h"
 #include <cstdint>
 

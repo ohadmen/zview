@@ -23,7 +23,7 @@ cc_library(
     ],
     hdrs = ["picking_texture.h"],
     deps = [
-        "//src/opengl_backend",
+        "//src/graphics_backend",
     ],
             visibility = ["//visibility:public"],
 )

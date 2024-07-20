@@ -1,7 +1,7 @@
 #include "shape_init_visitor.h"
-// #include "src/opengl_backend/imgui_impl_glfw.h"
-// #include "src/opengl_backend/imgui_impl_opengl3.h"
-// #include "src/opengl_backend/opengl_shader.h"
+// #include "src/graphics_backend/imgui_impl_glfw.h"
+// #include "src/graphics_backend/imgui_impl_opengl3.h"
+// #include "src/graphics_backend/opengl_shader.h"
 #include <GL/glew.h> // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 namespace zview {

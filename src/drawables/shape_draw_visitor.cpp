@@ -1,6 +1,6 @@
 #include "shape_draw_visitor.h"
 
-#include "src/opengl_backend/opengl_shader.h"
+#include "src/graphics_backend/opengl_shader.h"
 #include "src/params/params.h"
 
 #include <GL/glew.h> // Initialize with glewInit()

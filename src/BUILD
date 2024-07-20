@@ -9,7 +9,7 @@ cc_binary(
 
     deps = [
         "//src/ui:main_app",
-        "//src/opengl_backend",
+        "//src/graphics_backend",
         "//src/io",
         "//src/drawables",
         "//src/ui:input_device_handler",

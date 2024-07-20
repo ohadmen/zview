@@ -5,7 +5,7 @@ cc_library(
         
 
     deps = [
-        "//src/opengl_backend",
+        "//src/graphics_backend",
         "//src/io",
         "//src/drawables",
         "//src/ui:input_device_handler",

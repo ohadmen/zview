@@ -12,7 +12,7 @@ cc_library(
     
     deps = [
         "@eigen",
-         "//src/opengl_backend",
+         "//src/graphics_backend",
 
 
     ],
