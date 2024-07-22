@@ -7,12 +7,12 @@ namespace zview {
 Grid::Grid() : types::Edges("grid") {}
 bool Grid::init() {
 
-  static const float max_z_far = 1e4;
-  static const float max_fov_deg = 90;
+  static constexpr float max_z_far = 1e4;
+  static constexpr float max_fov_deg = 90;
 
   static const float q =
       float(std::pow(10, int(0.85 * std::log10(100 * max_z_far)))) / 100 * 0.1;
-  static const float fp = max_z_far * tan(max_fov_deg / 2 * M_PIf / 180.0F) / q;
+  static const float fp = max_z_far * tan(max_fov_deg / 2 * M_PI / 180.0F) / q;
   static const float stride = 1.0f;
   static uint8_t col = 255;
   static uint8_t alpha = 50;

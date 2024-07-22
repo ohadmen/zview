@@ -16,3 +16,11 @@ cc_binary(
         "//src/params"
     ],
 )
+
+cc_binary(
+    name = "vulkan_test",
+    deps = ["//src/graphics_backend"],
+
+    srcs = ["vulkan_test.cpp"],
+   
+)
