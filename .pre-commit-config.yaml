@@ -5,7 +5,7 @@ repos:
       - id: clang-format
         args: [-i, --style=Google]
       - id: clang-tidy
-        args: [--fix-errors, -warnings-as-errors=*]
+        args: [--fix-errors, -warnings-as-errors=*, -extra-arg=-std=c++20]
       - id: cppcheck
         args: [--enable=all]
       - id: cpplint
