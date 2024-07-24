@@ -9,9 +9,9 @@ repos:
     hooks:
       - id: clang-format
         args: [-i, --style=Google]
-        exclude: src/graphics_backend/|src/vulkan_test.cpp
+        exclude: src/graphics_backend/|src/vulkan_test.cpp|external/
       - id: clang-tidy
-        exclude: src/graphics_backend/|src/vulkan_test.cpp
+        exclude: src/graphics_backend/|src/vulkan_test.cpp|external/
       # - id: cppcheck
       #   args: [--enable=all]
       #   exclude: src/graphics_backend/

@@ -20,8 +20,8 @@ using Matrix4x4 = Eigen::Matrix4f;
 using Transform = Eigen::Transform<float, 3, Eigen::Affine>;
 
 class Bbox3d {
-  types::Vector3 m_min;
-  types::Vector3 m_max;
+  types::Vector3 m_min{};
+  types::Vector3 m_max{};
 
  public:
   Bbox3d() : m_min{0, 0, 0}, m_max{0, 0, 0} {}
