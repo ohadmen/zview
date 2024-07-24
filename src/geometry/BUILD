@@ -1,17 +1,17 @@
-
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "mvp_mat",
     srcs = [
-        "mvp_mat.cpp"
+        "mvp_mat.cpp",
     ],
     hdrs = [
         "mvp_mat.h",
     ],
-    deps = ["//src/types","//src/params",        "@imgui"],
     visibility = ["//visibility:public"],
-    
-
+    deps = [
+        "//src/params",
+        "//src/types",
+        "@imgui",
+    ],
 )
-
-

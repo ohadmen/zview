@@ -1,6 +1,11 @@
-#include "read_file.h"
+#include "src/io/read_file.h"
 
- std::string readFile(const std::string &filename) {
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+std::string readFile(const std::string& filename) {
   std::ifstream file;
   file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
   std::stringstream file_stream;

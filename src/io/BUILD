@@ -5,27 +5,25 @@ cc_library(
     srcs = [
         "read_ply.cpp",
         "write_ply.cpp",
-
     ],
-    hdrs = ["read_ply.h",
-    "write_ply.h",
-            ],
-    
+    hdrs = [
+        "read_ply.h",
+        "write_ply.h",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
+        "//src/io:read_file",
         "//src/types",
-        "//src/io:read_file"
     ],
-        visibility = ["//visibility:public"],
-
 )
+
 cc_library(
     name = "read_file",
     srcs = [
         "read_file.cpp",
     ],
     hdrs = ["read_file.h"],
+    visibility = ["//visibility:public"],
     deps = [
-
     ],
-        visibility = ["//visibility:public"],
 )

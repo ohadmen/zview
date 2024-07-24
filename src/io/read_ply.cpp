@@ -1,12 +1,15 @@
-#include "read_ply.h"
+#include "src/io/read_ply.h"
+
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <map>
+// https://github.com/google/styleguide/issues/194
+// NOLINTNEXTLINE[build/c++11]
 #include <regex>
 #include <string>
+#include <utility>
 #include <vector>
-
-#include <iostream> //cout
 
 namespace zview::io {
 using ElemData =
@@ -22,7 +25,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       "hargpropertyucharbpropertyuchara"] = [](std::ifstream &ss,
                                                size_t count) -> ElemData {
     std::vector<types::VertData> v(count);
-    ss.read((char *)(&v[0]), sizeof(v[0]) * count);
+    ss.read(reinterpret_cast<char *>(&v[0]), sizeof(v[0]) * count);
     return v;
   };
   // xyz
@@ -30,7 +33,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       [](std::ifstream &ss, size_t count) -> ElemData {
     std::vector<types::VertData> v(count);
     for (size_t i = 0; i != count; ++i)
-      ss.read((char *)(&v[i]), sizeof(float) * 3);
+      ss.read(reinterpret_cast<char *>(&v[i]), sizeof(float) * 3);
     return v;
   };
   // edge
@@ -38,7 +41,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       [](std::ifstream &ss, size_t count) -> ElemData {
     std::vector<types::EdgeIndx> v(count);
     for (size_t i = 0; i != count; ++i)
-      ss.read((char *)&v[i], 2 * sizeof(int32_t));
+      ss.read(reinterpret_cast<char *>(&v[i]), 2 * sizeof(int32_t));
     return v;
   };
 
@@ -49,10 +52,9 @@ std::map<std::string, ReaderFunc> getReaderMap() {
     uint8_t listsz;
 
     for (size_t i = 0; i != count; ++i) {
-      ss.read((char *)&listsz, 1);
-      if (listsz != 3)
-        throw std::runtime_error("support only tri meshes");
-      ss.read((char *)&v[i], 3 * sizeof(int32_t));
+      ss.read(reinterpret_cast<char *>(&listsz), 1);
+      if (listsz != 3) throw std::runtime_error("support only tri meshes");
+      ss.read(reinterpret_cast<char *>(&v[i]), 3 * sizeof(int32_t));
     }
 
     return v;
@@ -66,7 +68,7 @@ struct ElementHeader {
   size_t count;
   std::string signiture;
   ElementHeader(const std::string &type_, const std::string &count_,
-                std::string &propList_)
+                const std::string &propList_)
       : type(type_), count(std::atoi(count_.c_str())) {
     signiture = type;
     for (size_t i = 0; i != propList_.size(); ++i) {
@@ -85,8 +87,7 @@ std::string readHeader(std::ifstream &ss) {
                    .base(),
                line.end());
     header += line + " ";
-    if (line.find("end_header") != std::string::npos)
-      break;
+    if (line.find("end_header") != std::string::npos) break;
   }
 
   return header;
@@ -101,7 +102,6 @@ std::vector<ElementHeader> getElementHeaders(const std::string &header) {
   auto elemEnd = std::sregex_iterator();
 
   for (std::sregex_iterator i = elemBegin; i != elemEnd; ++i) {
-
     std::smatch m = *i;
     std::string prop = m[3];
     elems.push_back({m[1], m[2], prop});
@@ -110,7 +110,6 @@ std::vector<ElementHeader> getElementHeaders(const std::string &header) {
   return elems;
 }
 std::string getName(const std::string &header) {
-
   std::vector<ElementHeader> elems;
 
   static const std::regex rx("comment\\s+([^\\s]+)");
@@ -129,7 +128,6 @@ std::string getName(const std::string &header) {
 
 types::Shape elemArrayToshape(const std::vector<ElemData> &elems,
                               const std::string &name) {
-
   const std::vector<types::VertData> *verticesP = nullptr;
   const std::vector<types::FaceIndx> *faceP = nullptr;
   const std::vector<types::EdgeIndx> *edgesP = nullptr;
@@ -149,8 +147,7 @@ types::Shape elemArrayToshape(const std::vector<ElemData> &elems,
       edgesP = &std::get<std::vector<types::EdgeIndx>>(a);
     }
   }
-  if (!verticesP)
-    throw std::runtime_error("data doesn't hold vertex data");
+  if (!verticesP) throw std::runtime_error("data doesn't hold vertex data");
   if (faceP && edgesP)
     throw std::runtime_error(
         "data holds both mesh and edge data, currently not supported");
@@ -192,18 +189,14 @@ std::vector<ElemData> readElems(const std::vector<ElementHeader> &elemHeaders,
 }
 
 std::vector<types::Shape> read_ply(const std::string &fn) {
-
   std::ifstream ss(fn, std::ios::in | std::ios::binary);
-  if (ss.fail())
-    throw std::runtime_error("failed to open " + std::string(fn));
+  if (ss.fail()) throw std::runtime_error("failed to open " + std::string(fn));
 
   std::vector<types::Shape> container;
 
   while (!ss.eof()) {
-
     std::string header = readHeader(ss);
-    if (header.empty())
-      break;
+    if (header.empty()) break;
     auto elemHeaders = getElementHeaders(header);
     std::string name = getName(header);
     if (name.empty()) {
@@ -222,4 +215,4 @@ std::vector<types::Shape> read_ply(const std::string &fn) {
   }
   return container;
 }
-} // namespace zview::io
+}  // namespace zview::io
