@@ -115,10 +115,16 @@ class Pcl {
 
   explicit Pcl(const std::string &name) : m_name(name) {}
 
-  // define copy constructor to make sure that std::variant don't delete it
+  // default copy constructor
   Pcl(const Pcl &other) = default;
-
+  // default assignment operator
   Pcl &operator=(const Pcl &other) = default;
+  // default move constructor
+  Pcl(Pcl &&other) = default;
+  // default move assignment operator
+  Pcl &operator=(Pcl &&other) = default;
+  // default destructor
+  virtual ~Pcl() = default;
 
   const std::string &getName() const { return m_name; }
   void setName(const std::string &name) { m_name = name; }
@@ -148,9 +154,17 @@ class Mesh : public Pcl {
   std::uint32_t ebo() const { return m_ebo; }
 
   explicit Mesh(const std::string &name) : Pcl(name) {}
-  // define copy constructor to make sure that std::variant don't delete it
-  Mesh(const Mesh &) = default;
+
+  // default copy constructor
+  Mesh(const Mesh &other) = default;
+  // default assignment operator
   Mesh &operator=(const Mesh &other) = default;
+  // default move constructor
+  Mesh(Mesh &&other) = default;
+  // default move assignment operator
+  Mesh &operator=(Mesh &&other) = default;
+  // default destructor
+  virtual ~Mesh() = default;
 
   std::vector<FaceIndx> &f() { return m_f; }
   const std::vector<FaceIndx> &f() const { return m_f; }
@@ -171,8 +185,17 @@ class Edges : public Pcl {
   std::uint32_t ebo() const { return m_ebo; }
 
   explicit Edges(const std::string &name) : Pcl(name) {}
-  Edges(const Edges &) = default;
+
+  // default copy constructor
+  Edges(const Edges &other) = default;
+  // default assignment operator
   Edges &operator=(const Edges &other) = default;
+  // default move constructor
+  Edges(Edges &&other) = default;
+  // default move assignment operator
+  Edges &operator=(Edges &&other) = default;
+  // default destructor
+  virtual ~Edges() = default;
 
   std::vector<EdgeIndx> &e() { return m_e; }
   const std::vector<EdgeIndx> &e() const { return m_e; }
@@ -182,5 +205,6 @@ class Edges : public Pcl {
       const std::array<types::Vector3, 2> &ray) const override;
 };
 using Shape = std::variant<Pcl, Edges, Mesh>;
+
 }  // namespace types
 }  // namespace zview
