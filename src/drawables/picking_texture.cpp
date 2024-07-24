@@ -67,8 +67,7 @@ void PickingTexture::disableWriting() const {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-PickingTexture::PixelInfo PickingTexture::readPixel(unsigned int x,
-                                                    unsigned int y) const {
+PickingTexture::PixelInfo PickingTexture::readPixel(int x, int y) const {
   glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 
   glReadBuffer(GL_COLOR_ATTACHMENT0);

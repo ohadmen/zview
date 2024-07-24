@@ -19,7 +19,7 @@ class MainApp {
   Axis m_axis;
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
-  GLFWwindow *m_window;
+  GLFWwindow *m_window{nullptr};
   std::optional<types::Vector3> m_hover_point;
   /*
   @brief get the window size

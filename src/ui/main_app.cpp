@@ -20,7 +20,7 @@ static void glfw_error_callback(int error, const char *description) {
 }
 
 std::array<int, 2> MainApp::getWinSize() const {
-  std::array<int, 2> size;
+  std::array<int, 2> size{};
   glfwGetWindowSize(m_window, &size[0], &size[1]);
   return size;
 }
@@ -230,18 +230,19 @@ std::optional<types::Vector3> MainApp::pickingPhase(
   m_picking.setTransform(mvp);
   auto &picking = m_picking;
   const auto preDrawFunction =
-      [&picking](std::pair<std::uint32_t, types::Shape> s) {
+      [&picking](const std::pair<std::uint32_t, types::Shape> &s) {
         picking.setObjectIndex(s.first);
       };
   m_buffer.draw(nullptr, preDrawFunction);
   m_picking.disableWriting();
 
-  const auto pix = m_picking.readPixel(io.MousePos.x, io.MousePos.y);
+  const auto pix = m_picking.readPixel(static_cast<int>(io.MousePos.x),
+                                       static_cast<int>(io.MousePos.y));
 
   if (pix.valid == 1) {
     const auto r = m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::GLOBAL);
 
-    const auto pt = m_buffer.get3dLocation(pix.object_id, pix.prim_id, r);
+    auto pt = m_buffer.get3dLocation(pix.object_id, pix.prim_id, r);
 
     return pt;
   }
@@ -278,8 +279,8 @@ void MainApp::drawParamsMenu() {
   ImGui::Begin("Parameters");
   auto &params = zview::Params::i();
   const float object_distance = m_mvp.getViewDistance();
-  params.camera_z_near = object_distance * 1e-3;
-  params.camera_z_far = object_distance * 1e3;
+  params.camera_z_near = object_distance * 1e-3f;
+  params.camera_z_far = object_distance * 1e3f;
 
   static constexpr float deg2rad = M_PIf / 180.0f;
   float cam_fov_deg = params.camera_fov_rad / deg2rad;

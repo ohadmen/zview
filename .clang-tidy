@@ -11,5 +11,6 @@ Checks: >
     google-*,
     performance-*,
     -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-pro-type-vararg,
     { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
 
