@@ -2,11 +2,14 @@
 #include <Eigen/Dense>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <optional>
+#include <string>
 #include <variant>
 #include <vector>
 
 #include "src/graphics_backend/opengl_shader.h"
+
 namespace zview {
 namespace types {
 using Vector2 = Eigen::Vector2f;
@@ -157,7 +160,7 @@ class Edges : public Pcl {
   std::uint32_t &ebo() { return m_ebo; }
   std::uint32_t ebo() const { return m_ebo; }
 
-  explicit  Edges(const std::string &name) : Pcl(name) {}
+  explicit Edges(const std::string &name) : Pcl(name) {}
   std::vector<EdgeIndx> &e() { return m_e; }
   const std::vector<EdgeIndx> &e() const { return m_e; }
 

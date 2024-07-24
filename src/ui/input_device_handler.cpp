@@ -35,7 +35,7 @@ types::Vector3 InputDeviceHandler::getHitOnScreen(types::Vector3 u) {
 
   // }
 }
-InputDeviceHandler::InputDeviceHandler(MVPmat &mvp) : m_mvp{mvp} {
+InputDeviceHandler::InputDeviceHandler(MVPmat *mvpP) : m_mvp{*mvpP} {
   fillHitScreenLut();
 }
 void InputDeviceHandler::step(

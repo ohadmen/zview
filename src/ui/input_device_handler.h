@@ -12,7 +12,7 @@ class InputDeviceHandler {
   types::Vector3 getHitOnScreen(types::Vector3 u);
 
  public:
-  InputDeviceHandler(MVPmat &mvp);
+  explicit InputDeviceHandler(MVPmat *mvpP);
   void step(const std::optional<types::Vector3> &hover_point);
   InputDeviceHandler(InputDeviceHandler &&) = default;
   InputDeviceHandler(const InputDeviceHandler &) = default;

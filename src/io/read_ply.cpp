@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <functional>
-#include <iostream>  //cout
+#include <iostream>
 #include <map>
 // https://github.com/google/styleguide/issues/194
 // NOLINTNEXTLINE[build/c++11]
@@ -52,7 +52,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
     uint8_t listsz;
 
     for (size_t i = 0; i != count; ++i) {
-      ss.read((char *)&listsz, 1);
+      ss.read(reinterpret_cast<char *>(&listsz), 1);
       if (listsz != 3) throw std::runtime_error("support only tri meshes");
       ss.read(reinterpret_cast<char *>(&v[i]), 3 * sizeof(int32_t));
     }

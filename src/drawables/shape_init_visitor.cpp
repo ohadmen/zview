@@ -1,4 +1,4 @@
-#include "shape_init_visitor.h"
+#include "src/drawables/shape_init_visitor.h"
 // #include "src/graphics_backend/imgui_impl_glfw.h"
 // #include "src/graphics_backend/imgui_impl_opengl3.h"
 // #include "src/graphics_backend/opengl_shader.h"
@@ -16,10 +16,11 @@ bool ShapeInitVisitor::operator()(types::Pcl &obj) const {
   glBindBuffer(GL_ARRAY_BUFFER, obj.vbo());
   glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(types::VertData),
                verts.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                        reinterpret_cast<void *>(0));
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
+                        reinterpret_cast<void *>(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -42,10 +43,11 @@ bool ShapeInitVisitor::operator()(types::Edges &obj) const {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                indices.size() * sizeof(types::EdgeIndx), indices.data(),
                GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                        reinterpret_cast<void *>(0));
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
+                        reinterpret_cast<void *>(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
@@ -73,11 +75,12 @@ bool ShapeInitVisitor::operator()(types::Mesh &obj) const {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                indices.size() * sizeof(types::FaceIndx), indices.data(),
                GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                        reinterpret_cast<void *>(0));
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
+                        reinterpret_cast<void *>(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);

@@ -1,6 +1,7 @@
 #include "src/types/types.h"
 
 #include <limits>
+#include <string>
 namespace zview {
 namespace types {
 bool Pcl::initShader(const std::string &shader_name) {
