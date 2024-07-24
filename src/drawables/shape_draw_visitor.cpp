@@ -8,7 +8,8 @@
 #include "src/graphics_backend/opengl_shader.h"
 #include "src/params/params.h"
 namespace zview {
-void ShapeDrawVisitor::operator()(const types::Pcl& obj, const float* tform) {
+void ShapeDrawVisitor::operator()(const types::Pcl& obj,
+                                  const float* tform) const {
   if (tform) {
     obj.shader().use();
     obj.shader().setUniform("u_transformation", tform);
@@ -23,7 +24,8 @@ void ShapeDrawVisitor::operator()(const types::Pcl& obj, const float* tform) {
   glBindVertexArray(0);
 }
 
-void ShapeDrawVisitor::operator()(const types::Edges& obj, const float* tform) {
+void ShapeDrawVisitor::operator()(const types::Edges& obj,
+                                  const float* tform) const {
   if (tform) {
     obj.shader().use();
     obj.shader().setUniform("u_transformation", tform);
@@ -33,7 +35,8 @@ void ShapeDrawVisitor::operator()(const types::Edges& obj, const float* tform) {
   glBindVertexArray(0);
 }
 
-void ShapeDrawVisitor::operator()(const types::Mesh& obj, const float* tform) {
+void ShapeDrawVisitor::operator()(const types::Mesh& obj,
+                                  const float* tform) const {
   // rendering our geometries
   if (tform) {
     obj.shader().use();

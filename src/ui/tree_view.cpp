@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <regex>
+#include <string>
+#include <vector>
+#include <deque>
 
 #include "imgui.h"  // for Imvec2
 
@@ -49,6 +52,7 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
   if (name_parts.size() == 1) {
     current_node->children.push_back({name_parts[0], object_key, {}});
   }
+  
   // last part was found, thi means there is already an object with the same
   // name, but there should not be a linked object
   else if (name_parts.empty()) {

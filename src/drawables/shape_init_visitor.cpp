@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 namespace zview {
 
-bool ShapeInitVisitor::operator()(types::Pcl &obj) {
+bool ShapeInitVisitor::operator()(types::Pcl &obj) const {
   obj.initShader("point");
   const auto verts = obj.v();
   glGenVertexArrays(1, &obj.vao());
@@ -26,7 +26,7 @@ bool ShapeInitVisitor::operator()(types::Pcl &obj) {
   bool ok = glGetError() == GL_NO_ERROR;
   return ok;
 }
-bool ShapeInitVisitor::operator()(types::Edges &obj) {
+bool ShapeInitVisitor::operator()(types::Edges &obj) const {
   obj.initShader("edges");
 
   const auto indices = obj.e();
@@ -52,7 +52,7 @@ bool ShapeInitVisitor::operator()(types::Edges &obj) {
   bool ok = glGetError() == GL_NO_ERROR;
   return ok;
 }
-bool ShapeInitVisitor::operator()(types::Mesh &obj) {
+bool ShapeInitVisitor::operator()(types::Mesh &obj) const {
   if (!obj.initShader("mesh")) {
     return false;
   }

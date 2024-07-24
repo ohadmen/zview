@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <random>
-#include <variant>
 #include <string>
+#include <variant>
 
 #include "src/drawables/shape_draw_visitor.h"
 #include "src/drawables/shape_init_visitor.h"

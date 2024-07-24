@@ -1,13 +1,18 @@
 #include "src/ui/main_app.h"
 
+#include <GLFW/glfw3.h>
+
+#include <algorithm>
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "src/graphics_backend/imgui_impl_glfw.h"
 #include "src/graphics_backend/imgui_impl_opengl3.h"
 #include "src/io/read_ply.h"
 #include "src/params/params.h"
-// Include glfw3.h after our OpenGL definitions
-#include <GLFW/glfw3.h>
+
 namespace zview {
 
 static void glfw_error_callback(int error, const char *description) {

@@ -21,20 +21,21 @@ std::int32_t Shader::getLocation(const std::string& name) const {
 bool Shader::init(const std::string& shader_name) {
   const std::string vertex_code = readFile("shaders/" + shader_name + ".vs");
   const std::string fragment_code = readFile("shaders/" + shader_name + ".fs");
-  m_vertex_code = vertex_code;
-  m_fragment_code = fragment_code;
-  bool fail = !compile() || !link();
+  
+
+  bool fail = !compile(vertex_code,fragment_code) || !link();
 
   return !fail;
 }
 
-bool Shader::compile() {
-  const char* vcode = m_vertex_code.c_str();
+bool Shader::compile(const std::string& vertex_code,
+                     const std::string& fragment_code) {
+  const char* vcode = vertex_code.c_str();
   m_vertex_id = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(m_vertex_id, 1, &vcode, NULL);
   glCompileShader(m_vertex_id);
 
-  const char* fcode = m_fragment_code.c_str();
+  const char* fcode = fragment_code.c_str();
   m_fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(m_fragment_id, 1, &fcode, NULL);
   glCompileShader(m_fragment_id);

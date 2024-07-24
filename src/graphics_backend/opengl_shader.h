@@ -23,12 +23,11 @@ class Shader {
 
   bool checkCompileErr();
   bool checkLinkingErr();
-  bool compile();
+  bool compile(const std::string& vertex_code,
+                     const std::string& fragment_code);
   bool link();
   unsigned int m_vertex_id;
   unsigned int m_fragment_id;
   unsigned int m_id;
-  std::string m_vertex_code;
-  std::string m_fragment_code;
   mutable std::unordered_map<std::string, std::int32_t> m_location_key;
 };
