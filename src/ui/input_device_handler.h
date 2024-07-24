@@ -14,10 +14,11 @@ class InputDeviceHandler {
  public:
   explicit InputDeviceHandler(MVPmat *mvpP);
   void step(const std::optional<types::Vector3> &hover_point);
-  InputDeviceHandler(InputDeviceHandler &&) = default;
-  InputDeviceHandler(const InputDeviceHandler &) = default;
-  InputDeviceHandler &operator=(InputDeviceHandler &&) = default;
-  InputDeviceHandler &operator=(const InputDeviceHandler &) = default;
+  // delete as field 'm_mvp' is of reference type 'zview::MVPmat &
+  InputDeviceHandler(InputDeviceHandler &&) = delete;
+  InputDeviceHandler(const InputDeviceHandler &) = delete;
+  InputDeviceHandler &operator=(InputDeviceHandler &&) = delete;
+  InputDeviceHandler &operator=(const InputDeviceHandler &) = delete;
   ~InputDeviceHandler();
 
  private:

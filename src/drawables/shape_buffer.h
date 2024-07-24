@@ -9,8 +9,8 @@
 #include "src/drawables/picking_texture.h"
 #include "src/types/types.h"
 namespace zview {
-class ShapeInitVisitor;  // fwddecl
-class ShapeDrawVisitor;  // fwddecl
+struct ShapeInitVisitor;  // fwddecl
+struct ShapeDrawVisitor;  // fwddecl
 
 class ShapeBuffer {
   using BaseTypeVector = std::unordered_map<std::uint32_t, types::Shape>;

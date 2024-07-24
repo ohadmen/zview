@@ -37,7 +37,7 @@ std::optional<types::Vector3> Pcl::get3dLocation(
 std::optional<types::Vector3> Mesh::get3dLocation(
     const std::uint32_t &prim_index,
     const std::array<types::Vector3, 2> &ray) const {
-  if (prim_index >= m_v.size()) {
+  if (prim_index >= v().size()) {
     return std::nullopt;
   }
   // plane represent as n'*x=d
@@ -48,16 +48,17 @@ std::optional<types::Vector3> Mesh::get3dLocation(
   // assuming that the ray actually hits the said triangle (as it comes from the
   // picking shader)
 
-  const auto v0 = types::Vector3{m_v[m_f[prim_index][0]]};
-  const auto v1 = types::Vector3{m_v[m_f[prim_index][1]]};
-  const auto v2 = types::Vector3{m_v[m_f[prim_index][2]]};
+  const auto v0 = types::Vector3{v()[m_f[prim_index][0]]};
+  const auto v1 = types::Vector3{v()[m_f[prim_index][1]]};
+  const auto v2 = types::Vector3{v()[m_f[prim_index][2]]};
 
   // intersection between ray and triangle
   const auto u = v1 - v0;
   const auto v = v2 - v0;
   const auto n = u.cross(v).normalized();
-  if (n.squaredNorm() == 0)  // triangle is degenerate
+  if (n.squaredNorm() == 0) { // triangle is degenerate
     return std::nullopt;     // do not deal with this case
+  }
 
   float b = n.dot(ray[1]);
   if (b == 0) {  // ray is  parallel to triangle plane
@@ -70,19 +71,19 @@ std::optional<types::Vector3> Mesh::get3dLocation(
     return std::nullopt;  // => no intersect
   }
 
-  const auto pt = ray[0] + ray[1] * r;  // intersect point of ray and plane
+  auto pt = ray[0] + ray[1] * r;  // intersect point of ray and plane
   return pt;
 }
 
 std::optional<types::Vector3> Edges::get3dLocation(
     const std::uint32_t &prim_index,
     const std::array<types::Vector3, 2> &ray) const {
-  if (prim_index >= m_v.size()) {
+  if (prim_index >= v().size()) {
     return std::nullopt;
   }
 
-  const auto v0 = types::Vector3{m_v[m_e[prim_index][0]]};
-  const auto v1 = types::Vector3{m_v[m_e[prim_index][1]]};
+  const auto v0 = types::Vector3{v()[m_e[prim_index][0]]};
+  const auto v1 = types::Vector3{v()[m_e[prim_index][1]]};
 
   // intersection between ray and a segment [v0,v1]
   const auto u0 = (v1 - v0).normalized();
@@ -99,7 +100,7 @@ std::optional<types::Vector3> Edges::get3dLocation(
   const Eigen ::Matrix<float, 2, 3> matApinv =
       matA.completeOrthogonalDecomposition().pseudoInverse();
   const Eigen ::Matrix<float, 2, 1> x = matApinv * matB;
-  const auto res = (p0 + p1 + x[0] * u0 + x[1] * u1) / 2;
+  auto res = (p0 + p1 + x[0] * u0 + x[1] * u1) / 2;
   return res;
 }
 

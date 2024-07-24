@@ -8,7 +8,16 @@ namespace zview {
 class PickingTexture {
  public:
   PickingTexture() {}
+  // copy constructor
+  PickingTexture(const PickingTexture &other) = delete;
+  // copy assignment
+  PickingTexture &operator=(const PickingTexture &other) = delete;
+  // move constructor
+  PickingTexture(PickingTexture &&other) = delete;
+  // move assignment
+  PickingTexture &operator=(PickingTexture &&other) = delete;
 
+  // destructor
   ~PickingTexture();
 
   bool init(const std::array<int, 2> &wh);

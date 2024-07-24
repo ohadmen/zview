@@ -15,8 +15,8 @@ TreeView::TreeView(
 
     std::function<bool &(const std::uint32_t &)> set_shape_visibility,
     std::function<void(const std::vector<std::uint32_t> &)> zoom_to_selection)
-    : m_shape_visibility{set_shape_visibility},
-      m_zoom_to_selection{zoom_to_selection} {}
+    : m_shape_visibility{std::move(set_shape_visibility)},
+      m_zoom_to_selection{std::move(zoom_to_selection)} {}
 void TreeView::push(std::string name, const std::uint32_t object_key) {
   // sanizing the string: make sure doesn't end with "/", and if it does - omit
   // it
