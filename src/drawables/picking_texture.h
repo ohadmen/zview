@@ -1,11 +1,12 @@
 #pragma once
+#include <cstdint>
+
 #include "src/graphics_backend/opengl_shader.h"
 #include "src/types/types.h"
-#include <cstdint>
 
 namespace zview {
 class PickingTexture {
-public:
+ public:
   PickingTexture() {}
 
   ~PickingTexture();
@@ -27,11 +28,11 @@ public:
   void setDrawIndex(std::uint32_t draw_index) const;
   void setTransform(const types::Matrix4x4 &tform) const;
 
-private:
+ private:
   std::uint32_t m_height{0};
   Shader m_pickingShader;
   std::uint32_t m_fbo{0};
   std::uint32_t m_pickingTexture{0};
   std::uint32_t m_depthTexture{0};
 };
-} // namespace zview
+}  // namespace zview

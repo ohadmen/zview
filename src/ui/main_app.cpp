@@ -1,11 +1,11 @@
 #include "src/ui/main_app.h"
 
-#include "src/io/read_ply.h"
+#include <iostream>
 
 #include "src/graphics_backend/imgui_impl_glfw.h"
 #include "src/graphics_backend/imgui_impl_opengl3.h"
+#include "src/io/read_ply.h"
 #include "src/params/params.h"
-#include <iostream>
 // Include glfw3.h after our OpenGL definitions
 #include <GLFW/glfw3.h>
 namespace zview {
@@ -21,13 +21,13 @@ std::array<int, 2> MainApp::getWinSize() const {
 }
 
 MainApp::MainApp()
-    : m_axis(m_mvp), m_idh{m_mvp},
+    : m_axis(m_mvp),
+      m_idh{m_mvp},
       m_tree_view{std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
                             std::placeholders::_1),
                   std::bind(&MainApp::setCameraToViewSelectedKey, this,
                             std::placeholders::_1)} {}
 bool MainApp::init() {
-
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit()) {
     std::cerr << "Failed to initialize glfw" << std::endl;
@@ -38,8 +38,8 @@ bool MainApp::init() {
   const char *glsl_version = "#version 460";
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
   // Create window with graphics context
   m_window = glfwCreateWindow(1280, 720, "ZVIEW", nullptr, nullptr);
@@ -49,7 +49,7 @@ bool MainApp::init() {
   }
 
   glfwMakeContextCurrent(m_window);
-  glfwSwapInterval(1); // Enable vsync
+  glfwSwapInterval(1);  // Enable vsync
 
   if (glewInit() != GLEW_OK) {
     std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
@@ -57,7 +57,7 @@ bool MainApp::init() {
   }
 
   glEnable(GL_PROGRAM_POINT_SIZE);
-  glEnable(GL_DEPTH_TEST); // draw object back tp front
+  glEnable(GL_DEPTH_TEST);  // draw object back tp front
   glEnable(GL_LINE_SMOOTH);
 
   glEnable(GL_MULTISAMPLE);
@@ -146,7 +146,6 @@ void MainApp::setCameraToViewSelectedKey(
   m_mvp.setModelTranslation(Eigen::Translation3f(-obj_center));
   bbox.applyTransform(vm);
 
- 
   const auto tan_h_fov_x = std::tan(Params::i().camera_fov_rad / 2);
   const auto tan_h_fov_y = tan_h_fov_x / m_mvp.getAspect();
   const auto req_distance_x =
@@ -160,9 +159,7 @@ void MainApp::setCameraToViewSelectedKey(
 }
 
 void MainApp::loop() {
-  
   while (!glfwWindowShouldClose(m_window)) {
-    
     const auto wh = getWinSize();
     if (wh != m_mvp.getWinSize()) {
       m_mvp.setWinSize(wh);
@@ -220,8 +217,8 @@ void MainApp::renderPhase(const types::Matrix4x4 &mvp) const {
 
   m_buffer.draw(mvp.data());
 }
-std::optional<types::Vector3>
-MainApp::pickingPhase(const types::Matrix4x4 &mvp) {
+std::optional<types::Vector3> MainApp::pickingPhase(
+    const types::Matrix4x4 &mvp) {
   const auto &io = ImGui::GetIO();
   m_picking.enableWriting();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -247,11 +244,11 @@ MainApp::pickingPhase(const types::Matrix4x4 &mvp) {
   return {};
 }
 void MainApp::drawStatusBar() {
-  const auto sz = 40; // ImGui::GetTextLineHeightWithSpacing();
+  const auto sz = 40;  // ImGui::GetTextLineHeightWithSpacing();
 
   ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - sz), 0);
   ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 0), 0);
-  ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
+  ImGui::SetNextWindowBgAlpha(0.35f);  // Transparent background
 
   ImGui::Begin("Status Bar", nullptr,
                ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
@@ -272,7 +269,6 @@ void MainApp::drawStatusBar() {
   ImGui::End();
 }
 void MainApp::drawParamsMenu() {
-
   // render your GUI
   ImGui::Begin("Parameters");
   auto &params = zview::Params::i();
@@ -296,4 +292,4 @@ void MainApp::drawParamsMenu() {
 
   ImGui::End();
 }
-} // namespace zview
+}  // namespace zview

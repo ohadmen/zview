@@ -1,12 +1,13 @@
 #include "src/drawables/grid.h"
+
+#include <iostream>
+
 #include "src/drawables/shape_draw_visitor.h"
 #include "src/drawables/shape_init_visitor.h"
 #include "src/params/params.h"
-#include <iostream>
 namespace zview {
 Grid::Grid() : types::Edges("grid") {}
 bool Grid::init() {
-
   static constexpr float max_z_far = 1e4;
   static constexpr float max_fov_deg = 90;
 
@@ -30,17 +31,16 @@ bool Grid::init() {
 
   return ShapeInitVisitor()(*this);
 }
-void Grid::draw(const types::Matrix4x4 &mvp,
-                const types::Vector3& model_loc,const float d) const {
-  
+void Grid::draw(const types::Matrix4x4& mvp, const types::Vector3& model_loc,
+                const float d) const {
   static constexpr float fov_factor = 0.25f;
   const float camfov = std::tan(Params::i().camera_fov_rad / 2.0f) * d * 2;
   float q = std::pow(10.0f, std::floor(std::log10(camfov * fov_factor)));
   types::Vector3 shift{std::floor(-model_loc.x() / q) * q,
                        std::floor(-model_loc.y() / q) * q, 0};
-  
+
   Eigen::Affine3f m{Eigen::Matrix4f::Identity()};
-  
+
   m.scale(q);
   m.pretranslate(shift);
 
@@ -50,4 +50,4 @@ void Grid::draw(const types::Matrix4x4 &mvp,
   m_shader.setUniform("u_transformation", mvp_grid.data());
   ShapeDrawVisitor()(*this, nullptr);
 }
-} // namespace zview
+}  // namespace zview

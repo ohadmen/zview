@@ -1,9 +1,10 @@
 #include "input_device_handler.h"
 
-#include "imgui.h"
-#include "src/params/params.h"
 #include <Eigen/Dense>
 #include <iostream>
+
+#include "imgui.h"
+#include "src/params/params.h"
 
 std::complex<float> gaussianFunc(const float x) {
   static constexpr float tb_sigma = 0.5F;
@@ -13,14 +14,12 @@ std::complex<float> gaussianFunc(const float x) {
 }
 namespace zview {
 void InputDeviceHandler::fillHitScreenLut() {
-
   for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
     const auto z = gaussianFunc(float(i) / m_hit_screen_lut.size() * 3.0);
     m_hit_screen_lut[i] = {z.real(), z.imag()};
   }
 }
 types::Vector3 InputDeviceHandler::getHitOnScreen(types::Vector3 u) {
-
   u.normalize();
   const auto u_xy = std::sqrt(u.x() * u.x() + u.y() * u.y());
 
@@ -42,8 +41,7 @@ void InputDeviceHandler::step(
     const std::optional<types::Vector3> &hover_point) {
   auto &io = ImGui::GetIO();
 
-  if (io.WantCaptureMouse)
-    return;
+  if (io.WantCaptureMouse) return;
 
   if (io.MouseClicked[0] || io.MouseClicked[1]) {
     m_clickedViewRotation = m_mvp.getViewRotation();
@@ -53,7 +51,6 @@ void InputDeviceHandler::step(
   }
   if (io.MouseDoubleClicked[0]) {
     if (hover_point) {
-
       m_mvp.setModelTranslation(Eigen::Translation3f(-hover_point.value()));
       m_clickedModelTranslation = m_mvp.getModelTranslation();
     }
@@ -94,18 +91,17 @@ void InputDeviceHandler::step(
                               m_clickedModelTranslation);
 
   } else if (io.MouseWheel != 0) {
-
     static constexpr auto step_scale_up = 1.1f;
-    static constexpr auto step_scale_down = 1.0f/1.1f;
+    static constexpr auto step_scale_down = 1.0f / 1.1f;
     static constexpr auto eps = std::numeric_limits<float>::epsilon() * 1e3f;
 
-    const float d = std::max(eps, m_mvp.getViewDistance() *
-                                      (io.MouseWheel>0 ? step_scale_up : step_scale_down));
+    const float d = std::max(
+        eps, m_mvp.getViewDistance() *
+                 (io.MouseWheel > 0 ? step_scale_up : step_scale_down));
 
     m_mvp.setViewDistance(d);
   }
 }
 
-
 InputDeviceHandler::~InputDeviceHandler() {}
-} // namespace zview
+}  // namespace zview

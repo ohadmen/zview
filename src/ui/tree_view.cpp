@@ -1,7 +1,9 @@
 #include "src/ui/tree_view.h"
-#include "imgui.h" // for Imvec2
+
 #include <iostream>
 #include <regex>
+
+#include "imgui.h"  // for Imvec2
 
 namespace zview {
 TreeView::TreeView(
@@ -9,7 +11,7 @@ TreeView::TreeView(
     std::function<bool &(const std::uint32_t &)> set_shape_visibility,
     std::function<void(const std::vector<std::uint32_t> &)> zoom_to_selection)
     : m_shape_visibility{set_shape_visibility},
-    m_zoom_to_selection{zoom_to_selection} {}
+      m_zoom_to_selection{zoom_to_selection} {}
 void TreeView::push(std::string name, const std::uint32_t object_key) {
   // sanizing the string: make sure doesn't end with "/", and if it does - omit
   // it
@@ -23,7 +25,6 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
   // if name is falt with no slashes
   TreeNode *current_node = &m_root;
   while (!name_parts.empty()) {
-
     auto it = std::find_if(current_node->children.begin(),
                            current_node->children.end(),
                            [&name_parts](const TreeNode &node) {
@@ -50,7 +51,7 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
   }
   // last part was found, thi means there is already an object with the same
   // name, but there should not be a linked object
-  else if (name_parts.size() == 0) {
+  else if (name_parts.empty()) {
     if (current_node->object_key != 0) {
       std::cerr << "Object with the same name already exists ("
                 << current_node->name << ")" << std::endl;
@@ -70,22 +71,24 @@ void TreeView::setChildrenVisibility(const TreeNode &node, bool v) const {
 std::int32_t TreeView::getChildrenVisibility(const TreeNode &node) const {
   std::int32_t v{0};
   for (const auto &child : node.children) {
-
     if (child.object_key != 0) {
       v += m_shape_visibility(child.object_key) ? 1 : -1;
     }
     v += getChildrenVisibility(child);
   }
-      
+
   return v;
 }
 
-void TreeView::getEnabledObjectsKeys(const TreeNode &node, std::vector<std::uint32_t> &selected_objects_keys) const {
+void TreeView::getEnabledObjectsKeys(
+    const TreeNode &node,
+    std::vector<std::uint32_t> &selected_objects_keys) const {
   /*
-  * This function is used to get all the object keys that are enabled in the tree view and are children of node
-  */
-  if(node.object_key != 0){
-    if(m_shape_visibility(node.object_key)){
+   * This function is used to get all the object keys that are enabled in the
+   * tree view and are children of node
+   */
+  if (node.object_key != 0) {
+    if (m_shape_visibility(node.object_key)) {
       selected_objects_keys.push_back(node.object_key);
     }
   }
@@ -109,7 +112,6 @@ void TreeView::drawTree(const TreeNode &node) const {
   }
 
   if (ImGui::TreeNodeEx(node.name.c_str(), flag)) {
-
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
       // has a linked item
       if (node.object_key != 0) {
@@ -120,11 +122,10 @@ void TreeView::drawTree(const TreeNode &node) const {
         bool v = getChildrenVisibility(node) > 0;
         setChildrenVisibility(node, !v);
       }
-    }
-    else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-     std::vector<std::uint32_t> selected_objects_keys;
-     getEnabledObjectsKeys(node, selected_objects_keys);
-     m_zoom_to_selection(selected_objects_keys);
+    } else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+      std::vector<std::uint32_t> selected_objects_keys;
+      getEnabledObjectsKeys(node, selected_objects_keys);
+      m_zoom_to_selection(selected_objects_keys);
     }
 
     for (const auto &child : node.children) {
@@ -143,4 +144,4 @@ void TreeView::draw() {
   ImGui::End();
 }
 
-} // namespace zview
+}  // namespace zview

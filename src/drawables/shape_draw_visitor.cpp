@@ -1,13 +1,14 @@
 #include "shape_draw_visitor.h"
 
+#include <GL/glew.h>  // Initialize with glewInit()
+#include <GLFW/glfw3.h>
+
+#include <iostream>
+
 #include "src/graphics_backend/opengl_shader.h"
 #include "src/params/params.h"
-
-#include <GL/glew.h> // Initialize with glewInit()
-#include <GLFW/glfw3.h>
-#include <iostream>
 namespace zview {
-void ShapeDrawVisitor::operator()(const types::Pcl &obj,const float* tform) {
+void ShapeDrawVisitor::operator()(const types::Pcl& obj, const float* tform) {
   if (tform) {
     obj.shader().use();
     obj.shader().setUniform("u_transformation", tform);
@@ -18,24 +19,21 @@ void ShapeDrawVisitor::operator()(const types::Pcl &obj,const float* tform) {
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
   }
   glBindVertexArray(obj.vao());
-  glDrawArrays(GL_POINTS, 0, obj.v().size() );
+  glDrawArrays(GL_POINTS, 0, obj.v().size());
   glBindVertexArray(0);
 }
 
-void ShapeDrawVisitor::operator()(const types::Edges &obj,const float* tform) { 
-
-   if (tform) {
+void ShapeDrawVisitor::operator()(const types::Edges& obj, const float* tform) {
+  if (tform) {
     obj.shader().use();
     obj.shader().setUniform("u_transformation", tform);
-  
   }
   glBindVertexArray(obj.vao());
   glDrawElements(GL_LINES, obj.e().size() * 2, GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
- }
+}
 
-void ShapeDrawVisitor::operator()(const types::Mesh &obj,const float* tform) {
-
+void ShapeDrawVisitor::operator()(const types::Mesh& obj, const float* tform) {
   // rendering our geometries
   if (tform) {
     obj.shader().use();
@@ -47,4 +45,4 @@ void ShapeDrawVisitor::operator()(const types::Mesh &obj,const float* tform) {
   glDrawElements(GL_TRIANGLES, obj.f().size() * 3, GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
 }
-} // namespace zview
+}  // namespace zview

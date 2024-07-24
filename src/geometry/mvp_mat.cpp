@@ -1,5 +1,6 @@
 #include "mvp_mat.h"
-#include "imgui.h" // for Imvec2
+
+#include "imgui.h"  // for Imvec2
 #include "src/params/params.h"
 
 namespace zview {
@@ -10,7 +11,11 @@ bool qFuzzyIsNull(float d) {
 }
 
 MVPmat::MVPmat()
-    : m_viewRotation{Eigen::AngleAxisf{std::acos(0.0f),types::Vector3{0,0,1}}}, m_modelTranslation{0, 0, 0}, m_w{1}, m_h{1},
+    : m_viewRotation{Eigen::AngleAxisf{std::acos(0.0f),
+                                       types::Vector3{0, 0, 1}}},
+      m_modelTranslation{0, 0, 0},
+      m_w{1},
+      m_h{1},
       m_viewDistance{1.0f} {
   updatePmat();
 }
@@ -21,7 +26,6 @@ types::Matrix4x4 MVPmat::getMVPmatrix() const {
   return m_proj.matrix() * mv.matrix();
 }
 void MVPmat::updatePmat() {
-
   const float aspect = getAspect();
   const float h_angle_rad = zview::Params::i().camera_fov_rad / 2.0f;
   const float nearPlane = zview::Params::i().camera_z_near;
@@ -71,33 +75,33 @@ std::array<types::Vector3, 2> MVPmat::getRay(const ImVec2 &pt,
                                              CoordinateSystem s) const {
   std::array<types::Vector3, 2> cam_origin_ray;
   switch (s) {
-  case MVPmat::CoordinateSystem::GLOBAL: {
-    cam_origin_ray = getRay(pt, MVPmat::CoordinateSystem::CAMERA);
-    cam_origin_ray[0] = m_modelTranslation.inverse() * cam_origin_ray[0];
-    break;
-  }
-  case MVPmat::CoordinateSystem::CAMERA: {
-    cam_origin_ray = getRay(pt, CoordinateSystem::SCREEN);
-    cam_origin_ray[1] = m_viewRotation.inverse() * cam_origin_ray[1];
-    cam_origin_ray[0] = m_viewRotation.inverse() *
-                        Eigen::Translation3f{0, 0, m_viewDistance} *
-                        cam_origin_ray[0];
+    case MVPmat::CoordinateSystem::GLOBAL: {
+      cam_origin_ray = getRay(pt, MVPmat::CoordinateSystem::CAMERA);
+      cam_origin_ray[0] = m_modelTranslation.inverse() * cam_origin_ray[0];
+      break;
+    }
+    case MVPmat::CoordinateSystem::CAMERA: {
+      cam_origin_ray = getRay(pt, CoordinateSystem::SCREEN);
+      cam_origin_ray[1] = m_viewRotation.inverse() * cam_origin_ray[1];
+      cam_origin_ray[0] = m_viewRotation.inverse() *
+                          Eigen::Translation3f{0, 0, m_viewDistance} *
+                          cam_origin_ray[0];
 
-    break;
-  }
-  case MVPmat::CoordinateSystem::SCREEN:
-  default: {
-    types::Vector4 uv(pt.x / m_w * 2 - 1, -(pt.y / m_h * 2 - 1), 1, 1.0f);
-    types::Vector4 sv = m_proj.inverse() * uv;
-    cam_origin_ray[0] = types::Vector3(0, 0, 0);
-    cam_origin_ray[1] = types::Vector3(sv[0], sv[1], sv[2]).normalized();
+      break;
+    }
+    case MVPmat::CoordinateSystem::SCREEN:
+    default: {
+      types::Vector4 uv(pt.x / m_w * 2 - 1, -(pt.y / m_h * 2 - 1), 1, 1.0f);
+      types::Vector4 sv = m_proj.inverse() * uv;
+      cam_origin_ray[0] = types::Vector3(0, 0, 0);
+      cam_origin_ray[1] = types::Vector3(sv[0], sv[1], sv[2]).normalized();
 
-    break;
-  }
+      break;
+    }
   }
   return cam_origin_ray;
 }
 
 types::Matrix4x4 MVPmat::getProjectiveMatrix() const { return m_proj; }
 
-} // namespace zview
+}  // namespace zview

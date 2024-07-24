@@ -4,9 +4,13 @@ repos:
     hooks:
       - id: clang-format
         args: [-i, --style=Google]
+        exclude: src/graphics_backend/
       - id: clang-tidy
         args: [--fix-errors, -warnings-as-errors=*]
+        exclude: src/graphics_backend/
       - id: cppcheck
         args: [--enable=all]
+        exclude: src/graphics_backend/
       - id: cpplint
         args: [--verbose=0, --filter=-legal/copyright]
+        exclude: src/graphics_backend/

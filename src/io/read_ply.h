@@ -1,6 +1,7 @@
 #pragma once
-#include "src/types/types.h"
 #include <vector>
+
+#include "src/types/types.h"
 
 namespace zview::io {
 std::vector<types::Shape> read_ply(const std::string &fn);

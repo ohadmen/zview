@@ -4,9 +4,9 @@
 namespace zview {
 
 /**
- * @brief Class to handle the Model View Projection matrix 
- * 
- * 
+ * @brief Class to handle the Model View Projection matrix
+ *
+ *
  */
 class MVPmat {
   types::Matrix4x4 m_proj;
@@ -15,18 +15,16 @@ class MVPmat {
   int m_w;
   int m_h;
   float m_viewDistance;
-  
-public:
-  
+
+ public:
   MVPmat();
 
   types::Matrix4x4 getMVPmatrix() const;
-  
-  void setWinSize(const std::array<int, 2>& wh);
-  std::array<int, 2> getWinSize()const;
+
+  void setWinSize(const std::array<int, 2> &wh);
+  std::array<int, 2> getWinSize() const;
   void updatePmat();
   float getAspect() const;
-
 
   enum class CoordinateSystem : std::uint8_t {
     GLOBAL = 0,
@@ -34,11 +32,8 @@ public:
     SCREEN = 2
   };
 
-
   template <typename Pt>
-  std::array<types::Vector3, 2> getRay(const Pt &pt, CoordinateSystem s)const ; 
-
-
+  std::array<types::Vector3, 2> getRay(const Pt &pt, CoordinateSystem s) const;
 
   const Eigen::Quaternionf &getViewRotation() const;
 
@@ -51,9 +46,8 @@ public:
   const Eigen::Translation3f &getModelTranslation() const;
 
   void setModelTranslation(const Eigen::Translation3f &m);
- 
-  types::Matrix4x4 getProjectiveMatrix() const;
 
+  types::Matrix4x4 getProjectiveMatrix() const;
 };
 
-} // namespace zview
+}  // namespace zview

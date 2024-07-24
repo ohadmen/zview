@@ -1,11 +1,13 @@
 #include "shape_buffer.h"
-#include "src/drawables/shape_draw_visitor.h"
-#include "src/drawables/shape_init_visitor.h"
-#include "src/io/write_ply.h"
 
 #include <iostream>
 #include <random>
 #include <variant>
+#include <string>
+
+#include "src/drawables/shape_draw_visitor.h"
+#include "src/drawables/shape_init_visitor.h"
+#include "src/io/write_ply.h"
 namespace zview {
 
 ShapeBuffer::ShapeBuffer()
@@ -43,14 +45,13 @@ const std::string getName(const types::Shape &s) {
   return std::visit([](const auto &v) { return v.getName(); }, s);
 }
 std::uint32_t ShapeBuffer::push(const types::Shape &s) {
-
   // check that there is no other shape with the same name
   const std::string s_name = getName(s);
   for (const auto &shape : m_buffer) {
     if (getName(shape.second) == s_name) {
       std::cout << "shape with name " << s_name << " already exists"
                 << std::endl;
-      auto s_renamed = s;
+      auto s_renamed{s};
       std::visit(
           [](auto &v) {
             v.setName(v.getName() + "_" + std::to_string(randomInt()));
@@ -90,9 +91,9 @@ void ShapeBuffer::draw(
 }
 
 types::Bbox3d ShapeBuffer::getBbox(std::vector<std::uint32_t> keys) const {
-  if(keys.empty()){
+  if (keys.empty()) {
     keys.reserve(m_buffer.size());
-    for(const auto& s:m_buffer){
+    for (const auto &s : m_buffer) {
       keys.push_back(s.first);
     }
   }
@@ -111,10 +112,9 @@ types::Bbox3d ShapeBuffer::getBbox(std::vector<std::uint32_t> keys) const {
 }
 std::size_t ShapeBuffer::size() const { return m_buffer.size(); }
 
-std::optional<types::Vector3>
-ShapeBuffer::get3dLocation(const std::uint32_t &object_key,
-                           const std::uint32_t &prim_index,
-                           const std::array<types::Vector3, 2> &ray) const {
+std::optional<types::Vector3> ShapeBuffer::get3dLocation(
+    const std::uint32_t &object_key, const std::uint32_t &prim_index,
+    const std::array<types::Vector3, 2> &ray) const {
   auto it = m_buffer.find(object_key);
   if (it == m_buffer.end()) {
     return std::nullopt;
@@ -134,11 +134,10 @@ void ShapeBuffer::writeBufferToFile(const std::string &f) const {
 }
 
 bool &ShapeBuffer::shapeVisibility(const std::uint32_t &object_key) {
-
   auto it = m_buffer.find(object_key);
   if (it == m_buffer.end()) {
     throw std::runtime_error("object key not found");
   }
   return std::visit([](auto &v) -> bool & { return v.enabled(); }, it->second);
 }
-} // namespace zview
+}  // namespace zview

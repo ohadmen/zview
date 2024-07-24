@@ -1,11 +1,12 @@
 #pragma once
-#include "src/graphics_backend/opengl_shader.h"
 #include <Eigen/Dense>
 #include <array>
 #include <cmath>
 #include <optional>
 #include <variant>
 #include <vector>
+
+#include "src/graphics_backend/opengl_shader.h"
 namespace zview {
 namespace types {
 using Vector2 = Eigen::Vector2f;
@@ -19,7 +20,7 @@ class Bbox3d {
   types::Vector3 m_min;
   types::Vector3 m_max;
 
-public:
+ public:
   Bbox3d() : m_min{0, 0, 0}, m_max{0, 0, 0} {}
   Bbox3d(const types::Vector3 &mmin, const types::Vector3 &mmax)
       : m_min(mmin), m_max(mmax) {}
@@ -32,7 +33,7 @@ public:
   types::Vector3 max() const { return m_max; }
   types::Vector3 &min() { return m_min; }
   types::Vector3 &max() { return m_max; }
-  template<typename T>
+  template <typename T>
   void applyTransform(const T &t) {
     m_min = t * m_min;
     m_max = t * m_max;
@@ -54,7 +55,12 @@ struct VertData {
       : x(x_), y(y_), z(z_), r(r_), g(g_), b(b_), a(a_) {}
   VertData(const Vector3 &xyz,
            const Vector4 &rgba = Vector4{255, 255, 255, 255})
-      : x(xyz[0]), y(xyz[1]), z(xyz[2]), r(rgba.x()), g(rgba.y()), b(rgba.z()),
+      : x(xyz[0]),
+        y(xyz[1]),
+        z(xyz[2]),
+        r(rgba.x()),
+        g(rgba.y()),
+        b(rgba.z()),
         a(rgba.w()) {}
 
   operator Vector3() const { return Vector3(x, y, z); }
@@ -87,10 +93,9 @@ using FaceIndx = std::array<uint32_t, 3>;
 using EdgeIndx = std::array<uint32_t, 2>;
 
 class Pcl {
+  std::string m_name{};
 
-std::string m_name{};
-protected:
-  
+ protected:
   std::vector<types::VertData> m_v{};
   std::uint32_t m_vbo{0};
   std::uint32_t m_vao{0};
@@ -98,7 +103,7 @@ protected:
   Shader m_shader{};
   bool m_enabled{true};
 
-public:
+ public:
   std::uint32_t &vbo() { return m_vbo; }
   std::uint32_t &vao() { return m_vao; }
 
@@ -114,42 +119,41 @@ public:
   bool initShader(const std::string &shader_name);
   const Shader &shader() const;
   Bbox3d getBbox() const;
-  virtual std::optional<types::Vector3>
-  get3dLocation(const std::uint32_t &prim_index,
-                const std::array<types::Vector3, 2> &ray) const;
-  
-  bool& enabled() { return m_enabled;}
-  bool enabled() const { return m_enabled;}
-  
+  virtual std::optional<types::Vector3> get3dLocation(
+      const std::uint32_t &prim_index,
+      const std::array<types::Vector3, 2> &ray) const;
+
+  bool &enabled() { return m_enabled; }
+  bool enabled() const { return m_enabled; }
 };
 
 class Mesh : public Pcl {
-private:
+ private:
   std::uint32_t m_ebo;
 
-protected:
+ protected:
   std::vector<FaceIndx> m_f;
 
-public:
+ public:
   std::uint32_t &ebo() { return m_ebo; }
   std::uint32_t ebo() const { return m_ebo; }
 
   Mesh(const std::string &name) : Pcl(name) {}
   std::vector<FaceIndx> &f() { return m_f; }
   const std::vector<FaceIndx> &f() const { return m_f; }
-  std::optional<types::Vector3>
-  get3dLocation(const std::uint32_t &prim_index,
-                const std::array<types::Vector3, 2> &ray) const override;
+  std::optional<types::Vector3> get3dLocation(
+      const std::uint32_t &prim_index,
+      const std::array<types::Vector3, 2> &ray) const override;
 };
 
 class Edges : public Pcl {
-private:
+ private:
   std::uint32_t m_ebo;
 
-protected:
+ protected:
   std::vector<EdgeIndx> m_e;
 
-public:
+ public:
   std::uint32_t &ebo() { return m_ebo; }
   std::uint32_t ebo() const { return m_ebo; }
 
@@ -157,10 +161,10 @@ public:
   std::vector<EdgeIndx> &e() { return m_e; }
   const std::vector<EdgeIndx> &e() const { return m_e; }
 
-  std::optional<types::Vector3>
-  get3dLocation(const std::uint32_t &prim_index,
-                const std::array<types::Vector3, 2> &ray) const override;
+  std::optional<types::Vector3> get3dLocation(
+      const std::uint32_t &prim_index,
+      const std::array<types::Vector3, 2> &ray) const override;
 };
 using Shape = std::variant<Pcl, Edges, Mesh>;
-} // namespace types
-} // namespace zview
+}  // namespace types
+}  // namespace zview

@@ -1,4 +1,5 @@
 #include "write_ply.h"
+
 #include <fstream>
 
 namespace zview {
@@ -79,14 +80,12 @@ void io::writePly(std::string fn, const std::vector<types::Shape> &shapes) {
   auto pos = fn.find_last_of(".");
   std::string suffix =
       pos == std::string::npos ? fn : fn.substr(pos, std::string::npos);
-  if (suffix != ".ply")
-    fn += ".ply";
+  if (suffix != ".ply") fn += ".ply";
 
   Writer w(fn);
 
   for (const auto &objv : shapes) {
-
     std::visit(w, objv);
   }
 }
-}; // namespace zview
+};  // namespace zview
