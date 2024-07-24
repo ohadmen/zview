@@ -1,12 +1,12 @@
 #include "src/ui/tree_view.h"
 
+#include <imgui.h>  // for Imvec2
+
+#include <deque>
 #include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
-#include <deque>
-
-#include "imgui.h"  // for Imvec2
 
 namespace zview {
 TreeView::TreeView(
@@ -51,11 +51,10 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
   // last part of the name was not found --> add it as a child
   if (name_parts.size() == 1) {
     current_node->children.push_back({name_parts[0], object_key, {}});
-  }
-  
-  // last part was found, thi means there is already an object with the same
-  // name, but there should not be a linked object
-  else if (name_parts.empty()) {
+  } else if (name_parts.empty()) {
+    // last part was found, thi means there is already an object with the same
+    // name, but there should not be a linked object
+
     if (current_node->object_key != 0) {
       std::cerr << "Object with the same name already exists ("
                 << current_node->name << ")" << std::endl;
