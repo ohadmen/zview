@@ -10,7 +10,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//src/graphics_backend",
+        "//src/graphics_backend:shader",
         "@eigen",
     ],
 )

@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-#include "src/graphics_backend/opengl_shader.h"
+#include "src/graphics_backend/shader.h"
 #include "src/types/types.h"
 
 namespace zview {

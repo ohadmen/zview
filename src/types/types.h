@@ -8,7 +8,7 @@
 #include <variant>
 #include <vector>
 
-#include "src/graphics_backend/opengl_shader.h"
+#include "src/graphics_backend/shader.h"
 
 namespace zview {
 namespace types {

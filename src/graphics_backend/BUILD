@@ -6,14 +6,12 @@ cc_library(
         "imgui_impl_glfw.cpp",
         "imgui_impl_opengl3.cpp",
         "imgui_impl_vulkan.cpp",
-        "opengl_shader.cpp",
     ],
     hdrs = [
         "imgui_impl_glfw.h",
         "imgui_impl_opengl3.h",
         "imgui_impl_opengl3_loader.h",
         "imgui_impl_vulkan.h",
-        "opengl_shader.h",
     ],
     visibility = ["//visibility:public"],
     deps = [

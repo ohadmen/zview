@@ -3,7 +3,7 @@
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 
-#include "src/graphics_backend/opengl_shader.h"
+#include "src/graphics_backend/shader.h"
 #include "src/params/params.h"
 namespace zview {
 void ShapeDrawVisitor::operator()(const types::Pcl& obj,
