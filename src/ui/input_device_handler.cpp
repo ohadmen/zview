@@ -9,15 +9,16 @@
 std::complex<float> gaussianFunc(const float x) {
   static constexpr float tb_sigma = 0.5F;
   static constexpr float tb_height = +0.50F;
-  const float y = tb_height * std::exp(-0.5 * x * x / (tb_sigma * tb_sigma));
+  const float y = tb_height * expf(-0.5f * x * x / (tb_sigma * tb_sigma));
   return {x, y};
 }
 namespace zview {
 void InputDeviceHandler::fillHitScreenLut() {
   for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
     const auto z =
-        gaussianFunc(static_cast<float>(i) / m_hit_screen_lut.size() * 3.0);
-    m_hit_screen_lut[i] = {z.real(), z.imag()};
+        gaussianFunc(static_cast<float>(i) /
+                     static_cast<float>(m_hit_screen_lut.size()) * 3.0f);
+    m_hit_screen_lut.at(i) = {z.real(), z.imag()};
   }
 }
 types::Vector3 InputDeviceHandler::getHitOnScreen(types::Vector3 u) {

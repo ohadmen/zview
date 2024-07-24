@@ -47,17 +47,17 @@ std::optional<types::Vector3> Mesh::get3dLocation(
   // t=(d-n'd)/n'm
   // assuming that the ray actually hits the said triangle (as it comes from the
   // picking shader)
-
-  const auto v0 = types::Vector3{v()[m_f[prim_index][0]]};
-  const auto v1 = types::Vector3{v()[m_f[prim_index][1]]};
-  const auto v2 = types::Vector3{v()[m_f[prim_index][2]]};
+  const auto ind = m_f[prim_index];
+  const types::Vector3 v0{v()[ind[0]]};
+  const types::Vector3 v1{v()[ind[1]]};
+  const types::Vector3 v2{v()[ind[2]]};
 
   // intersection between ray and triangle
   const auto u = v1 - v0;
   const auto v = v2 - v0;
   const auto n = u.cross(v).normalized();
-  if (n.squaredNorm() == 0) { // triangle is degenerate
-    return std::nullopt;     // do not deal with this case
+  if (n.squaredNorm() == 0) {  // triangle is degenerate
+    return std::nullopt;       // do not deal with this case
   }
 
   float b = n.dot(ray[1]);

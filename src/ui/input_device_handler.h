@@ -22,10 +22,10 @@ class InputDeviceHandler {
   ~InputDeviceHandler();
 
  private:
-  Eigen::AngleAxisf m_clickedViewRotation;
-  Eigen::Translation3f m_clickedModelTranslation;
-  types::Vector3 m_click_ray;
-  std::array<std::array<float, 2>, 1024> m_hit_screen_lut;
+  Eigen::AngleAxisf m_clickedViewRotation{};
+  Eigen::Translation3f m_clickedModelTranslation{};
+  types::Vector3 m_click_ray{};
+  std::array<std::array<float, 2>, 1024> m_hit_screen_lut{};
   MVPmat &m_mvp;
 };
 

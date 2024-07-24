@@ -1,4 +1,9 @@
+FormatStyle: file
+HeaderFilterRegex: ".*"
 UseColor: true
+WarningsAsErrors: >
+    *,
+    -clang-diagnostic-builtin-macro-redefined,
 
 Checks: >
     bugprone-*,
@@ -6,10 +11,5 @@ Checks: >
     google-*,
     performance-*,
     -cppcoreguidelines-avoid-magic-numbers,
-HeaderFilterRegex: ".*"
+    { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
 
-WarningsAsErrors: >
-    bugprone-*,
-    cppcoreguidelines-*,
-    google-*,
-    performance-*,

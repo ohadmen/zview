@@ -40,7 +40,7 @@ std::uint32_t randomInt() {
   std::mt19937 rng(dev());
   std::uniform_int_distribution<std::mt19937::result_type> dist6(1000, 9999);
 
-  return std::uint32_t(dist6(rng));
+  return static_cast<std::uint32_t>(dist6(rng));
 }
 const std::string getName(const types::Shape &s) {
   return std::visit([](const auto &v) { return v.getName(); }, s);
@@ -116,6 +116,7 @@ types::Bbox3d ShapeBuffer::getBbox(std::vector<std::uint32_t> keys) const {
 std::size_t ShapeBuffer::size() const { return m_buffer.size(); }
 
 std::optional<types::Vector3> ShapeBuffer::get3dLocation(
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     const std::uint32_t &object_key, const std::uint32_t &prim_index,
     const std::array<types::Vector3, 2> &ray) const {
   auto it = m_buffer.find(object_key);

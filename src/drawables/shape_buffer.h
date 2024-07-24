@@ -17,6 +17,16 @@ class ShapeBuffer {
 
  public:
   ShapeBuffer();
+  // copy constructor
+  ShapeBuffer(const ShapeBuffer& other) = delete;
+  // copy assignment
+  ShapeBuffer& operator=(const ShapeBuffer& other) = delete;
+  // move constructor
+  ShapeBuffer(ShapeBuffer&& other) = delete;
+  // move assignment
+  ShapeBuffer& operator=(ShapeBuffer&& other) = delete;
+
+  // destructor
   ~ShapeBuffer();
 
   /*

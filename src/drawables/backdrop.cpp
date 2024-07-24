@@ -12,7 +12,9 @@ namespace zview {
 Backdrop::Backdrop() : Mesh("backdrop") {}
 bool zview::Backdrop::init(std::uint8_t background_color) {
   static const float zval = 1 - std::numeric_limits<float>::epsilon() * 1e3;
-  auto f2i = [](float x) -> std::uint8_t { return static_cast<std::uint8_t>(x * 255); };
+  auto f2i = [](float x) -> std::uint8_t {
+    return static_cast<std::uint8_t>(x * 255);
+  };
 
   switch (background_color) {
     {

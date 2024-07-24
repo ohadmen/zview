@@ -45,11 +45,11 @@ struct Writer {
     fid_ << "end_header" << std::endl;
 
     fid_.write(
-          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         reinterpret_cast<const char *>(&obj.v()[0]),
         static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     fid_.write(
-          // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         reinterpret_cast<const char *>(&obj.e()[0]),
         static_cast<std::int64_t>(sizeof(types::EdgeIndx) * obj.e().size()));
     fid_.flush();
@@ -71,8 +71,8 @@ struct Writer {
     fid_ << "property list uchar int vertex_indices" << std::endl;
     fid_ << "end_header" << std::endl;
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     fid_.write(
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         reinterpret_cast<const char *>(&obj.v()[0]),
         static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     uint8_t nfaces = 3;

@@ -37,8 +37,8 @@ void MVPmat::updatePmat() {
 
   const float cotan =
       std::abs(h_angle_rad) < std::numeric_limits<float>::epsilon() * 1e3
-          ? 1e3
-          : 1.0f / std::tan(h_angle_rad);
+          ? 1e3f
+          : 1.0f / tanf(h_angle_rad);
 
   // following
   // https://github.com/radekp/qt/blob/master/src/gui/math3d/qmatrix4x4.cpp
@@ -47,7 +47,9 @@ void MVPmat::updatePmat() {
       -(nearPlane + farPlane) / clip, -2.0f * nearPlane * farPlane / clip, 0, 0,
       -1, 0;
 }
-float MVPmat::getAspect() const { return static_cast<float>(m_w) / m_h; }
+float MVPmat::getAspect() const {
+  return static_cast<float>(m_w) / static_cast<float>(m_h);
+}
 void MVPmat::setWinSize(const std::array<int, 2> &wh) {
   m_w = wh[0];
   m_h = wh[1];
@@ -94,7 +96,8 @@ std::array<types::Vector3, 2> MVPmat::getRay(const ImVec2 &pt,
     }
     case MVPmat::CoordinateSystem::SCREEN:
     default: {
-      types::Vector4 uv(pt.x / m_w * 2 - 1, -(pt.y / m_h * 2 - 1), 1, 1.0f);
+      types::Vector4 uv(pt.x / static_cast<float>(m_w) * 2 - 1,
+                        -(pt.y / static_cast<float>(m_h) * 2 - 1), 1, 1.0f);
       types::Vector4 sv = m_proj.inverse() * uv;
       cam_origin_ray[0] = types::Vector3(0, 0, 0);
       cam_origin_ray[1] = types::Vector3(sv[0], sv[1], sv[2]).normalized();
