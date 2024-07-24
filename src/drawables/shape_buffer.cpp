@@ -54,7 +54,7 @@ std::uint32_t ShapeBuffer::push(const types::Shape &s) {
     if (getName(shape.second) == s_name) {
       std::cout << "shape with name " << s_name << " already exists"
                 << std::endl;
-      auto s_renamed{s};
+      types::Shape s_renamed{s};
       std::visit(
           [](auto &v) {
             v.setName(v.getName() + "_" + std::to_string(randomInt()));

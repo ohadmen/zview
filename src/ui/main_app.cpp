@@ -123,7 +123,7 @@ bool MainApp::init() {
 
 void MainApp::loadFiles(const std::vector<std::string> &files) {
   for (const auto &f : files) {
-    auto shape_vector = io::read_ply(f);
+    const auto shape_vector = io::read_ply(f);
 
     for (const auto &s : shape_vector) {
       const auto key = m_buffer.push(s);

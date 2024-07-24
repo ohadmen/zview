@@ -1,6 +1,6 @@
 load("//third_party:repos_http.bzl", "fetch_http_repositories")
 
-fetch_http_repositories()
+fetch_http_repositories("zview")
 
 load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
 

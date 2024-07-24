@@ -114,8 +114,11 @@ class Pcl {
   std::uint32_t vao() const { return m_vao; }
 
   explicit Pcl(const std::string &name) : m_name(name) {}
+
   // define copy constructor to make sure that std::variant don't delete it
   Pcl(const Pcl &other) = default;
+
+  Pcl &operator=(const Pcl &other) = default;
 
   const std::string &getName() const { return m_name; }
   void setName(const std::string &name) { m_name = name; }
@@ -145,6 +148,10 @@ class Mesh : public Pcl {
   std::uint32_t ebo() const { return m_ebo; }
 
   explicit Mesh(const std::string &name) : Pcl(name) {}
+  // define copy constructor to make sure that std::variant don't delete it
+  Mesh(const Mesh &) = default;
+  Mesh &operator=(const Mesh &other) = default;
+
   std::vector<FaceIndx> &f() { return m_f; }
   const std::vector<FaceIndx> &f() const { return m_f; }
   std::optional<types::Vector3> get3dLocation(
@@ -164,6 +171,9 @@ class Edges : public Pcl {
   std::uint32_t ebo() const { return m_ebo; }
 
   explicit Edges(const std::string &name) : Pcl(name) {}
+  Edges(const Edges &) = default;
+  Edges &operator=(const Edges &other) = default;
+
   std::vector<EdgeIndx> &e() { return m_e; }
   const std::vector<EdgeIndx> &e() const { return m_e; }
 
