@@ -114,6 +114,9 @@ class Pcl {
   std::uint32_t vao() const { return m_vao; }
 
   explicit Pcl(const std::string &name) : m_name(name) {}
+  // define copy constructor to make sure that std::variant don't delete it
+  Pcl(const Pcl &other) = default;
+
   const std::string &getName() const { return m_name; }
   void setName(const std::string &name) { m_name = name; }
 

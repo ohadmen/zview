@@ -27,7 +27,7 @@ std::array<int, 2> MainApp::getWinSize() const {
 
 MainApp::MainApp()
     : m_axis(m_mvp),
-      m_idh{m_mvp},
+      m_idh{&m_mvp},
       m_tree_view{std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
                             std::placeholders::_1),
                   std::bind(&MainApp::setCameraToViewSelectedKey, this,

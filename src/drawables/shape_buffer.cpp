@@ -47,6 +47,8 @@ const std::string getName(const types::Shape &s) {
 }
 std::uint32_t ShapeBuffer::push(const types::Shape &s) {
   // check that there is no other shape with the same name
+  static_assert(std::is_copy_constructible_v<types::Shape>);
+
   const std::string s_name = getName(s);
   for (const auto &shape : m_buffer) {
     if (getName(shape.second) == s_name) {

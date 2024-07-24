@@ -11,7 +11,7 @@ Axis::Axis(const MVPmat &mvp)
     : types::Mesh("grid"),
       m_mvp{mvp},
       m_locOnScreen{
-          Eigen::Affine3f{Eigen::Translation3f(-0.90, -0.8, 0)}.matrix()} {}
+          Eigen::Affine3f{Eigen::Translation3f(-0.90, -0.8, 1.0)}.matrix()} {}
 bool Axis::init() {
   static constexpr std::uint8_t c{255U};
 

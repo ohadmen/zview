@@ -3,24 +3,21 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 cc_binary(
     name = "zview",
     srcs = [
-        "zview_main.cpp",  
+        "zview_main.cpp",
     ],
     data = ["//shaders"],
-
     deps = [
-        "//src/ui:main_app",
+        "//src/drawables",
         "//src/graphics_backend",
         "//src/io",
-        "//src/drawables",
+        "//src/params",
         "//src/ui:input_device_handler",
-        "//src/params"
+        "//src/ui:main_app",
     ],
 )
 
 cc_binary(
     name = "vulkan_test",
-    deps = ["//src/graphics_backend"],
-
     srcs = ["vulkan_test.cpp"],
-   
+    deps = ["//src/graphics_backend"],
 )
