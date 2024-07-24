@@ -6,7 +6,7 @@ class Params {
   static float deg2rad(float deg);
 
  private:
-  Params(){};
+  Params() {}
 
  public:
   static Params& i();

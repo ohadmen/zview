@@ -3,6 +3,8 @@
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 
+#include <limits>
+
 #include "src/drawables/shape_draw_visitor.h"
 #include "src/drawables/shape_init_visitor.h"
 namespace zview {

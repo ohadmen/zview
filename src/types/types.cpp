@@ -1,5 +1,6 @@
 #include "src/types/types.h"
 
+#include <limits>
 namespace zview {
 namespace types {
 bool Pcl::initShader(const std::string &shader_name) {
@@ -64,8 +65,7 @@ std::optional<types::Vector3> Mesh::get3dLocation(
   float a = n.dot(v0 - ray[0]);
   // get intersect point of ray with triangle plane
   float r = a / b;
-  if (r < 0.0)  // ray goes away from triangle
-  {
+  if (r < 0.0) {          // ray goes away from triangle
     return std::nullopt;  // => no intersect
   }
 

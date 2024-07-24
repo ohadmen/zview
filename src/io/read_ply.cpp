@@ -1,11 +1,14 @@
-#include "read_ply.h"
+#include "src/io/read_ply.h"
 
 #include <fstream>
 #include <functional>
 #include <iostream>  //cout
 #include <map>
+// https://github.com/google/styleguide/issues/194
+// NOLINTNEXTLINE[build/c++11]
 #include <regex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace zview::io {
@@ -22,7 +25,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       "hargpropertyucharbpropertyuchara"] = [](std::ifstream &ss,
                                                size_t count) -> ElemData {
     std::vector<types::VertData> v(count);
-    ss.read((char *)(&v[0]), sizeof(v[0]) * count);
+    ss.read(reinterpret_cast<char *>(&v[0]), sizeof(v[0]) * count);
     return v;
   };
   // xyz
@@ -30,7 +33,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       [](std::ifstream &ss, size_t count) -> ElemData {
     std::vector<types::VertData> v(count);
     for (size_t i = 0; i != count; ++i)
-      ss.read((char *)(&v[i]), sizeof(float) * 3);
+      ss.read(reinterpret_cast<char *>(&v[i]), sizeof(float) * 3);
     return v;
   };
   // edge
@@ -38,7 +41,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       [](std::ifstream &ss, size_t count) -> ElemData {
     std::vector<types::EdgeIndx> v(count);
     for (size_t i = 0; i != count; ++i)
-      ss.read((char *)&v[i], 2 * sizeof(int32_t));
+      ss.read(reinterpret_cast<char *>(&v[i]), 2 * sizeof(int32_t));
     return v;
   };
 
@@ -51,7 +54,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
     for (size_t i = 0; i != count; ++i) {
       ss.read((char *)&listsz, 1);
       if (listsz != 3) throw std::runtime_error("support only tri meshes");
-      ss.read((char *)&v[i], 3 * sizeof(int32_t));
+      ss.read(reinterpret_cast<char *>(&v[i]), 3 * sizeof(int32_t));
     }
 
     return v;
@@ -65,7 +68,7 @@ struct ElementHeader {
   size_t count;
   std::string signiture;
   ElementHeader(const std::string &type_, const std::string &count_,
-                std::string &propList_)
+                const std::string &propList_)
       : type(type_), count(std::atoi(count_.c_str())) {
     signiture = type;
     for (size_t i = 0; i != propList_.size(); ++i) {

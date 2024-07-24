@@ -1,10 +1,10 @@
-#include "input_device_handler.h"
+#include "src/ui/input_device_handler.h"
+
+#include <imgui.h>
 
 #include <Eigen/Dense>
-#include <iostream>
-
-#include "imgui.h"
-#include "src/params/params.h"
+#include <algorithm>
+#include <limits>
 
 std::complex<float> gaussianFunc(const float x) {
   static constexpr float tb_sigma = 0.5F;
@@ -15,7 +15,8 @@ std::complex<float> gaussianFunc(const float x) {
 namespace zview {
 void InputDeviceHandler::fillHitScreenLut() {
   for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
-    const auto z = gaussianFunc(float(i) / m_hit_screen_lut.size() * 3.0);
+    const auto z =
+        gaussianFunc(static_cast<float>(i) / m_hit_screen_lut.size() * 3.0);
     m_hit_screen_lut[i] = {z.real(), z.imag()};
   }
 }

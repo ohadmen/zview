@@ -7,7 +7,7 @@
 #include "src/params/params.h"
 
 namespace zview {
-Axis::Axis(MVPmat &mvp)
+Axis::Axis(const MVPmat &mvp)
     : types::Mesh("grid"),
       m_mvp{mvp},
       m_locOnScreen{

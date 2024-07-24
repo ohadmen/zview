@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <string>
+#include <vector>
 namespace zview {
 
 class TreeView {
@@ -18,7 +19,7 @@ class TreeView {
   std::int32_t getChildrenVisibility(const TreeNode& node) const;
   void getEnabledObjectsKeys(
       const TreeNode& node,
-      std::vector<std::uint32_t>& selected_objects_keys) const;
+      std::vector<std::uint32_t>* selected_objects_keysP) const;
 
  public:
   TreeView(

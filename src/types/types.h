@@ -110,7 +110,7 @@ class Pcl {
   std::uint32_t vbo() const { return m_vbo; }
   std::uint32_t vao() const { return m_vao; }
 
-  Pcl(const std::string &name) : m_name(name) {}
+  explicit Pcl(const std::string &name) : m_name(name) {}
   const std::string &getName() const { return m_name; }
   void setName(const std::string &name) { m_name = name; }
 
@@ -138,7 +138,7 @@ class Mesh : public Pcl {
   std::uint32_t &ebo() { return m_ebo; }
   std::uint32_t ebo() const { return m_ebo; }
 
-  Mesh(const std::string &name) : Pcl(name) {}
+  explicit Mesh(const std::string &name) : Pcl(name) {}
   std::vector<FaceIndx> &f() { return m_f; }
   const std::vector<FaceIndx> &f() const { return m_f; }
   std::optional<types::Vector3> get3dLocation(
@@ -157,7 +157,7 @@ class Edges : public Pcl {
   std::uint32_t &ebo() { return m_ebo; }
   std::uint32_t ebo() const { return m_ebo; }
 
-  Edges(const std::string &name) : Pcl(name) {}
+  explicit  Edges(const std::string &name) : Pcl(name) {}
   std::vector<EdgeIndx> &e() { return m_e; }
   const std::vector<EdgeIndx> &e() const { return m_e; }
 

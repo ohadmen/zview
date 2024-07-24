@@ -4,6 +4,8 @@
 
 #include <deque>
 #include <iostream>
+// https://github.com/google/styleguide/issues/194
+// NOLINTNEXTLINE[build/c++11]
 #include <regex>
 #include <string>
 #include <vector>
@@ -85,18 +87,18 @@ std::int32_t TreeView::getChildrenVisibility(const TreeNode &node) const {
 
 void TreeView::getEnabledObjectsKeys(
     const TreeNode &node,
-    std::vector<std::uint32_t> &selected_objects_keys) const {
+    std::vector<std::uint32_t> *selected_objects_keys_p) const {
   /*
    * This function is used to get all the object keys that are enabled in the
    * tree view and are children of node
    */
   if (node.object_key != 0) {
     if (m_shape_visibility(node.object_key)) {
-      selected_objects_keys.push_back(node.object_key);
+      selected_objects_keys_p->push_back(node.object_key);
     }
   }
   for (const auto &child : node.children) {
-    getEnabledObjectsKeys(child, selected_objects_keys);
+    getEnabledObjectsKeys(child, selected_objects_keys_p);
   }
 }
 
@@ -127,7 +129,7 @@ void TreeView::drawTree(const TreeNode &node) const {
       }
     } else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
       std::vector<std::uint32_t> selected_objects_keys;
-      getEnabledObjectsKeys(node, selected_objects_keys);
+      getEnabledObjectsKeys(node, &selected_objects_keys);
       m_zoom_to_selection(selected_objects_keys);
     }
 

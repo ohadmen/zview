@@ -1,4 +1,4 @@
-#include "params.h"
+#include "src/params/params.h"
 
 #include <cmath>
 namespace zview {
@@ -7,5 +7,5 @@ Params &Params::i() {
   return instance;
 }
 void Params::load(std::string fn) {}
-float Params::deg2rad(float deg) { return deg * M_PIf / 180.0f; };
+float Params::deg2rad(float deg) { return deg * M_PIf / 180.0f; }
 }  // namespace zview

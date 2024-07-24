@@ -1,7 +1,4 @@
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#pragma once
 #include <string>
-#include <vector>
 
 std::string readFile(const std::string &filename);

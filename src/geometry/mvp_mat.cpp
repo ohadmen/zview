@@ -1,6 +1,10 @@
-#include "mvp_mat.h"
 
-#include "imgui.h"  // for Imvec2
+#include "src/geometry/mvp_mat.h"
+
+#include <imgui.h>  // for Imvec2
+
+#include <limits>
+
 #include "src/params/params.h"
 
 namespace zview {
@@ -43,7 +47,7 @@ void MVPmat::updatePmat() {
       -(nearPlane + farPlane) / clip, -2.0f * nearPlane * farPlane / clip, 0, 0,
       -1, 0;
 }
-float MVPmat::getAspect() const { return float(m_w) / m_h; }
+float MVPmat::getAspect() const { return static_cast<float>(m_w) / m_h; }
 void MVPmat::setWinSize(const std::array<int, 2> &wh) {
   m_w = wh[0];
   m_h = wh[1];
@@ -84,9 +88,8 @@ std::array<types::Vector3, 2> MVPmat::getRay(const ImVec2 &pt,
       cam_origin_ray = getRay(pt, CoordinateSystem::SCREEN);
       cam_origin_ray[1] = m_viewRotation.inverse() * cam_origin_ray[1];
       cam_origin_ray[0] = m_viewRotation.inverse() *
-                          Eigen::Translation3f{0, 0, m_viewDistance} *
+                          Eigen::Translation3f(0, 0, m_viewDistance) *
                           cam_origin_ray[0];
-
       break;
     }
     case MVPmat::CoordinateSystem::SCREEN:

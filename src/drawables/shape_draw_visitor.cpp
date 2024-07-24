@@ -1,9 +1,7 @@
-#include "shape_draw_visitor.h"
+#include "src/drawables/shape_draw_visitor.h"
 
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
-
-#include <iostream>
 
 #include "src/graphics_backend/opengl_shader.h"
 #include "src/params/params.h"

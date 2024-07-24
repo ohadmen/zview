@@ -1,11 +1,12 @@
-#include "write_ply.h"
+#include "src/io/write_ply.h"
 
 #include <fstream>
 
 namespace zview {
 struct Writer {
   std::ofstream fid_;
-  Writer(const std::string &fn) : fid_(fn, std::ios::out | std::ios::binary) {}
+  explicit Writer(const std::string &fn)
+      : fid_(fn, std::ios::out | std::ios::binary) {}
   void operator()(const types::Pcl &obj) {
     fid_ << "ply" << std::endl;
     fid_ << "format binary_little_endian 1.0" << std::endl;

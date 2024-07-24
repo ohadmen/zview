@@ -12,7 +12,8 @@ bool Grid::init() {
   static constexpr float max_fov_deg = 90;
 
   static const float q =
-      std::pow(10.0f, int(0.85 * std::log10(100 * max_z_far))) / 100 * 0.1f;
+      std::pow(10.0f, static_cast<int>(0.85f * std::log10(100 * max_z_far))) /
+      100 * 0.1f;
   static const float fp = max_z_far * tan(max_fov_deg / 2 * M_PI / 180.0F) / q;
   static const float stride = 1.0f;
   static uint8_t col = 255;
