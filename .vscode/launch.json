@@ -5,13 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "g++ build and debug active file",
+            "name": "bazel dbg",
+            "preLaunchTask": "Build(Debug)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/zview",
-            "args": [],
+            "program": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main/src/zview",
+             "args": ["${workspaceFolder}/models/horse.ply","${workspaceFolder}/models/lucy_pcl.ply","${workspaceFolder}/models/lucy_mesh.ply"],
+            //"args": ["${workspaceFolder}/models/horse.ply"],
+            
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/",
+            
+            "cwd": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -19,11 +23,15 @@
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
+                    "ignoreFailures": false,
+                    
+
+
                 }
             ],
-            "preLaunchTask": "Build(Debug)",
-            "miDebuggerPath": "/usr/bin/gdb"
-        }
+            "sourceFileMap": { "/proc/self/cwd": "${workspaceFolder}" },
+            
+            
+        },
     ]
 }

@@ -51,7 +51,7 @@ void TrackStateRotate::input(QMouseEvent *e)
 	if (e->button() == Qt::MouseButton::NoButton && e->type() == QInputEvent::MouseMove && e->modifiers() == Qt::KeyboardModifier::NoModifier)
 	{
 
-		static const float rad2deg = 90.0 / std::acos(0.0);
+		static const float rad2deg = 90.0F / std::acos(0.0F);
 		float tbradius = Params::trackBallRadius();
 		QVector3D hitnew = sprivGetHitSphere(e->localPos());
 		// when the scond hit is outside the sphere, scale by the length of the vector

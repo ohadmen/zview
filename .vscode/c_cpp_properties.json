@@ -4,13 +4,13 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/include/**",
-                "/usr/include/x86_64-linux-gnu/qt5/**"
+                "/usr/local/include/**"
+                
                 
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++-7",
-            "cStandard": "c11",
+            "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
         }
