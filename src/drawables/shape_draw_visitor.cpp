@@ -18,7 +18,7 @@ void ShapeDrawVisitor::operator()(const types::Pcl& obj,
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
   }
   glBindVertexArray(obj.vao());
-  glDrawArrays(GL_POINTS, 0, obj.v().size());
+  glDrawArrays(GL_POINTS, 0, static_cast<int>(obj.v().size()));
   glBindVertexArray(0);
 }
 
@@ -29,7 +29,8 @@ void ShapeDrawVisitor::operator()(const types::Edges& obj,
     obj.shader().setUniform("u_transformation", tform);
   }
   glBindVertexArray(obj.vao());
-  glDrawElements(GL_LINES, obj.e().size() * 2, GL_UNSIGNED_INT, NULL);
+  glDrawElements(GL_LINES, static_cast<int>(obj.e().size() * 2),
+                 GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
 }
 
@@ -43,7 +44,8 @@ void ShapeDrawVisitor::operator()(const types::Mesh& obj,
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
   }
   glBindVertexArray(obj.vao());
-  glDrawElements(GL_TRIANGLES, obj.f().size() * 3, GL_UNSIGNED_INT, NULL);
+  glDrawElements(GL_TRIANGLES, static_cast<int>(obj.f().size() * 3),
+                 GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
 }
 }  // namespace zview

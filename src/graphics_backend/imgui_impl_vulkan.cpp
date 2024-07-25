@@ -143,6 +143,8 @@
 //  resources. 2016-08-27: Vulkan: Fix Vulkan example for use when a depth
 //  buffer is active.
 
+#include <cstring>
+
 #include "imgui.h"
 #ifndef IMGUI_DISABLE
 #include <stdio.h>

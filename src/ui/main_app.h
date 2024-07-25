@@ -1,14 +1,16 @@
 #pragma once
 #include <GL/glew.h>  // Initialize with glewInit()
 
-#include "imgui.h"
+// #include "imgui.h"
 #include "src/drawables/axis.h"
 #include "src/drawables/backdrop.h"
 #include "src/drawables/grid.h"
 #include "src/drawables/shape_buffer.h"
 #include "src/geometry/mvp_mat.h"
+#include "src/types/types.h"
 #include "src/ui/input_device_handler.h"
 #include "src/ui/tree_view.h"
+
 namespace zview {
 class MainApp {
   MVPmat m_mvp;
