@@ -1,5 +1,6 @@
 #include "src/drawables/picking_texture.h"
-#include <GL/glew.h> // Initialize with glewInit()
+
+#include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 
 namespace zview {
@@ -57,7 +58,6 @@ void PickingTexture::setTransform(const types::Matrix4x4 &tform) const {
 }
 
 void PickingTexture::enableWriting() const {
-
   m_pickingShader.use();
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 }
@@ -67,8 +67,7 @@ void PickingTexture::disableWriting() const {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-PickingTexture::PixelInfo PickingTexture::readPixel(unsigned int x,
-                                                    unsigned int y) const {
+PickingTexture::PixelInfo PickingTexture::readPixel(int x, int y) const {
   glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
 
   glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -96,4 +95,4 @@ PickingTexture::~PickingTexture() {
     glDeleteTextures(1, &m_depthTexture);
   }
 }
-} // namespace zview
+}  // namespace zview

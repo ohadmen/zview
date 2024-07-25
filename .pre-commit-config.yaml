@@ -1,0 +1,21 @@
+exclude: |
+  (?x)^(
+      bazel-.*/|
+      third_party/.*|
+      external/.*
+  )
+
+repos:
+  - repo: https://github.com/warchant/pre-commit-buildifier
+    rev: 0.1.1
+    hooks:
+      - id: buildifier
+        args: ["--version=v7.1.1", "--lint=warn", "--warnings=all", "-v"]
+  - repo: https://github.com/pocc/pre-commit-hooks
+    rev: v1.3.5
+    hooks:
+      - id: clang-format
+        args: [-i, --style=Google]
+        exclude: src/graphics_backend/|src/vulkan_test.cpp
+      - id: clang-tidy
+        exclude: src/graphics_backend/|src/vulkan_test.cpp

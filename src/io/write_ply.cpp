@@ -1,10 +1,12 @@
-#include "write_ply.h"
+#include "src/io/write_ply.h"
+
 #include <fstream>
 
 namespace zview {
 struct Writer {
   std::ofstream fid_;
-  Writer(const std::string &fn) : fid_(fn, std::ios::out | std::ios::binary) {}
+  explicit Writer(const std::string &fn)
+      : fid_(fn, std::ios::out | std::ios::binary) {}
   void operator()(const types::Pcl &obj) {
     fid_ << "ply" << std::endl;
     fid_ << "format binary_little_endian 1.0" << std::endl;
@@ -18,9 +20,10 @@ struct Writer {
     fid_ << "property uchar b" << std::endl;
     fid_ << "property uchar a" << std::endl;
     fid_ << "end_header" << std::endl;
-
-    fid_.write((const char *)(&obj.v()[0]),
-               sizeof(types::VertData) * obj.v().size());
+    fid_.write(
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        reinterpret_cast<const char *>(&obj.v()[0]),
+        static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     fid_.flush();
   }
 
@@ -41,10 +44,14 @@ struct Writer {
     fid_ << "property int vertex2" << std::endl;
     fid_ << "end_header" << std::endl;
 
-    fid_.write((const char *)(&obj.v()[0]),
-               sizeof(types::VertData) * obj.v().size());
-    fid_.write((const char *)(&obj.e()[0]),
-               sizeof(types::EdgeIndx) * obj.e().size());
+    fid_.write(
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        reinterpret_cast<const char *>(&obj.v()[0]),
+        static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
+    fid_.write(
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        reinterpret_cast<const char *>(&obj.e()[0]),
+        static_cast<std::int64_t>(sizeof(types::EdgeIndx) * obj.e().size()));
     fid_.flush();
   }
 
@@ -64,29 +71,31 @@ struct Writer {
     fid_ << "property list uchar int vertex_indices" << std::endl;
     fid_ << "end_header" << std::endl;
 
-    fid_.write((const char *)(&obj.v()[0]),
-               sizeof(types::VertData) * obj.v().size());
+    fid_.write(
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        reinterpret_cast<const char *>(&obj.v()[0]),
+        static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     uint8_t nfaces = 3;
     for (const auto &f : obj.f()) {
-      fid_.write((const char *)(&nfaces), 1);
-      fid_.write((const char *)(&f), sizeof(types::FaceIndx));
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+      fid_.write(reinterpret_cast<const char *>(&nfaces), 1);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+      fid_.write(reinterpret_cast<const char *>(&f), sizeof(types::FaceIndx));
     }
     fid_.flush();
   }
 };
 
 void io::writePly(std::string fn, const std::vector<types::Shape> &shapes) {
-  auto pos = fn.find_last_of(".");
+  auto pos = fn.find_last_of('.');
   std::string suffix =
       pos == std::string::npos ? fn : fn.substr(pos, std::string::npos);
-  if (suffix != ".ply")
-    fn += ".ply";
+  if (suffix != ".ply") fn += ".ply";
 
   Writer w(fn);
 
   for (const auto &objv : shapes) {
-
     std::visit(w, objv);
   }
 }
-}; // namespace zview
+};  // namespace zview
