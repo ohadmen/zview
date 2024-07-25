@@ -21,9 +21,8 @@ std::int32_t Shader::getLocation(const std::string& name) const {
 bool Shader::init(const std::string& shader_name) {
   const std::string vertex_code = readFile("shaders/" + shader_name + ".vs");
   const std::string fragment_code = readFile("shaders/" + shader_name + ".fs");
-  
 
-  bool fail = !compile(vertex_code,fragment_code) || !link();
+  bool fail = !compile(vertex_code, fragment_code) || !link();
 
   return !fail;
 }
@@ -60,8 +59,7 @@ void Shader::setUniform<>(const char* name, const int val) const {
   glUniform1i(getLocation(name), val);
 }
 template <>
-void Shader::setUniform<>(const char* name,
-                          const std::uint32_t val) const {
+void Shader::setUniform<>(const char* name, const std::uint32_t val) const {
   glUniform1ui(getLocation(name), val);
 }
 

@@ -8,8 +8,7 @@ class Shader {
   Shader();
   bool init(const std::string& shader_name);
   void use() const;
-  void setUniform(const char* name,
-                  const std::array<float, 3U>& val) const;
+  void setUniform(const char* name, const std::array<float, 3U>& val) const;
   template <typename T>
   void setUniform(const char* name, const T val) const;
   template <typename T>
@@ -24,7 +23,7 @@ class Shader {
   bool checkCompileErr();
   bool checkLinkingErr();
   bool compile(const std::string& vertex_code,
-                     const std::string& fragment_code);
+               const std::string& fragment_code);
   bool link();
   unsigned int m_vertex_id{0};
   unsigned int m_fragment_id{0};
