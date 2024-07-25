@@ -7,7 +7,7 @@
 #include <limits>
 
 std::complex<float> gaussianFunc(const float x) {
-  static constexpr float tb_sigma = 0.5F;
+  static constexpr float tb_sigma = 0.25F;
   static constexpr float tb_height = +0.50F;
   const float y = tb_height * expf(-0.5f * x * x / (tb_sigma * tb_sigma));
   return {x, y};
