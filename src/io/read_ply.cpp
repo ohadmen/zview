@@ -117,8 +117,6 @@ std::vector<ElementHeader> getElementHeaders(const std::string &header) {
   return elems;
 }
 std::string getName(const std::string &header) {
-  std::vector<ElementHeader> elems;
-
   static const std::regex rx("comment\\s+([^\\s]+)");
 
   auto itbeg = std::sregex_iterator(header.begin(), header.end(), rx);

@@ -16,12 +16,6 @@ repos:
     hooks:
       - id: clang-format
         args: [-i, --style=Google]
-        exclude: src/graphics_backend/|src/vulkan_test.cpp|external/.*
+        exclude: src/graphics_backend/|src/vulkan_test.cpp
       - id: clang-tidy
-        exclude: src/graphics_backend/|src/vulkan_test.cpp|external/
-      # - id: cppcheck
-      #   args: [--enable=all]
-      #   exclude: src/graphics_backend/
-      # - id: cpplint
-      #   args: [--verbose=0, --filter=-legal/copyright]
-      #   exclude: src/graphics_backend/
+        exclude: src/graphics_backend/|src/vulkan_test.cpp
