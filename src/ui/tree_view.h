@@ -6,9 +6,9 @@ namespace zview {
 
 class TreeView {
   struct TreeNode {
-    std::string name;
-    std::uint32_t object_key;
-    std::vector<TreeNode> children;
+    std::string name{};
+    std::uint32_t object_key{0};
+    std::vector<TreeNode> children{};
   };
   TreeNode m_root{"root", 0, {}};
   void drawTree(const TreeNode& node) const;

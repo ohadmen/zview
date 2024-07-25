@@ -11,7 +11,7 @@ class Params {
  public:
   static Params& i();
 
-  void load(std::string fn);
+  void load(const std::string& fn);
 
   float camera_fov_rad{deg2rad(60.0f)};
   float camera_z_near{1e-1f};

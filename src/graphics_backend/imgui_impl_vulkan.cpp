@@ -144,6 +144,7 @@
 //  buffer is active.
 
 #include "imgui.h"
+#include <cstring>
 #ifndef IMGUI_DISABLE
 #include <stdio.h>
 
