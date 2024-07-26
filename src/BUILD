@@ -15,3 +15,9 @@ cc_binary(
         "//src/ui:main_app",
     ],
 )
+
+cc_binary(
+    name = "vulkan_test",
+    srcs = ["vulkan_test.cpp"],
+    deps = ["//src/graphics_backend"],
+)
