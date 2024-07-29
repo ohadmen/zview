@@ -34,7 +34,7 @@ class ShapeBuffer {
    * @param s the shape to push
    * @return the key of the pushed shape
    */
-  std::uint32_t push(const types::Shape& s);
+  std::uint32_t emplace(types::Shape&& s);
 
   /*
    * @brief draw all shapes in the shape buffer

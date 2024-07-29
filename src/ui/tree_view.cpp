@@ -18,6 +18,11 @@ TreeView::TreeView(
     : m_shape_visibility{std::move(set_shape_visibility)},
       m_zoom_to_selection{std::move(zoom_to_selection)} {}
 void TreeView::push(std::string name, const std::uint32_t object_key) {
+  if (object_key == 0) {
+    // no need to do anything when key is only update
+    return;
+  }
+
   // sanizing the string: make sure doesn't end with "/", and if it does - omit
   // it
   if (name.back() == '/') {
@@ -40,11 +45,11 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
     } else {
       // coult not find parent, create the branch for it
       while (name_parts.size() != 1) {
-        current_node->children.push_back({name_parts.front(), 0, {}});
+        current_node->children.push_back({name_parts.front(), 0});
         current_node = &current_node->children.back();
         name_parts.pop_front();
       }
-      current_node->children.push_back({name_parts.front(), object_key, {}});
+      current_node->children.push_back({name_parts.front(), object_key});
       return;
     }
 
@@ -52,7 +57,7 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
   }
   // last part of the name was not found --> add it as a child
   if (name_parts.size() == 1) {
-    current_node->children.push_back({name_parts[0], object_key, {}});
+    current_node->children.push_back({name_parts[0], object_key});
   } else if (name_parts.empty()) {
     // last part was found, thi means there is already an object with the same
     // name, but there should not be a linked object

@@ -1,4 +1,4 @@
-#include "src/ui/main_app.h"
+#include "src/zview.h"
 
 static std::vector<std::string> get_args(int argc, char **argv) {
   std::vector<std::string> list;
@@ -10,11 +10,14 @@ static std::vector<std::string> get_args(int argc, char **argv) {
 }
 
 int main(int argc, char *argv[]) {
-  const auto args = get_args(argc, argv);
+  const auto files = get_args(argc, argv);
 
-  zview::MainApp app;
-  app.init();
-  app.loadFiles(args);
-  app.loop();
+  zview::Zview app;
+  if (!app.init()) {
+    return 1;
+  }
+  app.plot(files);
+  while (app.loop())
+    ;
   return 0;
 }

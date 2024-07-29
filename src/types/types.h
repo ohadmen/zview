@@ -2,13 +2,13 @@
 #include <Eigen/Dense>
 #include <array>
 #include <cmath>
-#include <limits>
 #include <optional>
 #include <string>
 #include <variant>
 #include <vector>
 
 #include "src/graphics_backend/shader.h"
+#include "src/types/external_types.h"
 
 namespace zview {
 namespace types {
@@ -45,30 +45,21 @@ class Bbox3d {
   }
 };
 
-struct VertData {
-  float x{0};
-  float y{0};
-  float z{0};
-  std::uint8_t r{255U};
-  std::uint8_t g{255U};
-  std::uint8_t b{255U};
-  std::uint8_t a{255U};
-
+class VertData : public Vertex {
+ public:
   constexpr VertData() {}
   constexpr VertData(float x_, float y_, float z_, uint8_t r_ = 255U,
                      uint8_t g_ = 255U, uint8_t b_ = 255U, uint8_t a_ = 255)
-      : x(x_), y(y_), z(z_), r(r_), g(g_), b(b_), a(a_) {}
+      : Vertex{x_, y_, z_, r_, g_, b_, a_} {}
+  // copy constructor from base class
+  constexpr VertData(const Vertex &other) : Vertex(other) {}
+
   explicit VertData(const Vector3 &xyz,
                     const Vector4 &rgba = Vector4{255, 255, 255, 255})
-      : x(xyz[0]),
-        y(xyz[1]),
-        z(xyz[2]),
-        r(static_cast<std::uint8_t>(rgba.x())),
-        g(static_cast<std::uint8_t>(rgba.y())),
-        b(static_cast<std::uint8_t>(rgba.z())),
-        a(static_cast<std::uint8_t>(rgba.w())) {}
-
-  // NOLINTNEXTLINE(google-explicit-constructor)
+      : Vertex(xyz[0], xyz[1], xyz[2], static_cast<std::uint8_t>(rgba.x()),
+               static_cast<std::uint8_t>(rgba.y()),
+               static_cast<std::uint8_t>(rgba.z()),
+               static_cast<std::uint8_t>(rgba.w())) {}
   operator Vector3() const { return Vector3{x, y, z}; }
   bool operator!=(const VertData &rhs) const {
     return x != rhs.x || y != rhs.y || z != rhs.z;

@@ -6,11 +6,14 @@ namespace zview {
 
 class TreeView {
   struct TreeNode {
-    std::string name{};
+    std::string name;
     std::uint32_t object_key{0};
     std::vector<TreeNode> children{};
+    TreeNode(const std::string& name_, std::uint32_t object_key_ = 0U)
+        : name(name_), object_key{object_key_} {}
   };
-  TreeNode m_root{"root", 0, {}};
+
+  TreeNode m_root{"root"};
   void drawTree(const TreeNode& node) const;
 
   std::function<bool&(const std::uint32_t&)> m_shape_visibility;

@@ -9,13 +9,13 @@
             "preLaunchTask": "Build(Debug)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main/src/zview",
+            "program": "${workspaceFolder}/bazel-bin/src/zview_interface_test.runfiles/_main/src/zview_interface_test",
              "args": ["${workspaceFolder}/models/horse.ply","${workspaceFolder}/models/lucy_pcl.ply","${workspaceFolder}/models/lucy_mesh.ply"],
             //"args": ["${workspaceFolder}/models/horse.ply"],
             
             "stopAtEntry": false,
             
-            "cwd": "${workspaceFolder}/bazel-bin/src/zview.runfiles/_main",
+            "cwd": "${workspaceFolder}/bazel-bin/src/zview_interface_test.runfiles/_main",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

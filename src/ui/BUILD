@@ -2,8 +2,8 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "main_app",
-    srcs = ["main_app.cpp"],
-    hdrs = ["main_app.h"],
+    srcs = ["zview_main_app.cpp"],
+    hdrs = ["zview_main_app.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//src/drawables",
@@ -15,6 +15,7 @@ cc_library(
         "//src/params",
         "//src/ui:input_device_handler",
         "//src/ui:tree_view",
+        "@imgui",
     ],
 )
 

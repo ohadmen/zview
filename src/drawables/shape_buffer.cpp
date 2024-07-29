@@ -45,25 +45,19 @@ std::uint32_t randomInt() {
 const std::string getName(const types::Shape &s) {
   return std::visit([](const auto &v) { return v.getName(); }, s);
 }
-std::uint32_t ShapeBuffer::push(const types::Shape &s) {
+std::uint32_t ShapeBuffer::emplace(types::Shape &&s) {
   // check that there is no other shape with the same name
   static_assert(std::is_copy_constructible_v<types::Shape>);
 
   const std::string s_name = getName(s);
   for (const auto &shape : m_buffer) {
     if (getName(shape.second) == s_name) {
-      std::cout << "shape with name " << s_name << " already exists"
-                << std::endl;
-      types::Shape s_renamed{s};
-      std::visit(
-          [](auto &v) {
-            v.setName(v.getName() + "_" + std::to_string(randomInt()));
-          },
-          s_renamed);
-      return push(s_renamed);
+      std::cout << "shape with name " << s_name
+                << " already exists(TODO: update shape)" << std::endl;
+      return 0;
     }
   }
-  m_buffer.insert({m_next_key, s});
+  m_buffer.insert({m_next_key, std::move(s)});
 
   auto ret = std::visit(*m_shape_init_visitor_p.get(), m_buffer.at(m_next_key));
   if (!ret) {

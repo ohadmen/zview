@@ -1,4 +1,4 @@
-#include "src/ui/main_app.h"
+#include "src/ui/zview_main_app.h"
 
 #include <GLFW/glfw3.h>
 
@@ -19,26 +19,26 @@ static void glfw_error_callback(int error, const char *description) {
   std::cerr << "Glfw Error " << error << ": " << description << std::endl;
 }
 
-std::array<int, 2> MainApp::getWinSize() const {
+std::array<int, 2> ZviewMainApp::getWinSize() const {
   std::array<int, 2> size{};
   glfwGetWindowSize(m_window, &size[0], &size[1]);
   return size;
 }
 
-MainApp::MainApp()
+ZviewMainApp::ZviewMainApp()
     : m_axis(m_mvp),
       m_idh{&m_mvp},
       m_tree_view{std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
                             std::placeholders::_1),
-                  std::bind(&MainApp::setCameraToViewSelectedKey, this,
+                  std::bind(&ZviewMainApp::setCameraToViewSelectedKey, this,
                             std::placeholders::_1)} {}
-bool MainApp::init() {
+
+bool ZviewMainApp::init(bool init_gl_backend) {
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit()) {
     std::cerr << "Failed to initialize glfw" << std::endl;
     return false;
   }
-
   // GL 3.0 + GLSL 130
   const char *glsl_version = "#version 460";
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -78,7 +78,10 @@ bool MainApp::init() {
 
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
+
+  m_imgui_context = ImGui::CreateContext();
+
+  ImGui::SetCurrentContext(m_imgui_context);
   ImGuiIO &io = ImGui::GetIO();
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
@@ -86,9 +89,10 @@ bool MainApp::init() {
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+  ImGui_ImplOpenGL3_Init(glsl_version);
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-  ImGui_ImplOpenGL3_Init(glsl_version);
+
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
   if (!winResize(getWinSize())) {
@@ -121,20 +125,19 @@ bool MainApp::init() {
   return true;
 }
 
-void MainApp::loadFiles(const std::vector<std::string> &files) {
+void ZviewMainApp::loadFiles(const std::vector<std::string> &files) {
   for (const auto &f : files) {
-    const auto shape_vector = io::read_ply(f);
+    // temporary object to read the ply file
+    auto shape_vector = io::read_ply(f);
 
-    for (const auto &s : shape_vector) {
-      const auto key = m_buffer.push(s);
-      m_tree_view.push(std::visit([](const auto &v) { return v.getName(); }, s),
-                       key);
+    for (types::Shape &s : shape_vector) {
+      plot(std::move(s));
     }
   }
 
   setCameraToViewSelectedKey({});
 }
-bool MainApp::winResize(const std::array<int, 2> &wh) {
+bool ZviewMainApp::winResize(const std::array<int, 2> &wh) {
   m_mvp.setWinSize(wh);
   if (!m_picking.init(wh)) {
     std::cerr << "picking texture init failed" << std::endl;
@@ -143,7 +146,7 @@ bool MainApp::winResize(const std::array<int, 2> &wh) {
   return true;
 }
 
-void MainApp::setCameraToViewSelectedKey(
+void ZviewMainApp::setCameraToViewSelectedKey(
     const std::vector<std::uint32_t> &keys) {
   auto vm = m_mvp.getViewRotation();
   auto bbox = m_buffer.getBbox(keys);
@@ -163,47 +166,55 @@ void MainApp::setCameraToViewSelectedKey(
   m_mvp.setViewDistance(req_distance);
 }
 
-void MainApp::loop() {
-  while (!glfwWindowShouldClose(m_window)) {
-    const auto wh = getWinSize();
-    if (wh != m_mvp.getWinSize()) {
-      m_mvp.setWinSize(wh);
-      if (!m_picking.init(wh)) {
-        std::cerr << "picking texture init failed" << std::endl;
-        return;
-      }
-    }
-    glViewport(0, 0, wh[0], wh[1]);
-
-    glfwPollEvents();
-
-    // feed inputs to dear imgui, start new frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    drawParamsMenu();
-    drawStatusBar();
-
-    m_tree_view.draw();
-
-    m_idh.step(m_hover_point);
-
-    const auto transformation = m_mvp.getMVPmatrix();
-
-    // render phase
-
-    m_hover_point = pickingPhase(transformation);
-
-    renderPhase(transformation);
-
-    // Render dear imgui into screen
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    glfwSwapBuffers(m_window);
+bool ZviewMainApp::loop() {
+  const auto prev_context = ImGui::GetCurrentContext();
+  ImGui::SetCurrentContext(m_imgui_context);
+  if (glfwWindowShouldClose(m_window)) {
+    return false;
   }
 
+  const auto wh = getWinSize();
+  if (wh != m_mvp.getWinSize()) {
+    m_mvp.setWinSize(wh);
+    if (!m_picking.init(wh)) {
+      std::cerr << "picking texture init failed" << std::endl;
+      return false;
+    }
+  }
+  glViewport(0, 0, wh[0], wh[1]);
+
+  glfwPollEvents();
+
+  // feed inputs to dear imgui, start new frame
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+  drawParamsMenu();
+  drawStatusBar();
+
+  m_tree_view.draw();
+
+  m_idh.step(m_hover_point);
+
+  const auto transformation = m_mvp.getMVPmatrix();
+
+  // render phase
+
+  m_hover_point = pickingPhase(transformation);
+
+  renderPhase(transformation);
+
+  // Render dear imgui into screen
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+  glfwSwapBuffers(m_window);
+  ImGui::SetCurrentContext(prev_context);
+  return true;
+}
+ZviewMainApp::~ZviewMainApp() {
   // Cleanup
+  ImGui::SetCurrentContext(m_imgui_context);
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
@@ -212,7 +223,7 @@ void MainApp::loop() {
   glfwTerminate();
 }
 
-void MainApp::renderPhase(const types::Matrix4x4 &mvp) const {
+void ZviewMainApp::renderPhase(const types::Matrix4x4 &mvp) const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   m_backdrop.draw();
@@ -222,7 +233,7 @@ void MainApp::renderPhase(const types::Matrix4x4 &mvp) const {
 
   m_buffer.draw(mvp.data());
 }
-std::optional<types::Vector3> MainApp::pickingPhase(
+std::optional<types::Vector3> ZviewMainApp::pickingPhase(
     const types::Matrix4x4 &mvp) {
   const auto &io = ImGui::GetIO();
   m_picking.enableWriting();
@@ -249,7 +260,7 @@ std::optional<types::Vector3> MainApp::pickingPhase(
 
   return {};
 }
-void MainApp::drawStatusBar() {
+void ZviewMainApp::drawStatusBar() {
   const auto sz = 40;  // ImGui::GetTextLineHeightWithSpacing();
 
   ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - sz), 0);
@@ -274,7 +285,7 @@ void MainApp::drawStatusBar() {
 
   ImGui::End();
 }
-void MainApp::drawParamsMenu() {
+void ZviewMainApp::drawParamsMenu() {
   // render your GUI
   ImGui::Begin("Parameters");
   auto &params = zview::Params::i();
@@ -297,5 +308,12 @@ void MainApp::drawParamsMenu() {
   m_mvp.updatePmat();
 
   ImGui::End();
+}
+std::uint32_t ZviewMainApp::plot(types::Shape &&shape) {
+  const auto shape_name =
+      std::visit([](const auto &v) { return v.getName(); }, shape);
+  const auto key = m_buffer.emplace(std::move(shape));
+  m_tree_view.push(shape_name, key);
+  return key;
 }
 }  // namespace zview
