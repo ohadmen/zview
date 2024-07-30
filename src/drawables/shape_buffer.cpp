@@ -8,12 +8,14 @@
 
 #include "src/drawables/shape_draw_visitor.h"
 #include "src/drawables/shape_init_visitor.h"
+#include "src/drawables/shape_update_visitor.h"
 #include "src/io/write_ply.h"
 namespace zview {
 
 ShapeBuffer::ShapeBuffer()
     : m_shape_init_visitor_p{std::make_unique<ShapeInitVisitor>()},
-      m_shape_draw_visitor_p{std::make_unique<ShapeDrawVisitor>()} {}
+      m_shape_draw_visitor_p{std::make_unique<ShapeDrawVisitor>()},
+      m_shape_update_visitor_p{std::make_unique<ShapeUpdateVisitor>()} {}
 ShapeBuffer::~ShapeBuffer() = default;
 
 ShapeBuffer::BaseTypeVector::iterator ShapeBuffer::begin() {
@@ -50,10 +52,13 @@ std::uint32_t ShapeBuffer::emplace(types::Shape &&s) {
   static_assert(std::is_copy_constructible_v<types::Shape>);
 
   const std::string s_name = getName(s);
-  for (const auto &shape : m_buffer) {
+  for (auto &shape : m_buffer) {
     if (getName(shape.second) == s_name) {
-      std::cout << "shape with name " << s_name
-                << " already exists(TODO: update shape)" << std::endl;
+      bool ok = std::visit(*m_shape_update_visitor_p.get(), shape.second,
+                           std::move(s));
+      if (!ok) {
+        std::cout << "could not update shape" << std::endl;
+      }
       return 0;
     }
   }

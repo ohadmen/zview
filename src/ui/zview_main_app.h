@@ -3,6 +3,7 @@
 #include "src/drawables/axis.h"
 #include "src/drawables/backdrop.h"
 #include "src/drawables/grid.h"
+#include "src/drawables/picking_texture.h"
 #include "src/drawables/shape_buffer.h"
 #include "src/geometry/mvp_mat.h"
 #include "src/types/types.h"

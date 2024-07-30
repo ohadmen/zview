@@ -24,5 +24,6 @@ cc_library(
         "//src/params",
         "//src/ui:input_device_handler",
         "//src/ui:zview_main_app",
+        "//src/utils:recast",
     ],
 )

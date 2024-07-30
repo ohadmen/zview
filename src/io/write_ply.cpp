@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include "src/utils/recast.h"
+
 namespace zview {
 struct Writer {
   std::ofstream fid_;
@@ -21,8 +23,7 @@ struct Writer {
     fid_ << "property uchar a" << std::endl;
     fid_ << "end_header" << std::endl;
     fid_.write(
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        reinterpret_cast<const char *>(&obj.v()[0]),
+        recast<const char *>(&obj.v()[0]),
         static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     fid_.flush();
   }
@@ -45,12 +46,10 @@ struct Writer {
     fid_ << "end_header" << std::endl;
 
     fid_.write(
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        reinterpret_cast<const char *>(&obj.v()[0]),
+        recast<const char *>(&obj.v()[0]),
         static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     fid_.write(
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        reinterpret_cast<const char *>(&obj.e()[0]),
+        recast<const char *>(&obj.e()[0]),
         static_cast<std::int64_t>(sizeof(types::EdgeIndx) * obj.e().size()));
     fid_.flush();
   }
@@ -72,15 +71,12 @@ struct Writer {
     fid_ << "end_header" << std::endl;
 
     fid_.write(
-        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-        reinterpret_cast<const char *>(&obj.v()[0]),
+        recast<const char *>(&obj.v()[0]),
         static_cast<std::int64_t>(sizeof(types::VertData) * obj.v().size()));
     uint8_t nfaces = 3;
     for (const auto &f : obj.f()) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      fid_.write(reinterpret_cast<const char *>(&nfaces), 1);
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      fid_.write(reinterpret_cast<const char *>(&f), sizeof(types::FaceIndx));
+      fid_.write(recast<const char *>(&nfaces), 1);
+      fid_.write(recast<const char *>(&f), sizeof(types::FaceIndx));
     }
     fid_.flush();
   }

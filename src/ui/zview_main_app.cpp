@@ -207,7 +207,12 @@ void ZviewMainApp::drawParamsMenu() {
 std::uint32_t ZviewMainApp::plot(types::Shape &&shape) {
   const auto shape_name =
       std::visit([](const auto &v) { return v.getName(); }, shape);
+
   const auto key = m_buffer.emplace(std::move(shape));
+  if (key == 0) {
+    // only update
+    return 0;
+  }
   m_tree_view.push(shape_name, key);
   return key;
 }

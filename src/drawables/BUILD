@@ -32,17 +32,20 @@ cc_library(
         "picking_texture.cpp",
         "shape_draw_visitor.cpp",
         "shape_init_visitor.cpp",
+        "shape_update_visitor.cpp",
     ],
     hdrs = [
         "picking_texture.h",
         "shape_draw_visitor.h",
         "shape_init_visitor.h",
+        "shape_update_visitor.h",
     ],
     visibility = ["//visibility:__pkg__"],
     deps = [
         "//src/io",
         "//src/params",
         "//src/types",
+        "//src/utils:recast",
     ],
 )
 

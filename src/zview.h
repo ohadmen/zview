@@ -42,8 +42,8 @@ class Zview {
   *** @param vertices the vertices of the mesh
   *** @param faces the faces of the mesh
   */
-  void plot(const std::string &name, const std::vector<Vertex> &vertices,
-            const std::vector<Face> &faces);
+  void plot(const std::string &name, std::vector<Vertex> &&vertices,
+            std::vector<Face> &&faces);
   /*
   *** Plot a point cloud. If the name already exists, the point cloud will be
   *updated. To reduce memory copying, this is move only;
@@ -58,8 +58,8 @@ class Zview {
   *** @param vertices the vertices of the graph
   *** @param edges the edges of the graph
   */
-  void plot(const std::string &name, const std::vector<Vertex> &vertices,
-            const std::vector<Edge> &edges);
+  void plot(const std::string &name, std::vector<Vertex> &&vertices,
+            std::vector<Edge> &&edges);
   /*+
   *** Run the application
   *** @param win_sz_wh the size of the window

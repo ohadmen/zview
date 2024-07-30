@@ -1,7 +1,9 @@
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 
+#include <algorithm>
 #include <iostream>
+#include <random>
 
 #include "src/graphics_backend/imgui_impl_glfw.h"
 #include "src/graphics_backend/imgui_impl_opengl3.h"
@@ -9,6 +11,51 @@
 
 static void glfw_error_callback(int error, const char *description) {
   std::cerr << "Glfw Error " << error << ": " << description << std::endl;
+}
+
+std::vector<zview::Face> generateRandomFaces(int n_vertices, int n_faces) {
+  // random integer generator
+  static std::default_random_engine gen;
+  static std::uniform_int_distribution<std::uint32_t> dist(0, n_vertices - 1);
+
+  std::vector<zview::Face> faces{static_cast<std::size_t>(n_faces)};
+  std::for_each(faces.begin(), faces.end(), [&](zview::Face &f) {
+    f = {dist(gen), dist(gen), dist(gen)};
+  });
+  return faces;
+}
+
+std::vector<zview::Edge> generateRandomEdges(int n_vertices, int n_edges) {
+  // random integer generator
+  static std::default_random_engine gen;
+  static std::uniform_int_distribution<std::uint32_t> dist(0, n_vertices - 1);
+
+  std::vector<zview::Edge> edges{static_cast<std::size_t>(n_edges)};
+  std::for_each(edges.begin(), edges.end(), [&](zview::Edge &e) {
+    e = {dist(gen), dist(gen)};
+  });
+  return edges;
+}
+std::vector<zview::Vertex> generateRandomVertices(int n_vertices,
+                                                  float z_offset) {
+  std::vector<zview::Vertex> vertices{static_cast<std::size_t>(n_vertices)};
+  static std::default_random_engine gen;
+  static std::uniform_real_distribution<float> dist(-1, 1);
+  auto random_color = []() {
+    return static_cast<std::uint8_t>((dist(gen) / 2 + 0.5) * 255);
+  };
+  auto random_pos = [&]() { return dist(gen); };
+  std::for_each(vertices.begin(), vertices.end(), [&](zview::Vertex &v) {
+    v = {random_pos(),
+         random_pos(),
+         random_pos() + z_offset,
+         random_color(),
+         random_color(),
+         random_color(),
+         255U};
+  });
+
+  return vertices;
 }
 
 GLFWwindow *initGL() {
@@ -101,6 +148,14 @@ int main(int argc, char *argv[]) {
   }
 
   app.plot(files);
+
+  bool add_pcl{true};
+  bool add_mesh{false};
+  bool add_edges{false};
+  int n_vertices{1000};
+  int n_edges{1000};
+  int n_faces{1000};
+
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
     glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
@@ -111,6 +166,18 @@ int main(int argc, char *argv[]) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    ImGui::Begin("interface inject");
+    ImGui::Checkbox("add pcl", &add_pcl);
+    ImGui::SameLine();
+    ImGui::SliderInt("n vertices", &n_vertices, 0, 10000);
+    ImGui::Checkbox("add mesh", &add_mesh);
+    ImGui::SameLine();
+    ImGui::SliderInt("n faces", &n_faces, 0, 1000);
+    ImGui::Checkbox("add edges", &add_edges);
+    ImGui::SameLine();
+    ImGui::SliderInt("n edges", &n_edges, 0, 1000);
+    ImGui::End();
+
     const auto sz = getWinSize(window);
     glViewport(0, 0, sz[0], sz[1]);
     if (!app.draw(sz)) {
@@ -118,6 +185,21 @@ int main(int argc, char *argv[]) {
     }
 
     ImGui::Render();
+
+    if (add_pcl) {
+      auto vertices = generateRandomVertices(n_vertices, 0);
+      app.plot("test_interface/pcl", std::move(vertices));
+    }
+    if (add_mesh) {
+      auto vertices = generateRandomVertices(n_vertices, 2);
+      auto faces = generateRandomFaces(n_vertices, n_faces);
+      app.plot("test_interface/mesh", std::move(vertices), std::move(faces));
+    }
+    if (add_edges) {
+      auto vertices = generateRandomVertices(n_vertices, 3);
+      auto edges = generateRandomEdges(n_vertices, n_edges);
+      app.plot("test_interface/edges", std::move(vertices), std::move(edges));
+    }
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);

@@ -14,6 +14,7 @@ cc_library(
     deps = [
         "//src/io:read_file",
         "//src/types",
+        "//src/utils:recast",
     ],
 )
 
@@ -25,5 +26,6 @@ cc_library(
     hdrs = ["read_file.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//src/utils:recast",
     ],
 )
