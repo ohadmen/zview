@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
       app.plot("test_interface/mesh", std::move(vertices), std::move(faces));
     }
     if (add_edges) {
-      auto vertices = generateRandomVertices(n_vertices, 3);
+      auto vertices = generateRandomVertices(n_vertices, 4);
       auto edges = generateRandomEdges(n_vertices, n_edges);
       app.plot("test_interface/edges", std::move(vertices), std::move(edges));
     }

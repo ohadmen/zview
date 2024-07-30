@@ -37,6 +37,12 @@ class ShapeBuffer {
   std::uint32_t emplace(types::Shape&& s);
 
   /*
+   * @brief remove a shape from the buffer
+   * @param key the key of the shape to remove
+   */
+  void erase(const std::uint32_t& key);
+
+  /*
    * @brief draw all shapes in the shape buffer
    * @param tform the transformation matrix
    * @param preDrawFunction a function that is called before drawing each shape,

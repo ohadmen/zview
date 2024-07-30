@@ -14,9 +14,11 @@ namespace zview {
 TreeView::TreeView(
 
     std::function<bool &(const std::uint32_t &)> set_shape_visibility,
-    std::function<void(const std::vector<std::uint32_t> &)> zoom_to_selection)
+    std::function<void(const std::vector<std::uint32_t> &)> zoom_to_selection,
+    std::function<void(const std::uint32_t &)> delete_key)
     : m_shape_visibility{std::move(set_shape_visibility)},
-      m_zoom_to_selection{std::move(zoom_to_selection)} {}
+      m_zoom_to_selection{std::move(zoom_to_selection)},
+      m_delete_key(std::move(delete_key)) {}
 void TreeView::push(std::string name, const std::uint32_t object_key) {
   if (object_key == 0) {
     // no need to do anything when key is only update
@@ -45,11 +47,12 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
     } else {
       // coult not find parent, create the branch for it
       while (name_parts.size() != 1) {
-        current_node->children.push_back({name_parts.front(), 0});
+        current_node->children.push_back({name_parts.front(), current_node, 0});
         current_node = &current_node->children.back();
         name_parts.pop_front();
       }
-      current_node->children.push_back({name_parts.front(), object_key});
+      current_node->children.push_back(
+          {name_parts.front(), current_node, object_key});
       return;
     }
 
@@ -57,7 +60,7 @@ void TreeView::push(std::string name, const std::uint32_t object_key) {
   }
   // last part of the name was not found --> add it as a child
   if (name_parts.size() == 1) {
-    current_node->children.push_back({name_parts[0], object_key});
+    current_node->children.push_back({name_parts[0], current_node, object_key});
   } else if (name_parts.empty()) {
     // last part was found, thi means there is already an object with the same
     // name, but there should not be a linked object
@@ -90,24 +93,25 @@ std::int32_t TreeView::getChildrenVisibility(const TreeNode &node) const {
   return v;
 }
 
-void TreeView::getEnabledObjectsKeys(
-    const TreeNode &node,
-    std::vector<std::uint32_t> *selected_objects_keys_p) const {
+void TreeView::getChildObjectsKeys(
+    const TreeNode &node, std::vector<std::uint32_t> *selected_objects_keys_p,
+    bool enabled_only) const {
   /*
    * This function is used to get all the object keys that are enabled in the
    * tree view and are children of node
    */
   if (node.object_key != 0) {
-    if (m_shape_visibility(node.object_key)) {
+    if (!enabled_only ||
+        (enabled_only && m_shape_visibility(node.object_key))) {
       selected_objects_keys_p->push_back(node.object_key);
     }
   }
   for (const auto &child : node.children) {
-    getEnabledObjectsKeys(child, selected_objects_keys_p);
+    getChildObjectsKeys(child, selected_objects_keys_p, enabled_only);
   }
 }
 
-void TreeView::drawTree(const TreeNode &node) const {
+void TreeView::drawTree(TreeNode &node) const {
   static constexpr ImGuiTreeNodeFlags flag =
       ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Leaf;
   static constexpr ImVec4 col_active{1, 1, 1, 1};
@@ -134,11 +138,33 @@ void TreeView::drawTree(const TreeNode &node) const {
       }
     } else if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
       std::vector<std::uint32_t> selected_objects_keys;
-      getEnabledObjectsKeys(node, &selected_objects_keys);
+      getChildObjectsKeys(node, &selected_objects_keys, true);
       m_zoom_to_selection(selected_objects_keys);
+    } else if (ImGui::IsItemHovered() &&
+               ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete))) {
+      if (node.object_key != 0) {
+        m_delete_key(node.object_key);
+        node.object_key = 0;
+      } else {
+        std::vector<std::uint32_t> selected_objects_keys;
+        getChildObjectsKeys(node, &selected_objects_keys, false);
+        for (auto key : selected_objects_keys) {
+          m_delete_key(key);
+        }
+        node.children.clear();
+      }
+      // search for this node in the parent and remove it
+      if (node.parent != nullptr) {
+        auto it = std::find_if(
+            node.parent->children.begin(), node.parent->children.end(),
+            [&node](const TreeNode &n) { return n.name == node.name; });
+        if (it != node.parent->children.end()) {
+          node.parent->children.erase(it);
+        }
+      }
     }
 
-    for (const auto &child : node.children) {
+    for (auto &child : node.children) {
       drawTree(child);
     }
     ImGui::TreePop();
@@ -148,7 +174,7 @@ void TreeView::drawTree(const TreeNode &node) const {
 void TreeView::draw() {
   ImGui::Begin("Object Tree");
 
-  for (const auto &child : m_root.children) {
+  for (auto &child : m_root.children) {
     drawTree(child);
   }
   ImGui::End();

@@ -16,10 +16,12 @@ namespace zview {
 ZviewMainApp::ZviewMainApp()
     : m_axis(m_mvp),
       m_idh{&m_mvp},
-      m_tree_view{std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
-                            std::placeholders::_1),
-                  std::bind(&ZviewMainApp::setCameraToViewSelectedKey, this,
-                            std::placeholders::_1)} {}
+      m_tree_view{
+          std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
+                    std::placeholders::_1),
+          std::bind(&ZviewMainApp::setCameraToViewSelectedKey, this,
+                    std::placeholders::_1),
+          std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)} {}
 
 bool ZviewMainApp::init(const std::array<int, 2> &win_sz_wh) {
   if (!winResize(win_sz_wh)) {

@@ -143,4 +143,6 @@ bool &ShapeBuffer::shapeVisibility(const std::uint32_t &object_key) {
   }
   return std::visit([](auto &v) -> bool & { return v.enabled(); }, it->second);
 }
+
+void ShapeBuffer::erase(const std::uint32_t &key) { m_buffer.erase(key); }
 }  // namespace zview
