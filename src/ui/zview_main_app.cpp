@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
+
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -33,7 +34,10 @@ ZviewMainApp::ZviewMainApp()
                   std::bind(&ZviewMainApp::setCameraToViewSelectedKey, this,
                             std::placeholders::_1)} {}
 
-bool ZviewMainApp::init(bool init_gl_backend) {
+bool ZviewMainApp::init() {
+
+
+
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit()) {
     std::cerr << "Failed to initialize glfw" << std::endl;
@@ -52,14 +56,20 @@ bool ZviewMainApp::init(bool init_gl_backend) {
     std::cerr << "Failed to create window" << std::endl;
     return false;
   }
-
+  
   glfwMakeContextCurrent(m_window);
+  
   glfwSwapInterval(1);  // Enable vsync
 
   if (glewInit() != GLEW_OK) {
     std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
     return false;
   }
+    // Setup Dear ImGui context
+  IMGUI_CHECKVERSION();
+  auto prev_context = ImGui::GetCurrentContext();
+  ImGui::CreateContext();
+  
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST);  // draw object back tp front
@@ -75,27 +85,22 @@ bool ZviewMainApp::init(bool init_gl_backend) {
   glDepthFunc(GL_LESS);
 
   glClearColor(0, 1, 0, 1);
-
-  // Setup Dear ImGui context
-  IMGUI_CHECKVERSION();
-
-  m_imgui_context = ImGui::CreateContext();
-
-  ImGui::SetCurrentContext(m_imgui_context);
+  
   ImGuiIO &io = ImGui::GetIO();
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-  ImGui_ImplOpenGL3_Init(glsl_version);
+  
+  ImGui_ImplOpenGL3_Init(glsl_version);  
   // Setup Platform/Renderer bindings
   ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
-  if (!winResize(getWinSize())) {
+  const auto win_sz = getWinSize();
+  if (!winResize(win_sz)) {
     std::cerr << "Failed to resize window" << std::endl;
     return false;
   }
@@ -121,7 +126,8 @@ bool ZviewMainApp::init(bool init_gl_backend) {
   //   m_buffer.push(example);
 
   // }
-
+  ImGui::SetCurrentContext(prev_context);
+  
   return true;
 }
 
@@ -167,8 +173,10 @@ void ZviewMainApp::setCameraToViewSelectedKey(
 }
 
 bool ZviewMainApp::loop() {
-  const auto prev_context = ImGui::GetCurrentContext();
-  ImGui::SetCurrentContext(m_imgui_context);
+  
+  
+  glfwMakeContextCurrent(m_window);
+  
   if (glfwWindowShouldClose(m_window)) {
     return false;
   }
@@ -176,15 +184,14 @@ bool ZviewMainApp::loop() {
   const auto wh = getWinSize();
   if (wh != m_mvp.getWinSize()) {
     m_mvp.setWinSize(wh);
+    
     if (!m_picking.init(wh)) {
       std::cerr << "picking texture init failed" << std::endl;
       return false;
     }
   }
   glViewport(0, 0, wh[0], wh[1]);
-
   glfwPollEvents();
-
   // feed inputs to dear imgui, start new frame
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
@@ -197,24 +204,26 @@ bool ZviewMainApp::loop() {
   m_idh.step(m_hover_point);
 
   const auto transformation = m_mvp.getMVPmatrix();
-
+  ImGui::Render();
   // render phase
 
   m_hover_point = pickingPhase(transformation);
 
   renderPhase(transformation);
 
+
   // Render dear imgui into screen
-  ImGui::Render();
+  
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
   glfwSwapBuffers(m_window);
-  ImGui::SetCurrentContext(prev_context);
+  
   return true;
 }
 ZviewMainApp::~ZviewMainApp() {
   // Cleanup
-  ImGui::SetCurrentContext(m_imgui_context);
+  glfwMakeContextCurrent(m_window);
+  
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
@@ -232,6 +241,7 @@ void ZviewMainApp::renderPhase(const types::Matrix4x4 &mvp) const {
   m_axis.draw();
 
   m_buffer.draw(mvp.data());
+
 }
 std::optional<types::Vector3> ZviewMainApp::pickingPhase(
     const types::Matrix4x4 &mvp) {

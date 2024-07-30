@@ -29,3 +29,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = ["//src/graphics_backend"],
 )
+cc_library(
+    name = "framebuffer",
+    srcs = ["framebuffer.cpp"],
+    hdrs = ["framebuffer.h"],
+    visibility = ["//visibility:public"],
+    deps = ["//src/graphics_backend"],
+)

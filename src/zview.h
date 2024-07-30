@@ -26,10 +26,9 @@ class Zview {
   ~Zview();
   /*
   *** Initialize the application
-  *** @param init_gl_backend whether to initialize the OpenGL backend
   *** @return true if the application was initialized successfully
   */
-  bool init(bool init_gl_backend = true);
+  bool init();
   /*
   *** Load files into the application
   *** @param files the files to load

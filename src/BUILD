@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 cc_binary(
     name = "zview_binary",
     srcs = [
-        "zview_main.cpp",
+        "zview_binary.cpp",
     ],
     deps = [
         "//src:zview",
@@ -35,5 +35,12 @@ cc_binary(
         "//src/graphics_backend",
         "//src/types:external_types",
         "@imgui",
+        "//src/types",
+        "//src/graphics_backend:shader",
+        "//src/drawables",
+                "@sysroot//:libglew",
+        "@sysroot//:libglfw",
+        "//src/graphics_backend:framebuffer",
+
     ],
 )

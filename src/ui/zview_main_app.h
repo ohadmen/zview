@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include "src/drawables/axis.h"
+
 #include "src/drawables/backdrop.h"
 #include "src/drawables/grid.h"
 #include "src/drawables/shape_buffer.h"
@@ -23,7 +24,9 @@ class ZviewMainApp {
   TreeView m_tree_view;
   GLFWwindow *m_window{nullptr};
   std::optional<types::Vector3> m_hover_point;
-  ImGuiContext *m_imgui_context{nullptr};
+  
+  
+  
   /*
   @brief get the window size
   @return the window size
@@ -66,7 +69,7 @@ class ZviewMainApp {
   ZviewMainApp &operator=(ZviewMainApp &&) = delete;
 
   ~ZviewMainApp();
-  bool init(bool init_gl_backend = true);
+  bool init();
   void loadFiles(const std::vector<std::string> &files);
   bool winResize(const std::array<int, 2> &wh);
   bool loop();

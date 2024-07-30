@@ -7,7 +7,7 @@
 namespace zview {
 Zview::Zview() : m_app(std::make_unique<ZviewMainApp>()) {}
 Zview::~Zview() = default;
-bool Zview::init(bool init_gl_backend) { return m_app->init(init_gl_backend); }
+bool Zview::init() { return m_app->init(); }
 void Zview::plot(const std::vector<std::string> &files) {
   m_app->loadFiles(files);
 }
