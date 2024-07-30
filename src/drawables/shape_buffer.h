@@ -6,11 +6,11 @@
 #include <utility>
 #include <vector>
 
-#include "src/drawables/picking_texture.h"
 #include "src/types/types.h"
 namespace zview {
-struct ShapeInitVisitor;  // fwddecl
-struct ShapeDrawVisitor;  // fwddecl
+struct ShapeInitVisitor;    // fwddecl
+struct ShapeDrawVisitor;    // fwddecl
+struct ShapeUpdateVisitor;  // fwddecl
 
 class ShapeBuffer {
   using BaseTypeVector = std::unordered_map<std::uint32_t, types::Shape>;
@@ -34,7 +34,13 @@ class ShapeBuffer {
    * @param s the shape to push
    * @return the key of the pushed shape
    */
-  std::uint32_t push(const types::Shape& s);
+  std::uint32_t emplace(types::Shape&& s);
+
+  /*
+   * @brief remove a shape from the buffer
+   * @param key the key of the shape to remove
+   */
+  void erase(const std::uint32_t& key);
 
   /*
    * @brief draw all shapes in the shape buffer
@@ -68,5 +74,6 @@ class ShapeBuffer {
 
   std::unique_ptr<ShapeInitVisitor> m_shape_init_visitor_p;
   std::unique_ptr<ShapeDrawVisitor> m_shape_draw_visitor_p;
+  std::unique_ptr<ShapeUpdateVisitor> m_shape_update_visitor_p;
 };
 }  // namespace zview

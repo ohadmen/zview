@@ -4,6 +4,8 @@
 #include <functional>
 #include <iostream>
 #include <map>
+
+#include "src/utils/recast.h"
 // https://github.com/google/styleguide/issues/194
 // NOLINTNEXTLINE[build/c++11]
 #include <regex>
@@ -25,8 +27,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       "hargpropertyucharbpropertyuchara"] = [](std::ifstream &ss,
                                                size_t count) -> ElemData {
     std::vector<types::VertData> v(count);
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    ss.read(reinterpret_cast<char *>(&v[0]),
+    ss.read(recast<char *>(&v[0]),
             static_cast<std::int64_t>(sizeof(v[0]) * count));
     return v;
   };
@@ -35,8 +36,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       [](std::ifstream &ss, size_t count) -> ElemData {
     std::vector<types::VertData> v(count);
     for (size_t i = 0; i != count; ++i) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      ss.read(reinterpret_cast<char *>(&v[i]), sizeof(float) * 3);
+      ss.read(recast<char *>(&v[i]), sizeof(float) * 3);
     }
     return v;
   };
@@ -45,8 +45,7 @@ std::map<std::string, ReaderFunc> getReaderMap() {
       [](std::ifstream &ss, size_t count) -> ElemData {
     std::vector<types::EdgeIndx> v(count);
     for (size_t i = 0; i != count; ++i) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      ss.read(reinterpret_cast<char *>(&v[i]), 2 * sizeof(int32_t));
+      ss.read(recast<char *>(&v[i]), 2 * sizeof(int32_t));
     }
     return v;
   };
@@ -58,12 +57,10 @@ std::map<std::string, ReaderFunc> getReaderMap() {
     uint8_t listsz{0};
 
     for (size_t i = 0; i != count; ++i) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      ss.read(reinterpret_cast<char *>(&listsz), 1);
+      ss.read(recast<char *>(&listsz), 1);
       if (listsz != 3) throw std::runtime_error("support only tri meshes");
 
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-      ss.read(reinterpret_cast<char *>(&v[i]), 3 * sizeof(int32_t));
+      ss.read(recast<char *>(&v[i]), 3 * sizeof(int32_t));
     }
 
     return v;

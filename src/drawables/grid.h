@@ -1,7 +1,10 @@
 #pragma once
 #include "src/types/types.h"
 namespace zview {
-class Grid : public types::Edges {
+class Grid {
+  types::Edges m_minor;
+  types::Edges m_major;
+
  public:
   Grid();
   bool init();

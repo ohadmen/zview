@@ -1,10 +1,9 @@
 #pragma once
-#include <GL/glew.h>  // Initialize with glewInit()
 
-// #include "imgui.h"
 #include "src/drawables/axis.h"
 #include "src/drawables/backdrop.h"
 #include "src/drawables/grid.h"
+#include "src/drawables/picking_texture.h"
 #include "src/drawables/shape_buffer.h"
 #include "src/geometry/mvp_mat.h"
 #include "src/types/types.h"
@@ -12,7 +11,7 @@
 #include "src/ui/tree_view.h"
 
 namespace zview {
-class MainApp {
+class ZviewMainApp {
   MVPmat m_mvp;
   ShapeBuffer m_buffer;
   PickingTexture m_picking;
@@ -21,8 +20,9 @@ class MainApp {
   Axis m_axis;
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
-  GLFWwindow *m_window{nullptr};
+
   std::optional<types::Vector3> m_hover_point;
+
   /*
   @brief get the window size
   @return the window size
@@ -54,10 +54,12 @@ class MainApp {
   void drawStatusBar();
 
  public:
-  MainApp();
-  bool init();
+  ZviewMainApp();
+
+  bool init(const std::array<int, 2> &win_sz_wh);
   void loadFiles(const std::vector<std::string> &files);
   bool winResize(const std::array<int, 2> &wh);
-  void loop();
+  bool draw(const std::array<int, 2> &win_sz_wh);
+  std::uint32_t plot(types::Shape &&shape);
 };
 }  // namespace zview
