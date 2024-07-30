@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "main_app",
+    name = "zview_main_app",
     srcs = ["zview_main_app.cpp"],
     hdrs = ["zview_main_app.h"],
     visibility = ["//visibility:public"],
@@ -10,12 +10,10 @@ cc_library(
         "//src/drawables:axis",
         "//src/drawables:backdrop",
         "//src/drawables:grid",
-        "//src/graphics_backend",
         "//src/io",
         "//src/params",
         "//src/ui:input_device_handler",
         "//src/ui:tree_view",
-        "@imgui",
     ],
 )
 

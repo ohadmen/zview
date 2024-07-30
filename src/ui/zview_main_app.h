@@ -1,9 +1,6 @@
 #pragma once
-#include <GL/glew.h>  // Initialize with glewInit()
-#include <imgui.h>
 
 #include "src/drawables/axis.h"
-
 #include "src/drawables/backdrop.h"
 #include "src/drawables/grid.h"
 #include "src/drawables/shape_buffer.h"
@@ -22,11 +19,9 @@ class ZviewMainApp {
   Axis m_axis;
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
-  GLFWwindow *m_window{nullptr};
+
   std::optional<types::Vector3> m_hover_point;
-  
-  
-  
+
   /*
   @brief get the window size
   @return the window size
@@ -59,20 +54,11 @@ class ZviewMainApp {
 
  public:
   ZviewMainApp();
-  // copy constructor
-  ZviewMainApp(const ZviewMainApp &) = delete;
-  // move constructor
-  ZviewMainApp(ZviewMainApp &&) = delete;
-  // copy assignment
-  ZviewMainApp &operator=(const ZviewMainApp &) = delete;
-  // move assignment
-  ZviewMainApp &operator=(ZviewMainApp &&) = delete;
 
-  ~ZviewMainApp();
-  bool init();
+  bool init(const std::array<int, 2> &win_sz_wh);
   void loadFiles(const std::vector<std::string> &files);
   bool winResize(const std::array<int, 2> &wh);
-  bool loop();
+  bool draw(const std::array<int, 2> &win_sz_wh);
   std::uint32_t plot(types::Shape &&shape);
 };
 }  // namespace zview

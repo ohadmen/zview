@@ -7,6 +7,7 @@ cc_binary(
     ],
     deps = [
         "//src:zview",
+        "//src/graphics_backend",
         "//src/types:external_types",
     ],
 )
@@ -19,28 +20,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//src/drawables",
-        "//src/graphics_backend",
         "//src/io",
         "//src/params",
         "//src/ui:input_device_handler",
-        "//src/ui:main_app",
-    ],
-)
-
-cc_binary(
-    name = "zview_interface_test",
-    srcs = ["zview_interface_test.cpp"],
-    deps = [
-        "//src:zview",
-        "//src/graphics_backend",
-        "//src/types:external_types",
-        "@imgui",
-        "//src/types",
-        "//src/graphics_backend:shader",
-        "//src/drawables",
-                "@sysroot//:libglew",
-        "@sysroot//:libglfw",
-        "//src/graphics_backend:framebuffer",
-
+        "//src/ui:zview_main_app",
     ],
 )

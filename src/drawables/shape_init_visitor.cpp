@@ -3,8 +3,6 @@
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
 namespace zview {
-   
-
 
 bool ShapeInitVisitor::operator()(types::Pcl &obj) const {
   obj.initShader("point");

@@ -28,7 +28,8 @@ class Zview {
   *** Initialize the application
   *** @return true if the application was initialized successfully
   */
-  bool init();
+  bool init(const std::array<int, 2> &win_sz_wh);
+
   /*
   *** Load files into the application
   *** @param files the files to load
@@ -61,9 +62,10 @@ class Zview {
             const std::vector<Edge> &edges);
   /*+
   *** Run the application
+  *** @param win_sz_wh the size of the window
   *** @return true if the application should continue running
   */
-  bool loop();
+  bool draw(const std::array<int, 2> &win_sz_wh);
 
  private:
   std::unique_ptr<ZviewMainApp> m_app;

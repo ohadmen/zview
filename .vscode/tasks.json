@@ -6,7 +6,7 @@
       {
           "label": "Build(Debug)",
           "type": "shell",
-          "command": "bazel build --compilation_mode=dbg //src:zview_interface_test",
+          "command": "bazel build --compilation_mode=dbg //src:zview_binary",
           "group": {
               "kind": "build",
               "isDefault": true
