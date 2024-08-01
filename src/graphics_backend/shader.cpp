@@ -78,6 +78,11 @@ void Shader::setUniform(const char* name,
                         const std::array<float, 3U>& val) const {
   glUniform3f(getLocation(name), val.at(0), val.at(1), val.at(2));
 }
+template <>
+void Shader::setUniform(const char* name, const float val1,
+                        const float val2) const {
+  glUniform2f(getLocation(name), val1, val2);
+}
 
 template <>
 void Shader::setUniform<>(const char* name, const float* val) const {

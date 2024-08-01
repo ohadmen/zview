@@ -12,10 +12,15 @@ in vec3 xyz;
 //! [0]
 void main()
 {
-
-
 		fragColor =vertexColor;
 		
+		
+		float r2 = dot(xyz,xyz);
+		if(r2>THR_1)
+		{
+			fragColor.a *=max(0,(THR_2-r2)/(THR_2-THR_1));
+		}
+
 
     
 }
