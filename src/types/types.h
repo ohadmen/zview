@@ -1,5 +1,5 @@
 #pragma once
-#include <Eigen/Dense>
+
 #include <array>
 #include <cmath>
 #include <optional>
@@ -7,6 +7,7 @@
 #include <variant>
 #include <vector>
 
+#include "Eigen/Dense"
 #include "src/graphics_backend/shader.h"
 #include "src/types/external_types.h"
 

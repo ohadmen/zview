@@ -21,7 +21,10 @@ ZviewMainApp::ZviewMainApp()
                     std::placeholders::_1),
           std::bind(&ZviewMainApp::setCameraToViewSelectedKey, this,
                     std::placeholders::_1),
-          std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)} {}
+          std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)},
+      m_shared_mem(
+          std::bind(&ZviewMainApp::plot, this, std::placeholders::_1),
+          std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)) {}
 
 bool ZviewMainApp::init(const std::array<int, 2> &win_sz_wh) {
   if (!winResize(win_sz_wh)) {

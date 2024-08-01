@@ -6,6 +6,7 @@
 #include "src/drawables/picking_texture.h"
 #include "src/drawables/shape_buffer.h"
 #include "src/geometry/mvp_mat.h"
+#include "src/io/shared_mem.h"
 #include "src/types/types.h"
 #include "src/ui/input_device_handler.h"
 #include "src/ui/tree_view.h"
@@ -20,7 +21,7 @@ class ZviewMainApp {
   Axis m_axis;
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
-
+  SharedMem m_shared_mem;
   std::optional<types::Vector3> m_hover_point;
 
   /*

@@ -29,3 +29,14 @@ cc_library(
         "//src/utils:recast",
     ],
 )
+
+cc_library(
+    name = "shared_mem",
+    srcs = [
+    ],
+    hdrs = ["shared_mem.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//src/types",
+    ],
+)

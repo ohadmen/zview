@@ -11,6 +11,7 @@ cc_library(
         "//src/drawables:backdrop",
         "//src/drawables:grid",
         "//src/io",
+        "//src/io/shared_mem",
         "//src/params",
         "//src/ui:input_device_handler",
         "//src/ui:tree_view",
