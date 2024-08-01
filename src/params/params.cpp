@@ -7,5 +7,7 @@ Params& Params::i() {
   return instance;
 }
 void Params::load(const std::string& fn) {}
-float Params::deg2rad(float deg) { return deg * M_PIf / 180.0f; }
+float Params::deg2rad(float deg) {
+  return deg * static_cast<float>(M_PI) / 180.0f;
+}
 }  // namespace zview

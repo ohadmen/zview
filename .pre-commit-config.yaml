@@ -16,6 +16,4 @@ repos:
     hooks:
       - id: clang-format
         args: [-i, --style=Google]
-        exclude: src/graphics_backend/
       - id: clang-tidy
-        exclude: src/graphics_backend/
