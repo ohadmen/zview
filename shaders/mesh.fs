@@ -5,7 +5,7 @@ out vec4 fragColor;
 in vec4 vertexColor;
 
 uniform int u_txt;
-uniform vec3 u_light_dir;
+uniform vec3 u_lightDir;
 
 varying vec3 v_xyz;
 varying vec3 v_eyeDir;
@@ -19,7 +19,7 @@ void main()
 		 fragColor = vertexColor;
 		 break;
 		}
-		case 0:
+		case 2:
 		{
 			const vec3 lightColor=vec3(1,1,1);
 			const float ambientFactor = 0.5;
@@ -27,7 +27,7 @@ void main()
 			const float specFactor = 1.1;
 			//calc normal
 			vec3 ec_pos=v_xyz.xyz;
-			vec3 light_dir = normalize(u_light_dir+v_eyeDir);
+			vec3 light_dir = normalize(u_lightDir+v_eyeDir);
 			vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
 			//calc diffuse
 			float diffuse = max(0.0,dot(ec_normal, light_dir));
@@ -38,7 +38,7 @@ void main()
 			fragColor = vec4(result,vertexColor.w); 
 			break;
 		}
-		case 2:
+		case 3:
 		{
 			vec3 ec_pos=v_xyz.xyz;
 			vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
@@ -46,7 +46,7 @@ void main()
 			break;
 
 		}
-		case 3:
+		case 4:
 		{
 			const vec3 lightColor=vec3(1,1,1);
 			const float ambientFactor = 0.5;
@@ -56,7 +56,7 @@ void main()
 			vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
 			vec3 norm_color = (1.0-ec_normal)*0.5;
 
-			vec3 light_dir = normalize(u_light_dir+v_eyeDir);
+			vec3 light_dir = normalize(u_lightDir+v_eyeDir);
 			//calc diffuse
 			float diffuse = max(0.0,dot(ec_normal, light_dir));
 			//calc specularity
@@ -66,7 +66,7 @@ void main()
 			fragColor = vec4(result,1.0); 
 			break;
 		}
-		case 4:
+		case 5:
 		{
 			const vec4 specularColor1=vec4 (0.1,0.08,0.05,1.0);
   		const  vec4 specularColor2=vec4 (0.1,0.1,0.05,1.0);
@@ -75,7 +75,7 @@ void main()
   		const float specularFactor2=2.0;
   		vec3 ec_pos=v_xyz.xyz;
 		vec3 ec_normal = normalize(cross(dFdx(ec_pos),dFdy(ec_pos)));
-  	    vec3 reflect_dir = -reflect(u_light_dir, ec_normal);
+  	    vec3 reflect_dir = -reflect(u_lightDir, ec_normal);
   	    float spec = max(dot(v_eyeDir, reflect_dir), 0.0);
   	    spec = spec * spec;
   		vec4 color = glassColor + specularFactor1 * spec * specularColor1;
@@ -85,9 +85,9 @@ void main()
 		
 		break;
 	}
+		case 6:
 
-
-		default:
+		
 		{
 		const vec3 base3 = vec3(0.99, 0.96, 0.89);
 		const vec3 base2 = vec3(0.92, 0.91, 0.83);
@@ -101,6 +101,11 @@ void main()
 		float b = dot(ec_normal, vb);
 		fragColor = vec4(((a*base2 + (1.0-a)*base00) + (b*base3 + (1.0-b)*base00))*0.5, 1.0); 
 
+			break;
+		}
+		default:
+		{
+			fragColor = vec4(0.0,0.0,0.0,1.0);
 			break;
 		}
 	}	

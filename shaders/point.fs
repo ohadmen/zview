@@ -50,12 +50,13 @@ void main()
 
 	switch(u_txt)
 	{
-	case 0:
+	case 1:
 	{
 		fragColor =vertexColor;
 		break;
 	}
-	case 3:
+
+	case 5:
 	{
 	vec4 specularColor1=vec4 (0.1,0.08,0.05,1.0);
   		vec4 specularColor2=vec4 (0.1,0.1,0.05,1.0);

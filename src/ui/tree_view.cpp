@@ -171,8 +171,8 @@ void TreeView::drawTree(TreeNode &node) const {
   }
   ImGui::PopStyleColor();
 }
-void TreeView::draw() {
-  ImGui::Begin("Object Tree");
+void TreeView::draw(bool *showTreeP) {
+  ImGui::Begin("Object Tree", showTreeP);
 
   for (auto &child : m_root.children) {
     drawTree(child);

@@ -8,7 +8,7 @@
 
 namespace zview {
 Axis::Axis(const MVPmat &mvp)
-    : types::Mesh("grid"),
+    : types::Mesh("mesh"),
       m_mvp{mvp},
       m_locOnScreen{
           Eigen::Affine3f{Eigen::Translation3f(-0.90, -0.8, 0)}.matrix()} {}
@@ -48,13 +48,14 @@ bool Axis::init() {
 }
 void Axis::draw() const {
   Eigen::Affine3f r{m_mvp.getViewRotation()};
-  const float distance = Params::i().camera_z_near + d;
+  constexpr float distance = d * 1000;
   r.pretranslate(types::Vector3{0, 0, -distance});
   r.scale(distance);
   types::Matrix4x4 axisRotation = m_mvp.getProjectiveMatrix() * r.matrix();
   const types::Matrix4x4 m = m_locOnScreen * axisRotation;
 
   shader().use();
+  shader().setUniform("u_txt", 2);
   shader().setUniform("u_transformation", m.data());
   ShapeDrawVisitor()(*this, nullptr);
 }

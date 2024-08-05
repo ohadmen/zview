@@ -20,6 +20,11 @@ class ZviewMainApp {
   Axis m_axis;
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
+  bool m_show_params_menu{false};
+  bool m_show_tree{true};
+
+  bool m_show_help_menu{false};
+  bool m_show_grid{true};
 
   std::optional<types::Vector3> m_hover_point;
 
@@ -52,6 +57,10 @@ class ZviewMainApp {
   @brief draw the status bar
   */
   void drawStatusBar();
+
+  void drawHelpMenu();
+
+  void processInput();
 
  public:
   ZviewMainApp();

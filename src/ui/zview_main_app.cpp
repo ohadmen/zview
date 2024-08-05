@@ -23,6 +23,18 @@ ZviewMainApp::ZviewMainApp()
                     std::placeholders::_1),
           std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)} {}
 
+void ZviewMainApp::processInput() {
+  if (ImGui::IsKeyPressed(ImGuiKey_P)) {
+    m_show_params_menu = !m_show_params_menu;
+  }
+  if (ImGui::IsKeyPressed(ImGuiKey_G)) {
+    m_show_grid = !m_show_grid;
+  }
+  if (ImGui::IsKeyPressed(ImGuiKey_T)) {
+    m_show_tree = !m_show_tree;
+  }
+}
+
 bool ZviewMainApp::init(const std::array<int, 2> &win_sz_wh) {
   if (!winResize(win_sz_wh)) {
     std::cerr << "Failed to resize window" << std::endl;
@@ -102,10 +114,14 @@ bool ZviewMainApp::draw(const std::array<int, 2> &win_sz_wh) {
   if (!winResize(win_sz_wh)) {
     return false;
   }
+  processInput();
+  drawHelpMenu();
   drawParamsMenu();
   drawStatusBar();
 
-  m_tree_view.draw();
+  if (m_show_tree) {
+    m_tree_view.draw(&m_show_tree);
+  }
 
   m_idh.step(m_hover_point);
 
@@ -124,8 +140,10 @@ void ZviewMainApp::renderPhase(const types::Matrix4x4 &mvp) const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   m_backdrop.draw();
-  m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
-              m_mvp.getViewDistance());
+  if (m_show_grid) {
+    m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
+                m_mvp.getViewDistance());
+  }
   m_axis.draw();
 
   m_buffer.draw(mvp.data());
@@ -182,27 +200,54 @@ void ZviewMainApp::drawStatusBar() {
 
   ImGui::End();
 }
+
+void ZviewMainApp::drawHelpMenu() {
+  if (ImGui::IsKeyPressed(ImGuiKey_H)) {
+    m_show_help_menu = !m_show_help_menu;
+  }
+  if (!m_show_help_menu) {
+    return;
+  }
+  ImGui::OpenPopup("Help");
+  if (ImGui::BeginPopupModal("Help", &m_show_help_menu,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text(" H - open this menu");
+    ImGui::Text(" P - open the parameters menu");
+    ImGui::Text(" T - open the tree view");
+    ImGui::Text(" CTRL+1 - set the texture type to 1");
+    ImGui::Text(" CTRL+2 - set the texture type to 2");
+    ImGui::Text(" CTRL+3 - set the texture type to 3");
+    ImGui::Text(" CTRL+4 - set the texture type to 4");
+    ImGui::Text(" CTRL+5 - set the texture type to 5");
+    ImGui::Text(" CTRL+6 - set the texture type to 6");
+    if (ImGui::Button("Close", ImVec2(120, 0))) {
+      m_show_help_menu = false;
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
 void ZviewMainApp::drawParamsMenu() {
   // render your GUI
-  ImGui::Begin("Parameters");
+  if (!m_show_params_menu) {
+    return;
+  }
+  ImGui::Begin("Parameters", &m_show_params_menu);
   auto &params = zview::Params::i();
-  const float object_distance = m_mvp.getViewDistance();
-  params.camera_z_near = object_distance * 1e-3f;
-  params.camera_z_far = object_distance * 1e3f;
 
   static constexpr float deg2rad = M_PIf / 180.0f;
   float cam_fov_deg = params.camera_fov_rad / deg2rad;
 
   if (ImGui::SliderFloat("Field of view", &cam_fov_deg, 10, 90)) {
     params.camera_fov_rad = cam_fov_deg * deg2rad;
+    m_mvp.updatePmat();
   }
 
   if (ImGui::SliderInt("background color", &params.background_color, 0, 3)) {
     m_backdrop.init(params.background_color);
   }
-  ImGui::SliderInt("Texture type", &params.texture_type, 0, 4);
+  ImGui::SliderInt("Texture type", &params.texture_type, 1, 6);
   ImGui::SliderFloat("Point size", &params.point_size, 0.1, 10.0);
-  m_mvp.updatePmat();
 
   ImGui::End();
 }
