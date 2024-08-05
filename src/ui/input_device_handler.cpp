@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <limits>
 
+#include "src/params/params.h"
+
 std::complex<float> gaussianFunc(const float x) {
   static constexpr float tb_sigma = 0.25F;
   static constexpr float tb_height = +0.50F;
@@ -13,6 +15,32 @@ std::complex<float> gaussianFunc(const float x) {
   return {x, y};
 }
 namespace zview {
+void setTextureTypeByKeyboard() {
+  const bool isCtrlPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) ||
+                             ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+  if (!isCtrlPressed) {
+    return;
+  }
+  if (ImGui::IsKeyPressed(ImGuiKey_1)) {
+    Params::i().texture_type = 1;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_2)) {
+    Params::i().texture_type = 2;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_3)) {
+    Params::i().texture_type = 3;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_4)) {
+    Params::i().texture_type = 4;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_5)) {
+    Params::i().texture_type = 5;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_6)) {
+    Params::i().texture_type = 6;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_7)) {
+    Params::i().texture_type = 7;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_8)) {
+    Params::i().texture_type = 8;
+  } else if (ImGui::IsKeyPressed(ImGuiKey_9)) {
+    Params::i().texture_type = 9;
+  }
+}
 void InputDeviceHandler::fillHitScreenLut() {
   for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
     const auto z =
@@ -44,6 +72,8 @@ void InputDeviceHandler::step(
   auto &io = ImGui::GetIO();
 
   if (io.WantCaptureMouse) return;
+
+  setTextureTypeByKeyboard();
 
   if (io.MouseClicked[0] || io.MouseClicked[1]) {
     m_clickedViewRotation = m_mvp.getViewRotation();

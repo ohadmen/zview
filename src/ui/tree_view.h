@@ -16,6 +16,7 @@ class TreeView {
   };
 
   TreeNode m_root{"root", nullptr};
+
   void drawTree(TreeNode& node) const;
 
   std::function<bool&(const std::uint32_t&)> m_shape_visibility;
@@ -33,6 +34,6 @@ class TreeView {
       std::function<void(const std::vector<std::uint32_t>&)> zoom_to_selection,
       std::function<void(const std::uint32_t&)> delete_key);
   void push(std::string name, const std::uint32_t object_key);
-  void draw();
+  void draw(bool* showTreeP);
 };
 }  // namespace zview

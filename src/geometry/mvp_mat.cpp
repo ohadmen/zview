@@ -31,9 +31,10 @@ types::Matrix4x4 MVPmat::getMVPmatrix() const {
 }
 void MVPmat::updatePmat() {
   const float aspect = getAspect();
+
   const float h_angle_rad = zview::Params::i().camera_fov_rad / 2.0f;
-  const float nearPlane = zview::Params::i().camera_z_near;
-  const float farPlane = zview::Params::i().camera_z_far;
+  const float nearPlane = m_viewDistance * 1e-2f;
+  const float farPlane = m_viewDistance * 1e4f;
 
   const float cotan =
       std::abs(h_angle_rad) < std::numeric_limits<float>::epsilon() * 1e3
@@ -66,7 +67,10 @@ void MVPmat::setViewRotation(const Eigen::Quaternionf &m) {
 
 float MVPmat::getViewDistance() const { return m_viewDistance; }
 
-void MVPmat::setViewDistance(float m) { m_viewDistance = m; }
+void MVPmat::setViewDistance(float m) {
+  m_viewDistance = m;
+  updatePmat();
+}
 
 const Eigen::Translation3f &MVPmat::getModelTranslation() const {
   return m_modelTranslation;

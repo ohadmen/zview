@@ -23,9 +23,11 @@ bool Shader::init(const std::string& shader_name) {
   const std::string vertex_code = readFile("shaders/" + shader_name + ".vs");
   const std::string fragment_code = readFile("shaders/" + shader_name + ".fs");
 
-  bool fail = !compile(vertex_code, fragment_code) || !link();
-
-  return !fail;
+  bool ok = compile(vertex_code, fragment_code) && link();
+  if (!ok) {
+    std::cerr << "Failed to init shader: " << shader_name << std::endl;
+  }
+  return ok;
 }
 
 bool Shader::compile(const std::string& vertex_code,

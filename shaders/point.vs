@@ -6,8 +6,7 @@ layout (location = 1) in vec4 a_rgb;
 out vec4 vertexColor;
 uniform mat4 u_transformation;
 uniform float u_ptsize;
-uniform float u_zfar;
-uniform float u_znear;
+
 
 varying vec3 v_xyz;
 varying vec3 v_eyeDir;
@@ -19,8 +18,7 @@ void main()
     
 	vertexColor = a_rgb/255.0f;
     float z = gl_Position.z;
-    gl_PointSize = max(0.1f,u_ptsize*(u_zfar-z)/(u_zfar-u_znear));
-
+    gl_PointSize = max(0.1f,u_ptsize);
     v_xyz = a_xyz;
     v_eyeDir  =  -normalize(vec3(u_transformation[0]));
 
