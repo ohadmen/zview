@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <array>
 #include <iostream>
 
 #include "src/io/read_file.h"
@@ -75,7 +76,12 @@ void Shader::setUniform<>(const char* name, const float val) const {
 
 void Shader::setUniform(const char* name,
                         const std::array<float, 3U>& val) const {
-  glUniform3f(getLocation(name), val[0], val[1], val[2]);
+  glUniform3f(getLocation(name), val.at(0), val.at(1), val.at(2));
+}
+template <>
+void Shader::setUniform(const char* name, const float val1,
+                        const float val2) const {
+  glUniform2f(getLocation(name), val1, val2);
 }
 
 template <>
@@ -84,30 +90,33 @@ void Shader::setUniform<>(const char* name, const float* val) const {
 }
 
 bool Shader::checkCompileErr() {
-  int success;
-  char infoLog[1024];
+  int success{0};
+  std::array<char, 1024> infoLog{};
   glGetShaderiv(m_vertex_id, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(m_vertex_id, 1024, NULL, infoLog);
-    std::cout << "Error compiling Vertex Shader:\n" << infoLog << std::endl;
+    glGetShaderInfoLog(m_vertex_id, 1024, NULL, infoLog.data());
+    std::cout << "Error compiling Vertex Shader:\n"
+              << std::string(infoLog.data()) << std::endl;
     return false;
   }
   glGetShaderiv(m_fragment_id, GL_COMPILE_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(m_fragment_id, 1024, NULL, infoLog);
-    std::cout << "Error compiling Fragment Shader:\n" << infoLog << std::endl;
+    glGetShaderInfoLog(m_fragment_id, 1024, NULL, infoLog.data());
+    std::cout << "Error compiling Fragment Shader:\n"
+              << std::string(infoLog.data()) << std::endl;
     return false;
   }
   return true;
 }
 
 bool Shader::checkLinkingErr() {
-  int success;
-  char infoLog[1024];
+  int success{0};
+  std::array<char, 1024> infoLog{};
   glGetProgramiv(m_id, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetProgramInfoLog(m_id, 1024, NULL, infoLog);
-    std::cout << "Error Linking Shader Program:\n" << infoLog << std::endl;
+    glGetProgramInfoLog(m_id, 1024, NULL, infoLog.data());
+    std::cout << "Error Linking Shader Program:\n"
+              << std::string(infoLog.data()) << std::endl;
     return false;
   }
   return true;

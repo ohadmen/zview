@@ -3,7 +3,7 @@
 namespace zview {
 class Grid {
   types::Edges m_minor;
-  types::Edges m_major;
+  Shader m_shader;
 
  public:
   Grid();

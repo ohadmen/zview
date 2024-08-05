@@ -14,6 +14,6 @@ void main()
 
 	vertexColor = a_rgb/255.0f;
     xyz = a_xyz;
-    
+
 	
 }

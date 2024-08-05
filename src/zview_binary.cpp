@@ -149,13 +149,6 @@ int main(int argc, char *argv[]) {
 
   app.plot(files);
 
-  bool add_pcl{true};
-  bool add_mesh{false};
-  bool add_edges{false};
-  int n_vertices{1000};
-  int n_edges{1000};
-  int n_faces{1000};
-
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
     glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
@@ -166,17 +159,6 @@ int main(int argc, char *argv[]) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("interface inject");
-    ImGui::Checkbox("add pcl", &add_pcl);
-    ImGui::SameLine();
-    ImGui::SliderInt("n vertices", &n_vertices, 0, 10000);
-    ImGui::Checkbox("add mesh", &add_mesh);
-    ImGui::SameLine();
-    ImGui::SliderInt("n faces", &n_faces, 0, 1000);
-    ImGui::Checkbox("add edges", &add_edges);
-    ImGui::SameLine();
-    ImGui::SliderInt("n edges", &n_edges, 0, 1000);
-    ImGui::End();
 
     const auto sz = getWinSize(window);
     glViewport(0, 0, sz[0], sz[1]);
@@ -186,20 +168,6 @@ int main(int argc, char *argv[]) {
 
     ImGui::Render();
 
-    if (add_pcl) {
-      auto vertices = generateRandomVertices(n_vertices, 0);
-      app.plot("test_interface/pcl", std::move(vertices));
-    }
-    if (add_mesh) {
-      auto vertices = generateRandomVertices(n_vertices, 2);
-      auto faces = generateRandomFaces(n_vertices, n_faces);
-      app.plot("test_interface/mesh", std::move(vertices), std::move(faces));
-    }
-    if (add_edges) {
-      auto vertices = generateRandomVertices(n_vertices, 4);
-      auto edges = generateRandomEdges(n_vertices, n_edges);
-      app.plot("test_interface/edges", std::move(vertices), std::move(edges));
-    }
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
