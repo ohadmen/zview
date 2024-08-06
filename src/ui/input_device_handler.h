@@ -10,9 +10,12 @@ namespace zview {
 class InputDeviceHandler {
   void fillHitScreenLut();
   types::Vector3 getHitOnScreen(types::Vector3 u);
+  using AddShape = std::function<std::uint32_t(types::Shape &&)>;
+  using RemoveShape = std::function<void(const std::string &)>;
 
  public:
-  explicit InputDeviceHandler(MVPmat *mvpP);
+  explicit InputDeviceHandler(MVPmat *mvpP, const AddShape &addShape,
+                              const RemoveShape &removeShape);
   void step(const std::optional<types::Vector3> &hover_point);
   // delete as field 'm_mvp' is of reference type 'zview::MVPmat &
   InputDeviceHandler(InputDeviceHandler &&) = delete;
@@ -27,6 +30,10 @@ class InputDeviceHandler {
   types::Vector3 m_click_ray{};
   std::array<std::array<float, 2>, 1024> m_hit_screen_lut{};
   MVPmat &m_mvp;
+  const AddShape m_addShape;
+  const RemoveShape m_removeShape;
+
+  std::optional<types::Edges> m_measurement_edge;
 };
 
 }  // namespace zview

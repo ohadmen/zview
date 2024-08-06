@@ -42,6 +42,8 @@ class ShapeBuffer {
    */
   void erase(const std::uint32_t& key);
 
+  std::uint32_t getKey(const ::std::string& name);
+
   /*
    * @brief draw all shapes in the shape buffer
    * @param tform the transformation matrix
@@ -70,6 +72,7 @@ class ShapeBuffer {
 
  private:
   BaseTypeVector m_buffer;
+  std::unordered_map<std::string, std::uint32_t> m_string2key;
   std::uint32_t m_next_key{1000};
 
   std::unique_ptr<ShapeInitVisitor> m_shape_init_visitor_p;

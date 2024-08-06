@@ -142,26 +142,7 @@ void TreeView::drawTree(TreeNode &node) const {
       m_zoom_to_selection(selected_objects_keys);
     } else if (ImGui::IsItemHovered() &&
                ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Delete))) {
-      if (node.object_key != 0) {
-        m_delete_key(node.object_key);
-        node.object_key = 0;
-      } else {
-        std::vector<std::uint32_t> selected_objects_keys;
-        getChildObjectsKeys(node, &selected_objects_keys, false);
-        for (auto key : selected_objects_keys) {
-          m_delete_key(key);
-        }
-        node.children.clear();
-      }
-      // search for this node in the parent and remove it
-      if (node.parent != nullptr) {
-        auto it = std::find_if(
-            node.parent->children.begin(), node.parent->children.end(),
-            [&node](const TreeNode &n) { return n.name == node.name; });
-        if (it != node.parent->children.end()) {
-          node.parent->children.erase(it);
-        }
-      }
+      deleteNode(node);
     }
 
     for (auto &child : node.children) {
@@ -170,6 +151,49 @@ void TreeView::drawTree(TreeNode &node) const {
     ImGui::TreePop();
   }
   ImGui::PopStyleColor();
+}
+void TreeView::deleteNode(TreeNode &node) const {
+  if (node.object_key != 0) {
+    m_delete_key(node.object_key);
+    node.object_key = 0;
+  } else {
+    for (auto &ch : node.children) {
+      deleteNode(ch);
+    }
+    node.children.clear();
+  }
+  // search for this node in the parent and remove it
+  if (node.parent != nullptr) {
+    auto it =
+        std::find_if(node.parent->children.begin(), node.parent->children.end(),
+                     [&node](const TreeNode &n) { return &n == &node; });
+    if (it != node.parent->children.end()) {
+      node.parent->children.erase(it);
+    }
+  }
+}
+
+TreeView::TreeNode *TreeView::find(std::uint32_t key, TreeNode *root) {
+  if (!root) {
+    return nullptr;
+  }
+  if (root->object_key == key) {
+    return root;
+  }
+  for (auto &ch : root->children) {
+    auto it = find(key, &ch);
+    if (it) {
+      return it;
+    }
+  }
+  return nullptr;
+}
+void TreeView::remove(std::uint32_t obj_key) {
+  auto it = find(obj_key, &m_root);
+  if (!it) {
+    return;
+  }
+  deleteNode(*it);
 }
 void TreeView::draw(bool *showTreeP) {
   ImGui::Begin("Object Tree", showTreeP);

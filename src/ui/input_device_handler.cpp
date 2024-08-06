@@ -15,32 +15,7 @@ std::complex<float> gaussianFunc(const float x) {
   return {x, y};
 }
 namespace zview {
-void setTextureTypeByKeyboard() {
-  const bool isCtrlPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) ||
-                             ImGui::IsKeyDown(ImGuiKey_RightCtrl);
-  if (!isCtrlPressed) {
-    return;
-  }
-  if (ImGui::IsKeyPressed(ImGuiKey_1)) {
-    Params::i().texture_type = 1;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_2)) {
-    Params::i().texture_type = 2;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_3)) {
-    Params::i().texture_type = 3;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_4)) {
-    Params::i().texture_type = 4;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_5)) {
-    Params::i().texture_type = 5;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_6)) {
-    Params::i().texture_type = 6;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_7)) {
-    Params::i().texture_type = 7;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_8)) {
-    Params::i().texture_type = 8;
-  } else if (ImGui::IsKeyPressed(ImGuiKey_9)) {
-    Params::i().texture_type = 9;
-  }
-}
+
 void InputDeviceHandler::fillHitScreenLut() {
   for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
     const auto z =
@@ -64,7 +39,9 @@ types::Vector3 InputDeviceHandler::getHitOnScreen(types::Vector3 u) {
 
   // }
 }
-InputDeviceHandler::InputDeviceHandler(MVPmat *mvpP) : m_mvp{*mvpP} {
+InputDeviceHandler::InputDeviceHandler(MVPmat *mvpP, const AddShape &addShape,
+                                       const RemoveShape &removeShape)
+    : m_mvp{*mvpP}, m_addShape{addShape}, m_removeShape(removeShape) {
   fillHitScreenLut();
 }
 void InputDeviceHandler::step(
@@ -72,8 +49,6 @@ void InputDeviceHandler::step(
   auto &io = ImGui::GetIO();
 
   if (io.WantCaptureMouse) return;
-
-  setTextureTypeByKeyboard();
 
   if (io.MouseClicked[0] || io.MouseClicked[1]) {
     m_clickedViewRotation = m_mvp.getViewRotation();
@@ -132,6 +107,42 @@ void InputDeviceHandler::step(
                  (io.MouseWheel > 0 ? step_scale_up : step_scale_down));
 
     m_mvp.setViewDistance(d);
+  }
+
+  if (hover_point) {
+    // hovering over a point
+    if (m_measurement_edge) {
+      // measuring in progress
+      m_measurement_edge.value().v()[1] =
+          types::VertData{hover_point.value(), {0, 255, 0, 128}};
+      auto s = m_measurement_edge.value();
+      m_addShape(s);
+    }
+    if (ImGui::IsKeyPressed(ImGuiKey_D)) {
+      static const std::string name{"measurements/distance_measurement"};
+      // pressing key
+      if (!m_measurement_edge) {
+        // new measurement
+
+        m_measurement_edge = types::Edges{name};
+        m_measurement_edge.value().e().push_back({0, 1});
+        types::VertData v{hover_point.value(), {0, 255, 0, 128}};
+        m_measurement_edge.value().v() = {v, v};
+        auto s = m_measurement_edge.value();
+        m_addShape(s);
+      } else {
+        // existing measurement
+        float d = (types::Vector3(m_measurement_edge.value().v()[0]) -
+                   types::Vector3(m_measurement_edge.value().v()[1]))
+                      .squaredNorm();
+        const std::string new_name =
+            "measurements/distance=" + std::to_string(d);
+        m_measurement_edge.value().setName(new_name);
+        m_addShape(m_measurement_edge.value());
+        m_removeShape(name);
+        m_measurement_edge = std::nullopt;
+      }
+    }
   }
 }
 
