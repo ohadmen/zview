@@ -1,5 +1,6 @@
 #include "src/ui/zview_main_app.h"
 
+#include <ImGuiFileDialog.h>
 #include <imgui.h>
 
 #include <algorithm>
@@ -51,6 +52,41 @@ void ZviewMainApp::processInput() {
   } else if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_6)) {
     Params::i().texture_type = 6;
   }
+  if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_L)) {
+    static const IGFD::FileDialogConfig config{"."};
+
+    ImGuiFileDialog::Instance()->OpenDialog("LoadFileDlgKey", "Choose File",
+                                            ".ply", config);
+  }
+  if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_S)) {
+    static const IGFD::FileDialogConfig config{"."};
+
+    ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File",
+                                            ".ply", config);
+  }
+
+  // display
+  if (ImGuiFileDialog::Instance()->Display(
+          "LoadFileDlgKey", ImGuiWindowFlags_Modal, ImVec2(700, 310))) {
+    if (ImGuiFileDialog::Instance()->IsOk()) {  // action if OK
+      std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+      std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+      loadFiles({filePathName});
+    }
+    // close
+    ImGuiFileDialog::Instance()->Close();
+  }
+  if (ImGuiFileDialog::Instance()->Display(
+          "SaveFileDlgKey", ImGuiWindowFlags_Modal, ImVec2(700, 310))) {
+    if (ImGuiFileDialog::Instance()->IsOk()) {  // action if OK
+      std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+      std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+      m_buffer.writeBufferToFile({filePathName});
+    }
+    // close
+    ImGuiFileDialog::Instance()->Close();
+  }
 }
 
 bool ZviewMainApp::init(const std::array<int, 2> &win_sz_wh) {
@@ -87,10 +123,14 @@ bool ZviewMainApp::init(const std::array<int, 2> &win_sz_wh) {
 void ZviewMainApp::loadFiles(const std::vector<std::string> &files) {
   for (const auto &f : files) {
     // temporary object to read the ply file
-    auto shape_vector = io::read_ply(f);
+    try {
+      auto shape_vector = io::read_ply(f);
 
-    for (types::Shape &s : shape_vector) {
-      plot(std::move(s));
+      for (types::Shape &s : shape_vector) {
+        plot(std::move(s));
+      }
+    } catch (const std::exception &e) {
+      std::cerr << e.what() << '\n';
     }
   }
 
@@ -234,6 +274,8 @@ void ZviewMainApp::drawHelpMenu() {
     ImGui::Text(" T - show/hide  tree view");
     ImGui::Text(" G - show/hide  grid");
     ImGui::Text(" D - start/stop  distance measurement");
+    ImGui::Text(" CTRL+S - save current buffer to file to .ply file");
+    ImGui::Text(" CTRL+L - load .ply file");
     ImGui::Text(" CTRL+1 - set the texture type to 1");
     ImGui::Text(" CTRL+2 - set the texture type to 2");
     ImGui::Text(" CTRL+3 - set the texture type to 3");

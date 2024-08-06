@@ -15,7 +15,7 @@ uniform vec3 u_lightDir;
 
 varying vec3 v_xyz;
 varying vec3 v_eyeDir;
-
+varying float v_depth;
 uint wang_hash(uint seed)
 {
 	
@@ -55,7 +55,12 @@ void main()
 		fragColor =vertexColor;
 		break;
 	}
-
+	case 2:
+	{	
+		float z = max(0,1-v_depth/100);
+		fragColor  =vec4(z,z,z,1.0);
+		break;
+	}
 	case 5:
 	{
 	vec4 specularColor1=vec4 (0.1,0.08,0.05,1.0);

@@ -125,7 +125,7 @@ void TreeView::drawTree(TreeNode &node) const {
     ImGui::PushStyleColor(ImGuiCol_Text, col_noobj);
   }
 
-  if (ImGui::TreeNodeEx(node.name.c_str(), flag)) {
+  if (!node.name.empty() && ImGui::TreeNodeEx(node.name.c_str(), flag)) {
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
       // has a linked item
       if (node.object_key != 0) {

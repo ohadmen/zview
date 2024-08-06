@@ -48,9 +48,19 @@ def fetch_http_repositories(name):
         url = "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
         build_file = "//third_party/eigen:eigen.BUILD",
     )
+    # ImGui filedialog
+    http_archive(
+        name = "imgui_file_dialog",
+        sha256 = "136e714965afaec2bac857bf46a653fdd74a0bf493e281682706c604113026b8",
+        strip_prefix = "ImGuiFileDialog-0.6.7",
+        url = "https://github.com/aiekick/ImGuiFileDialog/archive/refs/tags/v0.6.7.tar.gz",
+        build_file = "//third_party/imgui_file_dialog:imgui_file_dialog.BUILD",
+    )
+    
 
     native.new_local_repository(
         name = "sysroot",
         build_file = "@//third_party/internals:internals.BUILD",
         path = "/usr",
     )
+    

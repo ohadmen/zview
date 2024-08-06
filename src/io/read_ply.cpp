@@ -198,7 +198,9 @@ std::vector<ElemData> readElems(const std::vector<ElementHeader> &elemHeaders,
 std::vector<types::Shape> read_ply(const std::string &fn) {
   std::ifstream ss(fn, std::ios::in | std::ios::binary);
   if (ss.fail()) throw std::runtime_error("failed to open " + std::string(fn));
-
+  if (!fn.ends_with(".ply")) {
+    throw std::runtime_error("file is not a ply file");
+  }
   std::vector<types::Shape> container;
 
   while (!ss.eof()) {
