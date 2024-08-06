@@ -1,4 +1,5 @@
 #pragma once
+#include <deque>
 #include <functional>
 #include <string>
 #include <vector>
@@ -8,7 +9,7 @@ class TreeView {
   struct TreeNode {
     std::string name;
     std::uint32_t object_key{0};
-    std::vector<TreeNode> children{};
+    std::deque<TreeNode> children{};
     TreeNode* parent;
     TreeNode(const std::string& name_, TreeNode* parent_,
              std::uint32_t object_key_ = 0U)
@@ -27,6 +28,8 @@ class TreeView {
   void getChildObjectsKeys(const TreeNode& node,
                            std::vector<std::uint32_t>* selected_objects_keysP,
                            bool enabled_only) const;
+  void deleteNode(TreeNode& node) const;
+  static TreeNode* find(std::uint32_t key, TreeNode* root);
 
  public:
   TreeView(
@@ -35,5 +38,6 @@ class TreeView {
       std::function<void(const std::uint32_t&)> delete_key);
   void push(std::string name, const std::uint32_t object_key);
   void draw(bool* showTreeP);
+  void remove(std::uint32_t obj_key);
 };
 }  // namespace zview

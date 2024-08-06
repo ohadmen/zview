@@ -48,29 +48,35 @@ const std::string getName(const types::Shape &s) {
   return std::visit([](const auto &v) { return v.getName(); }, s);
 }
 std::uint32_t ShapeBuffer::emplace(types::Shape &&s) {
-  // check that there is no other shape with the same name
-  static_assert(std::is_copy_constructible_v<types::Shape>);
-
   const std::string s_name = getName(s);
-  for (auto &shape : m_buffer) {
-    if (getName(shape.second) == s_name) {
-      bool ok = std::visit(*m_shape_update_visitor_p.get(), shape.second,
-                           std::move(s));
-      if (!ok) {
-        std::cout << "could not update shape" << std::endl;
-      }
+  const auto key = getKey(s_name);
+
+  if (key == 0) {
+    // new shape - add it to the buffer, init it
+
+    m_buffer.insert({m_next_key, std::move(s)});
+
+    auto ret =
+        std::visit(*m_shape_init_visitor_p.get(), m_buffer.at(m_next_key));
+    if (ret) {
+      // add it to string2key dict
+      m_string2key.insert({s_name, m_next_key});
+      return m_next_key++;
+    } else {
+      m_buffer.erase(m_next_key);
+      std::cout << "could not init shape" << std::endl;
       return 0;
     }
+  } else {
+    // shape already there, update it
+    auto &cur_shape = m_buffer.at(key);
+    bool ok =
+        std::visit(*m_shape_update_visitor_p.get(), cur_shape, std::move(s));
+    if (!ok) {
+      std::cout << "could not update shape" << std::endl;
+    }
   }
-  m_buffer.insert({m_next_key, std::move(s)});
-
-  auto ret = std::visit(*m_shape_init_visitor_p.get(), m_buffer.at(m_next_key));
-  if (!ret) {
-    m_buffer.erase(m_next_key);
-    std::cout << "could not init shape" << std::endl;
-    return 0;
-  }
-  return m_next_key++;
+  return 0;
 }
 
 void ShapeBuffer::draw(
@@ -143,6 +149,16 @@ bool &ShapeBuffer::shapeVisibility(const std::uint32_t &object_key) {
   }
   return std::visit([](auto &v) -> bool & { return v.enabled(); }, it->second);
 }
-
-void ShapeBuffer::erase(const std::uint32_t &key) { m_buffer.erase(key); }
+std::uint32_t ShapeBuffer::getKey(const ::std::string &name) {
+  auto it = m_string2key.find(name);
+  if (it == m_string2key.end()) {
+    return 0;
+  }
+  return it->second;
+}
+void ShapeBuffer::erase(const std::uint32_t &key) {
+  const std::string s_name = getName(m_buffer.at(key));
+  m_string2key.erase(s_name);
+  m_buffer.erase(key);
+}
 }  // namespace zview

@@ -70,5 +70,6 @@ class ZviewMainApp {
   bool winResize(const std::array<int, 2> &wh);
   bool draw(const std::array<int, 2> &win_sz_wh);
   std::uint32_t plot(types::Shape &&shape);
+  void remove(const std::string &name);
 };
 }  // namespace zview

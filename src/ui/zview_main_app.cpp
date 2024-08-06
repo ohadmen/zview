@@ -15,7 +15,8 @@ namespace zview {
 
 ZviewMainApp::ZviewMainApp()
     : m_axis(m_mvp),
-      m_idh{&m_mvp},
+      m_idh{&m_mvp, std::bind(&ZviewMainApp::plot, this, std::placeholders::_1),
+            std::bind(&ZviewMainApp::remove, this, std::placeholders::_1)},
       m_tree_view{
           std::bind(&ShapeBuffer::shapeVisibility, &m_buffer,
                     std::placeholders::_1),
@@ -24,6 +25,9 @@ ZviewMainApp::ZviewMainApp()
           std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)} {}
 
 void ZviewMainApp::processInput() {
+  const bool isCtrlPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) ||
+                             ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+
   if (ImGui::IsKeyPressed(ImGuiKey_P)) {
     m_show_params_menu = !m_show_params_menu;
   }
@@ -32,6 +36,20 @@ void ZviewMainApp::processInput() {
   }
   if (ImGui::IsKeyPressed(ImGuiKey_T)) {
     m_show_tree = !m_show_tree;
+  }
+
+  if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_1)) {
+    Params::i().texture_type = 1;
+  } else if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_2)) {
+    Params::i().texture_type = 2;
+  } else if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_3)) {
+    Params::i().texture_type = 3;
+  } else if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_4)) {
+    Params::i().texture_type = 4;
+  } else if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_5)) {
+    Params::i().texture_type = 5;
+  } else if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_6)) {
+    Params::i().texture_type = 6;
   }
 }
 
@@ -212,8 +230,10 @@ void ZviewMainApp::drawHelpMenu() {
   if (ImGui::BeginPopupModal("Help", &m_show_help_menu,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text(" H - open this menu");
-    ImGui::Text(" P - open the parameters menu");
-    ImGui::Text(" T - open the tree view");
+    ImGui::Text(" P - show/hide  parameters menu");
+    ImGui::Text(" T - show/hide  tree view");
+    ImGui::Text(" G - show/hide  grid");
+    ImGui::Text(" D - start/stop  distance measurement");
     ImGui::Text(" CTRL+1 - set the texture type to 1");
     ImGui::Text(" CTRL+2 - set the texture type to 2");
     ImGui::Text(" CTRL+3 - set the texture type to 3");
@@ -262,5 +282,11 @@ std::uint32_t ZviewMainApp::plot(types::Shape &&shape) {
   }
   m_tree_view.push(shape_name, key);
   return key;
+}
+void ZviewMainApp::remove(const std::string &name) {
+  std::uint32_t key = m_buffer.getKey(name);
+  if (key != 0) {
+    m_tree_view.remove(key);
+  }
 }
 }  // namespace zview
