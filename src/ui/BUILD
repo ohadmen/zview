@@ -14,6 +14,7 @@ cc_library(
         "//src/params",
         "//src/ui:input_device_handler",
         "//src/ui:tree_view",
+        "@imgui_file_dialog",
     ],
 )
 

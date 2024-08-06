@@ -1,5 +1,6 @@
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 #include <algorithm>
 #include <iostream>
@@ -8,6 +9,10 @@
 #include "src/graphics_backend/imgui_impl_glfw.h"
 #include "src/graphics_backend/imgui_impl_opengl3.h"
 #include "src/zview.h"
+
+// needed for glfwSetDropCallback
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+zview::Zview app;
 
 static void glfw_error_callback(int error, const char *description) {
   std::cerr << "Glfw Error " << error << ": " << description << std::endl;
@@ -137,16 +142,24 @@ static std::vector<std::string> get_args(int argc, char **argv) {
   return list;
 }
 
+void fileDropCallback(GLFWwindow *window, int count, const char **paths) {
+  std::vector<std::string> files(count);
+  for (int i = 0; i < count; ++i) {
+    files[i] = *std::next(paths, i);
+  }
+
+  app.plot(files);
+}
 int main(int argc, char *argv[]) {
   const auto files = get_args(argc, argv);
 
   auto window = initGL();
 
-  zview::Zview app;
   if (!app.init(getWinSize(window))) {
     return 1;
   }
 
+  glfwSetDropCallback(window, fileDropCallback);
   app.plot(files);
 
   while (!glfwWindowShouldClose(window)) {
