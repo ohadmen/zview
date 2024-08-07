@@ -53,7 +53,7 @@ class ShapeBuffer {
   void draw(
       const float* tform,
       const std::function<void(const std::pair<std::uint32_t, types::Shape>&)>&
-          preDrawFunction = [](const auto& s) {}) const;
+          preDrawFunction = []([[maybe_unused]] const auto& s) {}) const;
 
   std::optional<types::Vector3> get3dLocation(
       const std::uint32_t& object_key, const std::uint32_t& prim_index,
