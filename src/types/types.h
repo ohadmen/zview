@@ -114,8 +114,9 @@ class Pcl {
 
   std::vector<VertData> &v() { return m_v; }
   const std::vector<VertData> &v() const { return m_v; }
-  bool initShader(const std::string &shader_name);
+
   const Shader &shader() const;
+  Shader &shader();
   Bbox3d getBbox() const;
   virtual std::optional<types::Vector3> get3dLocation(
       const std::uint32_t &prim_index,

@@ -13,7 +13,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//src/io:read_file",
         "@eigen",
         "@imgui",
     ],
@@ -24,5 +23,8 @@ cc_library(
     srcs = ["shader.cpp"],
     hdrs = ["shader.h"],
     visibility = ["//visibility:public"],
-    deps = ["//src/graphics_backend"],
+    deps = [
+        "//src/graphics_backend",
+        "//src/graphics_backend/shader_code",
+    ],
 )

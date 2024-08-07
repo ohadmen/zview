@@ -7,7 +7,10 @@
 namespace zview {
 
 bool ShapeInitVisitor::operator()(types::Pcl &obj) const {
-  obj.initShader("point");
+  if (!obj.shader().init(Shader::ShaderType::PCL)) {
+    return false;
+  }
+
   const auto verts = obj.v();
   glGenVertexArrays(1, &obj.vao());
   glGenBuffers(1, &obj.vbo());
@@ -31,7 +34,9 @@ bool ShapeInitVisitor::operator()(types::Pcl &obj) const {
   return ok;
 }
 bool ShapeInitVisitor::operator()(types::Edges &obj) const {
-  obj.initShader("edges");
+  if (!obj.shader().init(Shader::ShaderType::EDGES)) {
+    return false;
+  }
 
   const auto indices = obj.e();
   const auto verts = obj.v();
@@ -62,7 +67,7 @@ bool ShapeInitVisitor::operator()(types::Edges &obj) const {
   return ok;
 }
 bool ShapeInitVisitor::operator()(types::Mesh &obj) const {
-  if (!obj.initShader("mesh")) {
+  if (!obj.shader().init(Shader::ShaderType::MESH)) {
     return false;
   }
 

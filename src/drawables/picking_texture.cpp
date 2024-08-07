@@ -9,7 +9,7 @@ bool PickingTexture::init(const std::array<int, 2> &wh) {
   if (m_fbo != 0) {
     glDeleteFramebuffers(1, &m_fbo);
   }
-  m_pickingShader.init("picking");
+  m_pickingShader.init(Shader::ShaderType::PICKING);
   m_height = wh[1];
   glGenFramebuffers(1, &m_fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);

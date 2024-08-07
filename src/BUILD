@@ -18,7 +18,6 @@ cc_library(
     name = "zview",
     srcs = ["zview.cpp"],
     hdrs = ["zview.h"],
-    data = ["//shaders"],
     visibility = ["//visibility:public"],
     deps = [
         "//src/drawables",
