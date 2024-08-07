@@ -21,7 +21,5 @@ cc_library(
     ],
     include_prefix = "imgui",
     includes = ["."],
-    deps = [
-        "@sysroot//:libglfw",
-    ],
+
 )

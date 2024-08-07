@@ -9,9 +9,7 @@ class Params {
   Params() {}
 
  public:
-  static Params& i();
-
-  void load(const std::string& fn);
+  static Params &i();
 
   float camera_fov_rad{deg2rad(60.0f)};
   int texture_type{1};
