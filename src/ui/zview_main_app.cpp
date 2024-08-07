@@ -53,13 +53,15 @@ void ZviewMainApp::processInput() {
     Params::i().texture_type = 6;
   }
   if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_L)) {
-    static const IGFD::FileDialogConfig config{"."};
+    static const IGFD::FileDialogConfig config{".", {}, {}, {}, {},
+                                               {},  {}, {}, {}};
 
     ImGuiFileDialog::Instance()->OpenDialog("LoadFileDlgKey", "Choose File",
                                             ".ply", config);
   }
   if (isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_S)) {
-    static const IGFD::FileDialogConfig config{"."};
+    static const IGFD::FileDialogConfig config{".", {}, {}, {}, {},
+                                               {},  {}, {}, {}};
 
     ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File",
                                             ".ply", config);
