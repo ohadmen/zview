@@ -22,7 +22,9 @@
 ### dependencies
 
 `sudo apt-get install libglfw3-dev libglew-dev`
+
 `sudo apt-get install clang-format clang-tidy cppcheck`
+
 `pip install pre-commit`
 `pip install cpplint`
 

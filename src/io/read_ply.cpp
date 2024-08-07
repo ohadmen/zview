@@ -8,6 +8,7 @@
 #include "src/utils/recast.h"
 // https://github.com/google/styleguide/issues/194
 // NOLINTNEXTLINE[build/c++11]
+#include <filesystem>  // C++17
 #include <regex>
 #include <string>
 #include <utility>
@@ -198,7 +199,7 @@ std::vector<ElemData> readElems(const std::vector<ElementHeader> &elemHeaders,
 std::vector<types::Shape> read_ply(const std::string &fn) {
   std::ifstream ss(fn, std::ios::in | std::ios::binary);
   if (ss.fail()) throw std::runtime_error("failed to open " + std::string(fn));
-  if (!fn.ends_with(".ply")) {
+  if (std::filesystem::path{fn}.extension() != ".ply") {
     throw std::runtime_error("file is not a ply file");
   }
   std::vector<types::Shape> container;
