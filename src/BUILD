@@ -9,6 +9,8 @@ cc_binary(
         "//src:zview",
         "//src/graphics_backend",
         "//src/types:external_types",
+        "@sysroot//:libglew",
+        "@sysroot//:libglfw",
     ],
 )
 

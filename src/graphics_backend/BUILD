@@ -16,9 +16,6 @@ cc_library(
         "//src/io:read_file",
         "@eigen",
         "@imgui",
-        "@sysroot//:libglew",
-        "@sysroot//:libglfw",
-        "@sysroot//:vulkan",
     ],
 )
 
