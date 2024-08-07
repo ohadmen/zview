@@ -27,7 +27,7 @@ Bbox3d Pcl::getBbox() const {
 
 std::optional<types::Vector3> Pcl::get3dLocation(
     const std::uint32_t &prim_index,
-    const std::array<types::Vector3, 2> &ray) const {
+    [[maybe_unused]] const std::array<types::Vector3, 2> &ray) const {
   if (prim_index >= m_v.size()) {
     return std::nullopt;
   }
