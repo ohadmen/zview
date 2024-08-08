@@ -9,20 +9,24 @@ bool PickingTexture::init(const std::array<int, 2> &wh) {
   if (m_fbo != 0) {
     glDeleteFramebuffers(1, &m_fbo);
   }
+  if (m_txt != 0) {
+    glDeleteTextures(1, &m_txt);
+  }
+
   m_pickingShader.init(Shader::ShaderType::PICKING);
-  m_height = wh[1];
+  m_wh = wh;
   glGenFramebuffers(1, &m_fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
   // Create the texture object for the primitive information buffer
-  glGenTextures(1, &m_pickingTexture);
-  glBindTexture(GL_TEXTURE_2D, m_pickingTexture);
+  glGenTextures(1, &m_txt);
+  glBindTexture(GL_TEXTURE_2D, m_txt);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32UI, wh[0], wh[1], 0, GL_RGB_INTEGER,
                GL_UNSIGNED_INT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         m_pickingTexture, 0);
+                         m_txt, 0);
 
   // Create the texture object for the depth buffer
   if (m_depthTexture != 0) {
@@ -59,6 +63,7 @@ void PickingTexture::setTransform(const types::Matrix4x4 &tform) const {
 
 void PickingTexture::enableWriting() const {
   m_pickingShader.use();
+  glViewport(0, 0, m_wh[0], m_wh[1]);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 }
 
@@ -73,8 +78,7 @@ PickingTexture::PixelInfo PickingTexture::readPixel(int x, int y) const {
   glReadBuffer(GL_COLOR_ATTACHMENT0);
 
   PixelInfo Pixel;
-  glReadPixels(x, m_height - y - 1, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT,
-               &Pixel);
+  glReadPixels(x, m_wh[1] - y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &Pixel);
 
   glReadBuffer(GL_NONE);
 
@@ -82,17 +86,19 @@ PickingTexture::PixelInfo PickingTexture::readPixel(int x, int y) const {
 
   return Pixel;
 }
+
 PickingTexture::~PickingTexture() {
   if (m_fbo != 0) {
     glDeleteFramebuffers(1, &m_fbo);
   }
 
-  if (m_pickingTexture != 0) {
-    glDeleteTextures(1, &m_pickingTexture);
+  if (m_txt != 0) {
+    glDeleteTextures(1, &m_txt);
   }
 
   if (m_depthTexture != 0) {
     glDeleteTextures(1, &m_depthTexture);
   }
 }
+
 }  // namespace zview

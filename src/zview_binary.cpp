@@ -130,6 +130,8 @@ GLFWwindow *initGL() {
 std::array<int, 2> getWinSize(GLFWwindow *window) {
   std::array<int, 2> size{};
   glfwGetWindowSize(window, &size[0], &size[1]);
+  size[0] = std::max(size[0], 1);
+  size[1] = std::max(size[1], 1);
   return size;
 }
 

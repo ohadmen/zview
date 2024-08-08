@@ -38,10 +38,12 @@ class PickingTexture {
   void setTransform(const types::Matrix4x4 &tform) const;
 
  private:
-  int m_height{0};
   Shader m_pickingShader;
   std::uint32_t m_fbo{0};
-  std::uint32_t m_pickingTexture{0};
+  std::uint32_t m_txt{0};
   std::uint32_t m_depthTexture{0};
+  std::array<std::int32_t, 2> m_wh{0, 0};
+  std::array<std::int32_t, 2> m_xy{0, 0};
+  mutable std::array<std::int32_t, 4> m_viewportSave{0, 0, 0, 0};
 };
 }  // namespace zview

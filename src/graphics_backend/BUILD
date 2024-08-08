@@ -28,3 +28,13 @@ cc_library(
         "//src/graphics_backend/shader_code",
     ],
 )
+
+cc_library(
+    name = "frame_buffer",
+    srcs = ["frame_buffer.cpp"],
+    hdrs = ["frame_buffer.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//src/graphics_backend",
+    ],
+)

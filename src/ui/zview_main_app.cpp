@@ -35,7 +35,7 @@ void ZviewMainApp::processInput() {
   if (ImGui::IsKeyPressed(ImGuiKey_G)) {
     m_show_grid = !m_show_grid;
   }
-  if (ImGui::IsKeyPressed(ImGuiKey_T)) {
+  if (ImGui::IsKeyPressed(ImGuiKey_L)) {
     m_show_tree = !m_show_tree;
   }
 
@@ -147,6 +147,11 @@ bool ZviewMainApp::winResize(const std::array<int, 2> &wh) {
     std::cerr << "picking texture init failed" << std::endl;
     return false;
   }
+  if (!m_fbo.init(wh)) {
+    std::cerr << "frame buffer init failed" << std::endl;
+    return false;
+  }
+
   return true;
 }
 
@@ -171,27 +176,50 @@ void ZviewMainApp::setCameraToViewSelectedKey(
 }
 
 bool ZviewMainApp::draw(const std::array<int, 2> &win_sz_wh) {
-  if (!winResize(win_sz_wh)) {
-    return false;
-  }
   processInput();
-  drawHelpMenu();
-  drawParamsMenu();
-  drawStatusBar();
 
   if (m_show_tree) {
     m_tree_view.draw(&m_show_tree);
   }
 
-  m_idh.step(m_hover_point);
-
   const auto transformation = m_mvp.getMVPmatrix();
-  ImGui::Render();
-  // render phase
+  drawHelpMenu();
+  drawParamsMenu();
+  drawStatusBar();
+  ImGui::Begin("window", nullptr,
+               ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+                   ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize |
+                   ImGuiWindowFlags_NoBringToFrontOnFocus |
+                   ImGuiWindowFlags_NoFocusOnAppearing);
+  ImGui::SetWindowPos(ImVec2(0, 0));
+  ImGui::SetWindowSize(ImGui::GetIO().DisplaySize);
+  if (ImGui::IsWindowHovered()) {
+    m_idh.step(m_hover_point);
+  }
 
+  auto sz = ImGui::GetContentRegionAvail();
+
+  sz[0] = std::max(1.0f, sz[0]);
+  sz[1] = std::max(1.0f, sz[1]);
+
+  if (!winResize({static_cast<int>(sz.x), static_cast<int>(sz.y)})) {
+    return false;
+  }
+
+  m_fbo.bind();
+  renderPhase(transformation);
+  m_fbo.unbind();
   m_hover_point = pickingPhase(transformation);
 
-  renderPhase(transformation);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  ImGui::Image(
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,performance-no-int-to-ptr)
+      reinterpret_cast<void *>(m_fbo.txt()),
+      ImVec2{static_cast<float>(sz[0]), static_cast<float>(sz[1])},
+      ImVec2(0, 1), ImVec2{1, 0});
+  ImGui::PopStyleVar();
+
+  ImGui::End();
 
   return true;
 }
@@ -210,7 +238,6 @@ void ZviewMainApp::renderPhase(const types::Matrix4x4 &mvp) const {
 }
 std::optional<types::Vector3> ZviewMainApp::pickingPhase(
     const types::Matrix4x4 &mvp) {
-  const auto &io = ImGui::GetIO();
   m_picking.enableWriting();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_picking.setTransform(mvp);
@@ -221,12 +248,16 @@ std::optional<types::Vector3> ZviewMainApp::pickingPhase(
       };
   m_buffer.draw(nullptr, preDrawFunction);
   m_picking.disableWriting();
+  // get mouse position relative to the current window, reducing the window
+  // offset
+  const auto mouse_rel =
+      ImGui::GetMousePos() - ImGui::GetWindowPos() - ImVec2{10, 10};
 
-  const auto pix = m_picking.readPixel(static_cast<int>(io.MousePos.x),
-                                       static_cast<int>(io.MousePos.y));
+  const auto pix = m_picking.readPixel(static_cast<int>(mouse_rel.x),
+                                       static_cast<int>(mouse_rel.y));
 
   if (pix.valid == 1) {
-    const auto r = m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::GLOBAL);
+    const auto r = m_mvp.getRay(mouse_rel, MVPmat::CoordinateSystem::GLOBAL);
 
     auto pt = m_buffer.get3dLocation(pix.object_id, pix.prim_id, r);
 
@@ -273,7 +304,7 @@ void ZviewMainApp::drawHelpMenu() {
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text(" H - open this menu");
     ImGui::Text(" P - show/hide  parameters menu");
-    ImGui::Text(" T - show/hide  tree view");
+    ImGui::Text(" L - show/hide  layers view");
     ImGui::Text(" G - show/hide  grid");
     ImGui::Text(" D - start/stop  distance measurement");
     ImGui::Text(" CTRL+S - save current buffer to file to .ply file");
@@ -296,7 +327,8 @@ void ZviewMainApp::drawParamsMenu() {
   if (!m_show_params_menu) {
     return;
   }
-  ImGui::Begin("Parameters", &m_show_params_menu);
+  ImGui::Begin("Parameters", &m_show_params_menu,
+               ImGuiWindowFlags_AlwaysAutoResize);
   auto &params = zview::Params::i();
 
   static constexpr float deg2rad = M_PIf / 180.0f;

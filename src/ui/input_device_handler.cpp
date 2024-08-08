@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 #include <algorithm>
+#include <iostream>
 #include <limits>
 
 #include "src/params/params.h"
@@ -47,14 +48,13 @@ InputDeviceHandler::InputDeviceHandler(MVPmat *mvpP, const AddShape &addShape,
 void InputDeviceHandler::step(
     const std::optional<types::Vector3> &hover_point) {
   auto &io = ImGui::GetIO();
-
-  if (io.WantCaptureMouse) return;
+  const auto mouse_rel =
+      ImGui::GetMousePos() - ImGui::GetWindowPos() - ImVec2{10, 10};
 
   if (io.MouseClicked[0] || io.MouseClicked[1]) {
     m_clickedViewRotation = m_mvp.getViewRotation();
     m_clickedModelTranslation = m_mvp.getModelTranslation();
-    m_click_ray =
-        m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::SCREEN)[1];
+    m_click_ray = m_mvp.getRay(mouse_rel, MVPmat::CoordinateSystem::SCREEN)[1];
   }
   if (io.MouseDoubleClicked[0]) {
     if (hover_point) {
@@ -69,7 +69,7 @@ void InputDeviceHandler::step(
       // rotating
       const auto clickHit_normalized = getHitOnScreen(m_click_ray);
       const auto ray =
-          m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::SCREEN)[1];
+          m_mvp.getRay(mouse_rel, MVPmat::CoordinateSystem::SCREEN)[1];
       auto hitnew = getHitOnScreen(ray);
 
       const auto axis = hitnew.cross(clickHit_normalized).normalized();
@@ -88,8 +88,7 @@ void InputDeviceHandler::step(
   } else if (io.MouseDown[1]) {
     // //translating
     const float d = m_mvp.getViewDistance();
-    auto hitnew =
-        m_mvp.getRay(io.MousePos, MVPmat::CoordinateSystem::SCREEN)[1];
+    auto hitnew = m_mvp.getRay(mouse_rel, MVPmat::CoordinateSystem::SCREEN)[1];
 
     const auto delta = m_clickedViewRotation.inverse() *
                        (-hitnew / hitnew.z() + m_click_ray / m_click_ray.z()) *

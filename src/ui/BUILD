@@ -10,6 +10,7 @@ cc_library(
         "//src/drawables:axis",
         "//src/drawables:backdrop",
         "//src/drawables:grid",
+        "//src/graphics_backend:frame_buffer",
         "//src/io",
         "//src/params",
         "//src/ui:input_device_handler",
