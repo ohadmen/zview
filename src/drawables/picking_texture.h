@@ -1,30 +1,20 @@
 #pragma once
 #include <cstdint>
 
+#include "src/graphics_backend/frame_buffer.h"
 #include "src/graphics_backend/shader.h"
 #include "src/types/types.h"
 
 namespace zview {
-class PickingTexture {
+class PickingTexture : public FrameBuffer {
  public:
-  PickingTexture() {}
-  // copy constructor
-  PickingTexture(const PickingTexture &other) = delete;
-  // copy assignment
-  PickingTexture &operator=(const PickingTexture &other) = delete;
-  // move constructor
-  PickingTexture(PickingTexture &&other) = delete;
-  // move assignment
-  PickingTexture &operator=(PickingTexture &&other) = delete;
-
-  // destructor
-  ~PickingTexture();
+  PickingTexture();
 
   bool init(const std::array<int, 2> &wh);
 
-  void enableWriting() const;
+  void bind();
 
-  void disableWriting() const;
+  void unbind();
 
   struct PixelInfo {
     std::uint32_t valid{0};
@@ -38,10 +28,6 @@ class PickingTexture {
   void setTransform(const types::Matrix4x4 &tform) const;
 
  private:
-  int m_height{0};
   Shader m_pickingShader;
-  std::uint32_t m_fbo{0};
-  std::uint32_t m_pickingTexture{0};
-  std::uint32_t m_depthTexture{0};
 };
 }  // namespace zview

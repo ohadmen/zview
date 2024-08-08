@@ -42,6 +42,7 @@ cc_library(
     ],
     visibility = ["//visibility:__pkg__"],
     deps = [
+        "//src/graphics_backend:frame_buffer",
         "//src/io",
         "//src/params",
         "//src/types",

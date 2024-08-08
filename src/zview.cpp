@@ -10,15 +10,11 @@ namespace zview {
 Zview::Zview() : m_app(std::make_unique<ZviewMainApp>()) {}
 Zview::~Zview() = default;
 
-bool Zview::init(const std::array<int, 2> &win_sz_wh) {
-  return m_app->init(win_sz_wh);
-}
+bool Zview::init() { return m_app->init(); }
 void Zview::plot(const std::vector<std::string> &files) {
   m_app->loadFiles(files);
 }
-bool Zview::draw(const std::array<int, 2> &win_sz_wh) {
-  return m_app->draw(win_sz_wh);
-}
+bool Zview::draw() { return m_app->draw(); }
 
 // template<typename T>
 // std::variant<std::reference_wrapper<T>> unvisit(T &x) {

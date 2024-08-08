@@ -196,7 +196,7 @@ void TreeView::remove(std::uint32_t obj_key) {
   deleteNode(*it);
 }
 void TreeView::draw(bool *showTreeP) {
-  ImGui::Begin("Object Tree", showTreeP);
+  ImGui::Begin("Layers", showTreeP, ImGuiWindowFlags_AlwaysAutoResize);
 
   for (auto &child : m_root.children) {
     drawTree(child);

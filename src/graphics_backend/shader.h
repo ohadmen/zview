@@ -2,12 +2,15 @@
 
 #include <string>
 #include <unordered_map>
+namespace zview {
 
 class Shader {
  public:
   Shader();
-  bool init(const std::string& shader_name);
+  enum class ShaderType : std::uint8_t { PCL, EDGES, MESH, PICKING, GRID };
+  bool init(const ShaderType& shader_type);
   void use() const;
+  void unuse() const;
   void setUniform(const char* name, const std::array<float, 3U>& val) const;
   template <typename T>
   void setUniform(const char* name, const T val) const;
@@ -30,3 +33,4 @@ class Shader {
   unsigned int m_id{0};
   mutable std::unordered_map<std::string, std::int32_t> m_location_key;
 };
+}  // namespace zview

@@ -6,6 +6,7 @@
 #include "src/drawables/picking_texture.h"
 #include "src/drawables/shape_buffer.h"
 #include "src/geometry/mvp_mat.h"
+#include "src/graphics_backend/frame_buffer.h"
 #include "src/types/types.h"
 #include "src/ui/input_device_handler.h"
 #include "src/ui/tree_view.h"
@@ -14,6 +15,7 @@ namespace zview {
 class ZviewMainApp {
   MVPmat m_mvp;
   ShapeBuffer m_buffer;
+  FrameBuffer m_fbo{FrameBuffer::TextureType::RGBA8};
   PickingTexture m_picking;
   Backdrop m_backdrop;
   Grid m_grid;
@@ -21,7 +23,7 @@ class ZviewMainApp {
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
   bool m_show_params_menu{false};
-  bool m_show_tree{true};
+  bool m_show_tree{false};
 
   bool m_show_help_menu{false};
   bool m_show_grid{true};
@@ -62,13 +64,14 @@ class ZviewMainApp {
 
   void processInput();
 
+  bool winResize(const std::array<int, 2> &wh);
+
  public:
   ZviewMainApp();
 
-  bool init(const std::array<int, 2> &win_sz_wh);
+  bool init();
   void loadFiles(const std::vector<std::string> &files);
-  bool winResize(const std::array<int, 2> &wh);
-  bool draw(const std::array<int, 2> &win_sz_wh);
+  bool draw();
   std::uint32_t plot(types::Shape &&shape);
   void remove(const std::string &name);
 };

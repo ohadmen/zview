@@ -4,9 +4,6 @@
 #include <string>
 namespace zview {
 namespace types {
-bool Pcl::initShader(const std::string &shader_name) {
-  return m_shader.init(shader_name);
-}
 Bbox3d Pcl::getBbox() const {
   static const float e = 0.001f;
   if (m_v.size() == 0) {
@@ -27,7 +24,7 @@ Bbox3d Pcl::getBbox() const {
 
 std::optional<types::Vector3> Pcl::get3dLocation(
     const std::uint32_t &prim_index,
-    const std::array<types::Vector3, 2> &ray) const {
+    [[maybe_unused]] const std::array<types::Vector3, 2> &ray) const {
   if (prim_index >= m_v.size()) {
     return std::nullopt;
   }
@@ -105,6 +102,7 @@ std::optional<types::Vector3> Edges::get3dLocation(
 }
 
 const Shader &Pcl::shader() const { return m_shader; }
+Shader &Pcl::shader() { return m_shader; }
 
 }  // namespace types
 }  // namespace zview

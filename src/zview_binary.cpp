@@ -127,12 +127,6 @@ GLFWwindow *initGL() {
   return m_window;
 }
 
-std::array<int, 2> getWinSize(GLFWwindow *window) {
-  std::array<int, 2> size{};
-  glfwGetWindowSize(window, &size[0], &size[1]);
-  return size;
-}
-
 static std::vector<std::string> get_args(int argc, char **argv) {
   std::vector<std::string> list;
   for (int i = 1; i != argc; ++i) {
@@ -155,7 +149,7 @@ int main(int argc, char *argv[]) {
 
   auto window = initGL();
 
-  if (!app.init(getWinSize(window))) {
+  if (!app.init()) {
     return 1;
   }
 
@@ -164,18 +158,14 @@ int main(int argc, char *argv[]) {
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
-    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
     glfwMakeContextCurrent(window);
-    glClear(GL_COLOR_BUFFER_BIT);
 
     // feed inputs to dear imgui, start new frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    const auto sz = getWinSize(window);
-    glViewport(0, 0, sz[0], sz[1]);
-    if (!app.draw(sz)) {
+    if (!app.draw()) {
       break;
     }
 
