@@ -15,8 +15,6 @@ class FrameBuffer {
 
   void bind();
 
-  void setXY(const std::array<int, 2> &xy) { m_xy = xy; }
-
   void unbind() const;
 
   std::uint32_t txt() const { return m_txt; }
@@ -24,8 +22,9 @@ class FrameBuffer {
  private:
   std::uint32_t m_txt{0};
   std::uint32_t m_fbo{0};
+  std::uint32_t m_dpt{0};
   std::array<int, 2> m_wh{200, 200};
-  std::array<int, 2> m_xy{0, 0};
+
   std::array<std::int32_t, 4> m_viewport{0, 0, 0, 0};
 };
 
