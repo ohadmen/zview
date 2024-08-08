@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -29,13 +30,13 @@ void ZviewMainApp::processInput() {
   const bool isCtrlPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) ||
                              ImGui::IsKeyDown(ImGuiKey_RightCtrl);
 
-  if (ImGui::IsKeyPressed(ImGuiKey_P)) {
+  if (!isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_P)) {
     m_show_params_menu = !m_show_params_menu;
   }
-  if (ImGui::IsKeyPressed(ImGuiKey_G)) {
+  if (!isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_G)) {
     m_show_grid = !m_show_grid;
   }
-  if (ImGui::IsKeyPressed(ImGuiKey_L)) {
+  if (!isCtrlPressed && ImGui::IsKeyPressed(ImGuiKey_L)) {
     m_show_tree = !m_show_tree;
   }
 
@@ -91,12 +92,7 @@ void ZviewMainApp::processInput() {
   }
 }
 
-bool ZviewMainApp::init(const std::array<int, 2> &win_sz_wh) {
-  if (!winResize(win_sz_wh)) {
-    std::cerr << "Failed to resize window" << std::endl;
-    return false;
-  }
-
+bool ZviewMainApp::init() {
   if (!m_backdrop.init(Params::i().background_color)) {
     std::cerr << "Failed to init backdrop" << std::endl;
     return false;
@@ -175,7 +171,7 @@ void ZviewMainApp::setCameraToViewSelectedKey(
   m_mvp.setViewDistance(req_distance);
 }
 
-bool ZviewMainApp::draw(const std::array<int, 2> &win_sz_wh) {
+bool ZviewMainApp::draw() {
   processInput();
 
   if (m_show_tree) {
@@ -238,7 +234,7 @@ void ZviewMainApp::renderPhase(const types::Matrix4x4 &mvp) const {
 }
 std::optional<types::Vector3> ZviewMainApp::pickingPhase(
     const types::Matrix4x4 &mvp) {
-  m_picking.enableWriting();
+  m_picking.bind();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_picking.setTransform(mvp);
   auto &picking = m_picking;
@@ -247,7 +243,7 @@ std::optional<types::Vector3> ZviewMainApp::pickingPhase(
         picking.setObjectIndex(s.first);
       };
   m_buffer.draw(nullptr, preDrawFunction);
-  m_picking.disableWriting();
+  m_picking.unbind();
   // get mouse position relative to the current window, reducing the window
   // offset
   const auto mouse_rel =

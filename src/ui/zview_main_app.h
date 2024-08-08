@@ -15,7 +15,7 @@ namespace zview {
 class ZviewMainApp {
   MVPmat m_mvp;
   ShapeBuffer m_buffer;
-  FrameBuffer m_fbo;
+  FrameBuffer m_fbo{FrameBuffer::TextureType::RGBA8};
   PickingTexture m_picking;
   Backdrop m_backdrop;
   Grid m_grid;
@@ -64,13 +64,14 @@ class ZviewMainApp {
 
   void processInput();
 
+  bool winResize(const std::array<int, 2> &wh);
+
  public:
   ZviewMainApp();
 
-  bool init(const std::array<int, 2> &win_sz_wh);
+  bool init();
   void loadFiles(const std::vector<std::string> &files);
-  bool winResize(const std::array<int, 2> &wh);
-  bool draw(const std::array<int, 2> &win_sz_wh);
+  bool draw();
   std::uint32_t plot(types::Shape &&shape);
   void remove(const std::string &name);
 };

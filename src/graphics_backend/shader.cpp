@@ -95,6 +95,7 @@ bool Shader::link() {
 }
 
 void Shader::use() const { glUseProgram(m_id); }
+void Shader::unuse() const { glUseProgram(0); }
 
 template <>
 void Shader::setUniform<>(const char *name, const int val) const {

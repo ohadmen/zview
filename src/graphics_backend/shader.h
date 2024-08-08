@@ -10,6 +10,7 @@ class Shader {
   enum class ShaderType : std::uint8_t { PCL, EDGES, MESH, PICKING, GRID };
   bool init(const ShaderType& shader_type);
   void use() const;
+  void unuse() const;
   void setUniform(const char* name, const std::array<float, 3U>& val) const;
   template <typename T>
   void setUniform(const char* name, const T val) const;

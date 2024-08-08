@@ -28,7 +28,7 @@ class Zview {
   *** Initialize the application
   *** @return true if the application was initialized successfully
   */
-  bool init(const std::array<int, 2> &win_sz_wh);
+  bool init();
 
   /*
   *** Load files into the application
@@ -65,7 +65,7 @@ class Zview {
   *** @param win_sz_wh the size of the window
   *** @return true if the application should continue running
   */
-  bool draw(const std::array<int, 2> &win_sz_wh);
+  bool draw();
 
  private:
   std::unique_ptr<ZviewMainApp> m_app;

@@ -2,11 +2,28 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#include <stdexcept>
 namespace zview {
 
-FrameBuffer::FrameBuffer(){
-
-};
+FrameBuffer::FrameBuffer(TextureType textureType) {
+  static constexpr ParamSet rgba8{GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE,
+                                  GL_LINEAR};
+  static constexpr ParamSet rgb32ui{GL_RGB32UI, GL_RGB_INTEGER, GL_UNSIGNED_INT,
+                                    GL_NEAREST};
+  switch (textureType) {
+    case TextureType::RGB32UI: {
+      m_paramSet = rgb32ui;
+      break;
+    }
+    case TextureType::RGBA8: {
+      m_paramSet = rgba8;
+      break;
+    }
+    default:
+      throw std::runtime_error("Unknown texture type");
+  }
+}
 
 bool FrameBuffer::init(const std::array<int, 2> &wh) {
   if (wh == m_wh) {
@@ -24,10 +41,10 @@ bool FrameBuffer::init(const std::array<int, 2> &wh) {
   }
   glGenTextures(1, &m_txt);
   glBindTexture(GL_TEXTURE_2D, m_txt);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_wh[0], m_wh[1], 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, nullptr);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, m_paramSet.internalFormat, m_wh[0], m_wh[1], 0,
+               m_paramSet.format, m_paramSet.type, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_paramSet.filterType);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_paramSet.filterType);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          m_txt, 0);
 
@@ -56,17 +73,26 @@ void FrameBuffer::bind() {
   glGetIntegerv(GL_VIEWPORT, m_viewport.data());
   glViewport(0, 0, m_wh[0], m_wh[1]);
   glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-  glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
-  glClear(GL_COLOR_BUFFER_BIT);
 }
 void FrameBuffer::unbind() const {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glViewport(m_viewport[0], m_viewport[1], m_viewport[2], m_viewport[3]);
 }
 FrameBuffer::~FrameBuffer() {
-  glDeleteFramebuffers(1, &m_fbo);
-  glDeleteTextures(1, &m_txt);
-  glDeleteTextures(1, &m_dpt);
+  if (m_fbo != 0) {
+    glDeleteFramebuffers(1, &m_fbo);
+    m_fbo = 0;
+  }
+
+  if (m_txt != 0) {
+    glDeleteTextures(1, &m_txt);
+    m_txt = 0;
+  }
+
+  if (m_dpt != 0) {
+    glDeleteTextures(1, &m_dpt);
+    m_dpt = 0;
+  }
 }
 
 }  // namespace zview
