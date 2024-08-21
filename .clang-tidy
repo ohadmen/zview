@@ -1,0 +1,19 @@
+FormatStyle: file
+HeaderFilterRegex: "src/.*"
+UseColor: true
+WarningsAsErrors: >
+    *,
+    -clang-diagnostic-builtin-macro-redefined,
+    -cppcoreguidelines-pro-type-reinterpret-cast
+
+Checks: >
+    bugprone-*,
+    -bugprone-easily-swappable-parameters,
+    cppcoreguidelines-*,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-pro-type-vararg,
+    -cppcoreguidelines-pro-type-reinterpret-cast
+    google-*,
+    performance-*,
+    { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
+
