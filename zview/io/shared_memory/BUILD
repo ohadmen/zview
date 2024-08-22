@@ -33,3 +33,11 @@ cc_library(
     hdrs = ["shared_memory_types.h"],
     visibility = ["//visibility:__pkg__"],
 )
+
+cc_binary(
+    name = "interprocess_test",
+    srcs = ["interprocess_test.cpp"],
+    deps = [
+        "@boost//:interprocess",
+    ],
+)
