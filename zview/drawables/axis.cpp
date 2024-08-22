@@ -47,7 +47,7 @@ bool Axis::init() {
   return ShapeInitVisitor()(*this);
 }
 void Axis::draw() const {
-  static constexpr float rad_30 = M_PIf / 180.0f * 30.0f;
+  static constexpr float rad_30 = static_cast<float>(M_PI) / 180.0f * 30.0f;
   Eigen::Affine3f r{m_mvp.getViewRotation()};
   float distance = (m_mvp.getViewDistance() * Params::i().zmin_factor) / d;
   r.pretranslate(types::Vector3{0, 0, -distance});

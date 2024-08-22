@@ -326,7 +326,7 @@ void ZviewInfImpl::drawParamsMenu() {
       ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
   auto &params = zview::Params::i();
 
-  static constexpr float deg2rad = M_PIf / 180.0f;
+  static constexpr float deg2rad = static_cast<float>(M_PI) / 180.0f;
   float cam_fov_deg = params.camera_fov_rad / deg2rad;
 
   if (ImGui::SliderFloat("Field of view", &cam_fov_deg, 10, 90)) {
