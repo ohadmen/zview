@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 cc_library(
     name = "server",
@@ -34,7 +34,7 @@ cc_library(
     visibility = ["//visibility:__pkg__"],
 )
 
-cc_binary(
+cc_test(
     name = "interprocess_test",
     srcs = ["interprocess_test.cpp"],
     deps = [
