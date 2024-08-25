@@ -34,12 +34,18 @@ cc_library(
     name = "shared_memory_types",
     hdrs = ["shared_memory_types.h"],
     visibility = ["//visibility:__pkg__"],
+    deps = [
+        "@boost//:interprocess",
+    ],
 )
 
 cc_test(
-    name = "interprocess_test",
-    srcs = ["interprocess_test.cpp"],
+    name = "shared_memory_test",
+    srcs = ["tests/shared_memory_test.cpp"],
+    defines = ["CATCH_CONFIG_MAIN"],
     deps = [
-        "@boost//:interprocess",
+        ":client",
+        ":server",
+        "@catch2//:catch2_main",
     ],
 )
