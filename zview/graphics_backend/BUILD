@@ -15,6 +15,8 @@ cc_library(
     deps = [
         "@eigen",
         "@imgui",
+        "@sysroot//:libglew",
+        "@sysroot//:libglfw",
     ],
 )
 
