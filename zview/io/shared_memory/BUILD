@@ -8,9 +8,10 @@ cc_library(
     hdrs = ["shared_memory_server.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//zview/io/shared_memory:shared_memory_types",
+        ":shared_memory_types",
         "//zview/types",
         "//zview/utils:recast",
+        "@boost//:interprocess",
     ],
 )
 
