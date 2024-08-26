@@ -119,40 +119,22 @@ SCENARIO("Shared Memory Test") {
                   AND_WHEN("Calling the step function") {
                     server.step();
 
-                    THEN("The add_shape_calls should be 2") {
-                      CHECK(add_shape_calls == 2);
+                    THEN("The add_shape_calls should be 3") {
+                      CHECK(add_shape_calls == 3);
                     }
                     AND_THEN(
                         "The added_shape_names should contain the names of the "
                         "PCLs") {
-                      CHECK(added_shape_names.size() == 2);
+                      CHECK(added_shape_names.size() == 3);
                       CHECK(added_shape_names[1] == name2);
+                      CHECK(added_shape_names[2] == name3);
                     }
                     AND_THEN(
                         "The added_shape_num_points should contain the number "
                         "of points in the PCLs") {
-                      CHECK(added_shape_num_points.size() == 2);
+                      CHECK(added_shape_num_points.size() == 3);
                       CHECK(added_shape_num_points[1] == n_points2);
-                    }
-
-                    AND_WHEN("Calling the step function") {
-                      server.step();
-
-                      THEN("The add_shape_calls should be 3") {
-                        CHECK(add_shape_calls == 3);
-                      }
-                      AND_THEN(
-                          "The added_shape_names should contain the names of "
-                          "the PCLs") {
-                        CHECK(added_shape_names.size() == 3);
-                        CHECK(added_shape_names[2] == name3);
-                      }
-                      AND_THEN(
-                          "The added_shape_num_points should contain the "
-                          "number of points in the PCLs") {
-                        CHECK(added_shape_num_points.size() == 3);
-                        CHECK(added_shape_num_points[2] == n_points3);
-                      }
+                      CHECK(added_shape_num_points[2] == n_points3);
                     }
                   }
                 }

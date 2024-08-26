@@ -90,25 +90,27 @@ SharedMemoryServer::~SharedMemoryServer() {
 void SharedMemoryServer::step() {
   SharedMemoryInfo *info =
       static_cast<SharedMemoryInfo *>(m_region.get_address());
-
   boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
       lock(info->mutex);
-  auto ptr =
-      static_cast<std::uint8_t *>(m_region.get_address()) + info->read_offset;
 
-  if (*ptr == 0) {
-    return;
-  }
+  while (true) {
+    auto ptr =
+        static_cast<std::uint8_t *>(m_region.get_address()) + info->read_offset;
 
-  if (call_callback(ptr)) {
-    info->read_offset =
-        std::distance(static_cast<std::uint8_t *>(m_region.get_address()), ptr);
-  } else {
-    std::uint8_t *end = static_cast<std::uint8_t *>(m_region.get_address()) +
-                        m_region.get_size();
-    std::memset(ptr, 0, std::distance(ptr, end));
+    if (*ptr == 0) {
+      return;
+    }
 
-    info->write_offset = info->read_offset;
+    if (call_callback(ptr)) {
+      info->read_offset = std::distance(
+          static_cast<std::uint8_t *>(m_region.get_address()), ptr);
+    } else {
+      std::uint8_t *end = static_cast<std::uint8_t *>(m_region.get_address()) +
+                          m_region.get_size();
+      std::memset(ptr, 0, std::distance(ptr, end));
+
+      info->write_offset = info->read_offset;
+    }
   }
 }
 
