@@ -13,6 +13,9 @@ class SharedMemoryClient {
   boost::interprocess::mapped_region m_data_region;
   boost::interprocess::mapped_region m_cmd_region;
 
+  bool sendServerResizeRequest(std::size_t size);
+  bool checkResponse();
+
  public:
   explicit SharedMemoryClient();
 

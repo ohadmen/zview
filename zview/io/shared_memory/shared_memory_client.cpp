@@ -21,11 +21,13 @@ SharedMemoryClient::SharedMemoryClient()
       m_data_region{m_data_shm, boost::interprocess::read_write},
       m_cmd_region{m_cmd_shm, boost::interprocess::read_write} {}
 
-bool checkResponse(SharedMemoryInfo &info) {
-  return true;
+bool SharedMemoryClient::checkResponse() {
+  SharedMemoryInfo &info =
+      *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+
   // wait 10 ms
-  for (int i = 0; i < 100; ++i) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  for (int i = 0; i < 20; ++i) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     {
       boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
           lock(info.mutex);
@@ -36,24 +38,48 @@ bool checkResponse(SharedMemoryInfo &info) {
   }
   return false;
 }
+bool SharedMemoryClient::sendServerResizeRequest(std::size_t size) {
+  {  // mutex scope
+    SharedMemoryInfo &info =
+        *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+    boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
+        lock(info.mutex);
+    info.type = SharedMemMessageType::SM_RESIZE;
+    info.n_vertices = size;
+  }
+  if (!checkResponse()) {
+    return false;
+  }
+  m_data_shm.truncate(ssize_t(size));
+
+  m_data_region = boost::interprocess::mapped_region(
+      m_data_shm, boost::interprocess::read_write);
+  return true;
+}
 bool SharedMemoryClient::plot(const std::string &name, const float *xyz,
                               size_t n_points, std::uint16_t dim_points,
                               const std::uint32_t *indices, size_t n_indices,
                               std::uint16_t dim_indices) {
-  SharedMemoryInfo &info =
-      *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
-  {  // mutex scope
-    boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
-        lock(info.mutex);
-    const std::size_t available_size = m_data_region.get_size();
-    const std::size_t req_size =
-        n_points * dim_points * sizeof(float) +
-        n_indices * dim_indices * sizeof(std::uint32_t);
-    if (available_size < req_size) {
+  const std::size_t available_size = m_data_region.get_size();
+  const std::size_t req_size = n_points * dim_points * sizeof(float) +
+                               n_indices * dim_indices * sizeof(std::uint32_t);
+  if (available_size < req_size) {
+    bool ok = sendServerResizeRequest(req_size);
+    if (!ok) {
       std::cerr << "Shared memory is too small (available: " << available_size
-                << ", required: " << req_size << ")" << std::endl;
+                << ", required: " << req_size
+                << "). Server could not resize shared memory" << std::endl;
       return false;
     }
+  }
+
+  {  // mutex scope
+    SharedMemoryInfo &info =
+        *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+
+    boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
+        lock(info.mutex);
+
     std::fill(info.name.begin(), info.name.end(), '\0');
     std::memcpy(info.name.data(), name.data(),
                 std::min(name.size(), MAX_NAME_LENGTH));
@@ -73,12 +99,12 @@ bool SharedMemoryClient::plot(const std::string &name, const float *xyz,
                   n_indices * dim_indices * sizeof(std::uint32_t));
     }
   }
-  return checkResponse(info);
+  return checkResponse();
 }
 bool SharedMemoryClient::removeShape(const std::string &name) {
-  SharedMemoryInfo &info =
-      *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
   {  // mutex scope
+    SharedMemoryInfo &info =
+        *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
     boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
         lock(info.mutex);
     info.type = SharedMemMessageType::REMOVE_SHAPE;
@@ -86,7 +112,7 @@ bool SharedMemoryClient::removeShape(const std::string &name) {
     std::memcpy(info.name.data(), name.data(),
                 std::min(name.size(), MAX_NAME_LENGTH));
   }
-  return checkResponse(info);
+  return checkResponse();
 }
 
 }  // namespace zview

@@ -22,6 +22,7 @@ SharedMemoryServer::SharedMemoryServer(const AddShape &addShape,
       boost::interprocess::read_write);
 
   m_cmd_shm->truncate(sizeof(SharedMemoryInfo));
+
   m_cmd_region = boost::interprocess::mapped_region(
       *m_cmd_shm, boost::interprocess::read_write);
 
@@ -67,6 +68,7 @@ void SharedMemoryServer::step() {
       auto vertices_ptr = getRegionAddress<const float>(0);
       pcl.v() = ptr2vertData(vertices_ptr, info.n_vertices, info.dim_vertices);
       m_addShape(std::move(pcl));
+
       break;
     }
     case SharedMemMessageType::ADD_MESH: {
@@ -91,9 +93,24 @@ void SharedMemoryServer::step() {
       m_addShape(std::move(edges));
       break;
     }
-    case SharedMemMessageType::REMOVE_SHAPE:
+    case SharedMemMessageType::REMOVE_SHAPE: {
       m_removeShape(std::string(info.name.begin(), info.name.end()));
       break;
+    }
+    case SharedMemMessageType::SM_RESIZE: {
+      std::size_t target_size = info.n_vertices;
+      std::cout << "Resizing shared memory to " << target_size << std::endl;
+      if (target_size > (1 << 29)) {
+        std::cerr << "Shared memory resize request too large: " << target_size
+                  << std::endl;
+        break;
+      }
+
+      m_data_shm->truncate(ssize_t(target_size));
+      m_data_region = boost::interprocess::mapped_region(
+          *m_data_shm, boost::interprocess::read_write);
+      break;
+    }
     default:
       break;
   }

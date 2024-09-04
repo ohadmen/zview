@@ -11,7 +11,8 @@ enum class SharedMemMessageType : std::uint8_t {
   ADD_PCL,
   ADD_MESH,
   ADD_EDGE,
-  REMOVE_SHAPE
+  REMOVE_SHAPE,
+  SM_RESIZE
 };
 static constexpr std::size_t MAX_NAME_LENGTH = 256;
 struct SharedMemoryInfo {
