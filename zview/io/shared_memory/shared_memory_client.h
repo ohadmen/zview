@@ -8,8 +8,10 @@
 namespace zview {
 
 class SharedMemoryClient {
-  boost::interprocess::shared_memory_object m_shm;
-  boost::interprocess::mapped_region m_region;
+  boost::interprocess::shared_memory_object m_data_shm;
+  boost::interprocess::shared_memory_object m_cmd_shm;
+  boost::interprocess::mapped_region m_data_region;
+  boost::interprocess::mapped_region m_cmd_region;
 
  public:
   explicit SharedMemoryClient();

@@ -13,15 +13,15 @@ class ZviewPyInf {
 
  public:
  public:
-  void plot(const char *name, const py::array_t<float> &xyz) {
+  bool plot(const char *name, const py::array_t<float> &xyz) {
     py::buffer_info buff = xyz.request();
     const auto ptr = static_cast<float *>(buff.ptr);
     if (buff.ndim != 2) {
       throw std::runtime_error("xyz should be Nx3");
     }
-    m_client.plot(name, ptr, buff.shape[0], buff.shape[1]);
+    return m_client.plot(name, ptr, buff.shape[0], buff.shape[1]);
   }
-  void plot(const char *name, const py::array_t<float> &xyz,
+  bool plot(const char *name, const py::array_t<float> &xyz,
             const py::array_t<int32_t> &indices) {
     py::buffer_info buff = xyz.request();
     const auto ptr = static_cast<float *>(buff.ptr);
@@ -33,10 +33,10 @@ class ZviewPyInf {
     if (buff_indices.ndim != 2) {
       throw std::runtime_error("indices should be Nx3");
     }
-    m_client.plot(name, ptr, buff.shape[0], buff.shape[1], ptr_indices,
-                  buff_indices.shape[0], buff_indices.shape[1]);
+    return m_client.plot(name, ptr, buff.shape[0], buff.shape[1], ptr_indices,
+                         buff_indices.shape[0], buff_indices.shape[1]);
   }
-  void removeShape(const char *name) { m_client.removeShape(name); }
+  bool removeShape(const char *name) { return m_client.removeShape(name); }
 };
 
 }  // namespace zview

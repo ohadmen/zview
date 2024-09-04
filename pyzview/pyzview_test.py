@@ -9,9 +9,10 @@ class TestBasic(unittest.TestCase):
 
   def test_add(self):
 
-    pts = np.random.rand(100, 3)
+    pts = np.random.rand(1000, 3)*100
     inf = pyzview_inf.interface()
-    inf.plot("interface_check", pts)
+    ok=inf.plot("interface_check", pts)
+    print (f"response: {ok}")
     
 
 

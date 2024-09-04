@@ -13,41 +13,50 @@ namespace zview {
 SharedMemoryServer::SharedMemoryServer(const AddShape &addShape,
                                        const RemoveShape &removeShape)
     : m_addShape{addShape}, m_removeShape{removeShape} {
-  if (SHARED_MEMORY_SIZE <= sizeof(SharedMemoryInfo)) {
-    throw std::runtime_error("Shared memory size too small");
+  if (boost::interprocess::shared_memory_object::remove(
+          SHARED_MEMORY_CMD_NAME)) {
+    std::cout << "Removing data command memory" << std::endl;
   }
-
-  if (boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_NAME)) {
-    std::cout << "Removing shared memory" << std::endl;
-  }
-  m_shm = std::make_unique<boost::interprocess::shared_memory_object>(
-      boost::interprocess::create_only, SHARED_MEMORY_NAME,
+  m_cmd_shm = std::make_unique<boost::interprocess::shared_memory_object>(
+      boost::interprocess::create_only, SHARED_MEMORY_CMD_NAME,
       boost::interprocess::read_write);
 
-  m_shm->truncate(SHARED_MEMORY_SIZE);
-  m_region = boost::interprocess::mapped_region(
-      *m_shm, boost::interprocess::read_write);
-  std::memset(m_region.get_address(), 0, m_region.get_size());
+  m_cmd_shm->truncate(sizeof(SharedMemoryInfo));
+  m_cmd_region = boost::interprocess::mapped_region(
+      *m_cmd_shm, boost::interprocess::read_write);
 
   SharedMemoryInfo &info =
-      *static_cast<SharedMemoryInfo *>(m_region.get_address());
+      *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
   info.type = SharedMemMessageType::UNKNOWN;
+
+  if (boost::interprocess::shared_memory_object::remove(
+          SHARED_MEMORY_DATA_NAME)) {
+    std::cout << "Removing data shared memory" << std::endl;
+  }
+
+  m_data_shm = std::make_unique<boost::interprocess::shared_memory_object>(
+      boost::interprocess::create_only, SHARED_MEMORY_DATA_NAME,
+      boost::interprocess::read_write);
+  m_data_shm->truncate(SHARED_MEMORY_INIT_SIZE);
+  m_data_region = boost::interprocess::mapped_region(
+      *m_data_shm, boost::interprocess::read_write);
 }
 
 template <typename T>
 T *SharedMemoryServer::getRegionAddress(size_t offset_bytes) {
   return recast<T *>(
-      std::next(static_cast<std::uint8_t *>(m_region.get_address()),
-                ssize_t(offset_bytes + sizeof(SharedMemoryInfo))));
+      std::next(static_cast<std::uint8_t *>(m_data_region.get_address()),
+                ssize_t(offset_bytes)));
 }
 
 SharedMemoryServer::~SharedMemoryServer() {
-  boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_NAME);
+  boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_DATA_NAME);
+  boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_CMD_NAME);
 }
 
 void SharedMemoryServer::step() {
   SharedMemoryInfo &info =
-      *static_cast<SharedMemoryInfo *>(m_region.get_address());
+      *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
 
   boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
       lock(info.mutex);

@@ -16,8 +16,11 @@ class SharedMemoryServer {
   AddShape m_addShape;
   RemoveShape m_removeShape;
 
-  std::unique_ptr<boost::interprocess::shared_memory_object> m_shm;
-  boost::interprocess::mapped_region m_region;
+  std::unique_ptr<boost::interprocess::shared_memory_object> m_data_shm;
+  boost::interprocess::mapped_region m_data_region;
+
+  std::unique_ptr<boost::interprocess::shared_memory_object> m_cmd_shm;
+  boost::interprocess::mapped_region m_cmd_region;
 
   template <typename T>
   T *getRegionAddress(size_t offset_bytes);

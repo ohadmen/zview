@@ -25,8 +25,9 @@ struct SharedMemoryInfo {
   std::uint32_t dim_indices{0U};  // 2 for edges, 3 for faces
 };
 
-static constexpr char const* SHARED_MEMORY_NAME = "zview_channel";
+static constexpr char const* SHARED_MEMORY_DATA_NAME = "zview_data_channel";
+static constexpr char const* SHARED_MEMORY_CMD_NAME = "zview_cmd_channel";
 
-static constexpr std::size_t SHARED_MEMORY_SIZE = 1 << 29;  // 512MB
+static constexpr std::size_t SHARED_MEMORY_INIT_SIZE = 1 << 10;  // 1MB
 
 }  // namespace zview
