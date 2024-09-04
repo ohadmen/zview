@@ -1,15 +1,10 @@
 #pragma once
 
+#include <array>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <cstdint>
 
 namespace zview {
-
-struct SharedMemoryInfo {
-  std::size_t read_offset{0U};
-  std::size_t write_offset{0U};
-  boost::interprocess::interprocess_mutex mutex;
-};
 
 enum class SharedMemMessageType : std::uint8_t {
   UNKNOWN,
@@ -19,10 +14,18 @@ enum class SharedMemMessageType : std::uint8_t {
   REMOVE_SHAPE
 };
 static constexpr std::size_t MAX_NAME_LENGTH = 256;
-static constexpr std::size_t REQUEST_HEADER_SIZE =
-    sizeof(SharedMemMessageType) + MAX_NAME_LENGTH;
+struct SharedMemoryInfo {
+  boost::interprocess::interprocess_mutex mutex;
+  SharedMemMessageType type{0U};
+  std::array<std::uint8_t, MAX_NAME_LENGTH> name;
+  size_t n_vertices{0U};
+  std::uint32_t dim_vertices{
+      0U};  // 3 for xyz, 4 for xyzi, 6 for xyzrgb, 7 for xyzrgba
+  std::uint32_t n_indices{0U};
+  std::uint32_t dim_indices{0U};  // 2 for edges, 3 for faces
+};
 
-static constexpr char const* SHARED_MEMORY_NAME = "zview_channel5";
+static constexpr char const* SHARED_MEMORY_NAME = "zview_channel";
 
 static constexpr std::size_t SHARED_MEMORY_SIZE = 1 << 29;  // 512MB
 

@@ -3,6 +3,7 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <functional>
+#include <memory>
 
 #include "zview/types/types.h"
 
@@ -15,10 +16,11 @@ class SharedMemoryServer {
   AddShape m_addShape;
   RemoveShape m_removeShape;
 
-  boost::interprocess::shared_memory_object m_shm;
+  std::unique_ptr<boost::interprocess::shared_memory_object> m_shm;
   boost::interprocess::mapped_region m_region;
 
-  bool call_callback(std::uint8_t *&ptr);
+  template <typename T>
+  T *getRegionAddress(size_t offset_bytes);
 
  public:
   explicit SharedMemoryServer(const AddShape &addShape,

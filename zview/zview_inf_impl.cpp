@@ -29,7 +29,9 @@ ZviewInfImpl::ZviewInfImpl()
                     std::placeholders::_1),
           std::bind(&ZviewInfImpl::setCameraToViewSelectedKey, this,
                     std::placeholders::_1),
-          std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)} {}
+          std::bind(&ShapeBuffer::erase, &m_buffer, std::placeholders::_1)},
+      m_sms{std::bind(&ZviewInfImpl::plotShape, this, std::placeholders::_1),
+            std::bind(&ZviewInfImpl::remove, this, std::placeholders::_1)} {}
 
 void ZviewInfImpl::processInput() {
   const bool isCtrlPressed = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) ||
@@ -200,6 +202,7 @@ bool ZviewInfImpl::draw() {
   if (ImGui::IsWindowHovered()) {
     m_idh.step(m_hover_point);
   }
+  m_sms.step();
 
   m_fbo.bind();
   renderPhase(transformation);

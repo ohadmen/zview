@@ -5,7 +5,10 @@ cc_library(
     srcs = [
         "shared_memory_server.cpp",
     ],
-    hdrs = ["shared_memory_server.h"],
+    hdrs = [
+        "pointer_shape_conversion.h",
+        "shared_memory_server.h",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":shared_memory_types",
