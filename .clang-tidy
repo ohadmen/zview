@@ -2,7 +2,7 @@ FormatStyle: file
 HeaderFilterRegex: "src/.*"
 UseColor: true
 WarningsAsErrors: >
-    -*,
+    *,
     -clang-diagnostic-builtin-macro-redefined,
     -cppcoreguidelines-pro-type-reinterpret-cast
 
