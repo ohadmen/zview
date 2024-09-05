@@ -2,6 +2,15 @@ load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
 load("@python_pip_deps//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
+py_library(
+    name = "pyzview",
+    srcs = ["pyzview.py"],
+    deps = [
+        ":pyzview_lib",
+        requirement("numpy"),
+    ],
+)
+
 pybind_extension(
     name = "pyzview_inf",
     srcs = ["pyzview_inf.cpp"],
@@ -18,7 +27,6 @@ py_test(
     name = "pyzview_test",
     srcs = ["tests/pyzview_test.py"],
     deps = [
-        ":pyzview_lib",
-        requirement("numpy"),
+        ":pyzview",
     ],
 )
