@@ -16,7 +16,7 @@ py_library(
 
 py_test(
     name = "pyzview_test",
-    srcs = ["pyzview_test.py"],
+    srcs = ["tests/pyzview_test.py"],
     deps = [
         ":pyzview_lib",
         requirement("numpy"),
