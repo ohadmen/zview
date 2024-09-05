@@ -13,17 +13,10 @@
 
 namespace zview {
 
-SharedMemoryClient::SharedMemoryClient()
-    : m_data_shm{boost::interprocess::open_only, SHARED_MEMORY_DATA_NAME,
-                 boost::interprocess::read_write},
-      m_cmd_shm{boost::interprocess::open_only, SHARED_MEMORY_CMD_NAME,
-                boost::interprocess::read_write},
-      m_data_region{m_data_shm, boost::interprocess::read_write},
-      m_cmd_region{m_cmd_shm, boost::interprocess::read_write} {}
+SharedMemoryClient::SharedMemoryClient() {}
 
 bool SharedMemoryClient::checkResponse() {
-  SharedMemoryInfo &info =
-      *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+  auto &info = m_handler.getCmdInfo();
 
   // wait 10 ms
   for (int i = 0; i < 20; ++i) {
@@ -40,8 +33,7 @@ bool SharedMemoryClient::checkResponse() {
 }
 bool SharedMemoryClient::sendServerResizeRequest(std::size_t size) {
   {  // mutex scope
-    SharedMemoryInfo &info =
-        *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+    auto &info = m_handler.getCmdInfo();
     boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
         lock(info.mutex);
     info.type = SharedMemMessageType::SM_RESIZE;
@@ -50,32 +42,28 @@ bool SharedMemoryClient::sendServerResizeRequest(std::size_t size) {
   if (!checkResponse()) {
     return false;
   }
-  m_data_shm.truncate(ssize_t(size));
-
-  m_data_region = boost::interprocess::mapped_region(
-      m_data_shm, boost::interprocess::read_write);
+  m_handler.resizeData(size);
   return true;
 }
 bool SharedMemoryClient::plot(const std::string &name, const float *xyz,
                               size_t n_points, std::uint16_t dim_points,
                               const std::uint32_t *indices, size_t n_indices,
                               std::uint16_t dim_indices) {
-  const std::size_t available_size = m_data_region.get_size();
+  const std::size_t available_size = m_handler.getAvailableSize();
   const std::size_t req_size = n_points * dim_points * sizeof(float) +
                                n_indices * dim_indices * sizeof(std::uint32_t);
   if (available_size < req_size) {
+    std::cout << "Shared memory is too small (available: " << available_size
+              << ", required: " << req_size << ")" << std::endl;
+
     bool ok = sendServerResizeRequest(req_size);
     if (!ok) {
-      std::cerr << "Shared memory is too small (available: " << available_size
-                << ", required: " << req_size
-                << "). Server could not resize shared memory" << std::endl;
       return false;
     }
   }
 
   {  // mutex scope
-    SharedMemoryInfo &info =
-        *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+    auto &info = m_handler.getCmdInfo();
 
     boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
         lock(info.mutex);
@@ -83,13 +71,27 @@ bool SharedMemoryClient::plot(const std::string &name, const float *xyz,
     std::fill(info.name.begin(), info.name.end(), '\0');
     std::memcpy(info.name.data(), name.data(),
                 std::min(name.size(), MAX_NAME_LENGTH));
-    info.type = SharedMemMessageType::ADD_PCL;
+    switch (dim_indices) {
+      case 0:
+        info.type = SharedMemMessageType::ADD_PCL;
+        break;
+      case 2:
+        info.type = SharedMemMessageType::ADD_EDGE;
+        break;
+      case 3:
+        info.type = SharedMemMessageType::ADD_MESH;
+        break;
+      default:
+        info.type = SharedMemMessageType::UNKNOWN;
+        return false;
+    }
+
     info.n_vertices = n_points;
     info.dim_vertices = dim_points;
     info.n_indices = n_indices;
     info.dim_indices = dim_indices;
-    std::uint8_t *vertices_ptr =
-        static_cast<std::uint8_t *>(m_data_region.get_address());
+    std::uint8_t *vertices_ptr = m_handler.getDataPtr<std::uint8_t>(0);
+
     std::memcpy(vertices_ptr, xyz, n_points * dim_points * sizeof(float));
     if (indices) {
       std::uint8_t *indices_ptr = std::next(
@@ -103,8 +105,7 @@ bool SharedMemoryClient::plot(const std::string &name, const float *xyz,
 }
 bool SharedMemoryClient::removeShape(const std::string &name) {
   {  // mutex scope
-    SharedMemoryInfo &info =
-        *static_cast<SharedMemoryInfo *>(m_cmd_region.get_address());
+    auto &info = m_handler.getCmdInfo();
     boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex>
         lock(info.mutex);
     info.type = SharedMemMessageType::REMOVE_SHAPE;

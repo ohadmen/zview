@@ -3,15 +3,13 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 
+#include "zview/io/shared_memory/shared_memory_types.h"
 #include "zview/types/external_types.h"
 
 namespace zview {
 
 class SharedMemoryClient {
-  boost::interprocess::shared_memory_object m_data_shm;
-  boost::interprocess::shared_memory_object m_cmd_shm;
-  boost::interprocess::mapped_region m_data_region;
-  boost::interprocess::mapped_region m_cmd_region;
+  SharedMemoryHandler m_handler{false};
 
   bool sendServerResizeRequest(std::size_t size);
   bool checkResponse();

@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 
+#include "zview/io/shared_memory/shared_memory_types.h"
 #include "zview/types/types.h"
 
 namespace zview {
@@ -17,14 +18,7 @@ class SharedMemoryServer {
   AddShape m_addShape;
   RemoveShape m_removeShape;
 
-  std::unique_ptr<boost::interprocess::shared_memory_object> m_data_shm;
-  boost::interprocess::mapped_region m_data_region;
-
-  std::unique_ptr<boost::interprocess::shared_memory_object> m_cmd_shm;
-  boost::interprocess::mapped_region m_cmd_region;
-
-  template <typename T>
-  T *getRegionAddress(size_t offset_bytes);
+  SharedMemoryHandler m_handler{true};
 
  public:
   explicit SharedMemoryServer(const AddShape &addShape,

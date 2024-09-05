@@ -35,6 +35,7 @@ cc_library(
 
 cc_library(
     name = "shared_memory_types",
+    srcs = ["shared_memory_types.cpp"],
     hdrs = ["shared_memory_types.h"],
     visibility = ["//visibility:__pkg__"],
     deps = [
