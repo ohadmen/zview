@@ -71,7 +71,7 @@ GLFWwindow *initGL() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
   // Create window with graphics context
-  auto m_window = glfwCreateWindow(1280, 720, "ZVIEW", nullptr, nullptr);
+  auto m_window = glfwCreateWindow(1280, 720, "zview", nullptr, nullptr);
   if (m_window == nullptr) {
     std::cerr << "Failed to create window" << std::endl;
     return nullptr;

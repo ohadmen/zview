@@ -12,6 +12,8 @@ cc_binary(
         "@sysroot//:libglew",
         "@sysroot//:libglfw",
     ],
+      visibility = ["//visibility:public"],
+  
 )
 
 cc_library(
