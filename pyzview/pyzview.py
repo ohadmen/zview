@@ -52,7 +52,7 @@ class Pyzview(metaclass=Singleton):
         if self.zv is not None:
             return True
         try:
-            self.zv = pyzview_inf.interface()  # get interface
+            self.zv = pyzview.pyzview_inf.interface()  # get interface
             return True
         except RuntimeError:
             raise RuntimeWarning("Could not connect to zview")
