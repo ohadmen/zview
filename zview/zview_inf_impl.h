@@ -8,6 +8,7 @@
 #include "zview/drawables/statusbar.h"
 #include "zview/geometry/mvp_mat.h"
 #include "zview/graphics_backend/frame_buffer.h"
+#include "zview/io/shared_memory/shared_memory_server.h"
 #include "zview/types/types.h"
 #include "zview/ui/input_device_handler.h"
 #include "zview/ui/tree_view.h"
@@ -25,6 +26,7 @@ class ZviewInfImpl : public ZviewInf {
   StatusBar m_status_bar;
   InputDeviceHandler m_idh;
   TreeView m_tree_view;
+  SharedMemoryServer m_sms;
   bool m_show_params_menu{false};
   bool m_show_tree{false};
   bool m_show_help_menu{false};

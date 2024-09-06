@@ -20,9 +20,8 @@ std::vector<zview::Face> generateRandomFaces(int n_vertices, int n_faces) {
   static std::uniform_int_distribution<std::uint32_t> dist(0, n_vertices - 1);
 
   std::vector<zview::Face> faces{static_cast<std::size_t>(n_faces)};
-  std::for_each(faces.begin(), faces.end(), [&](zview::Face &f) {
-    f = {dist(gen), dist(gen), dist(gen)};
-  });
+  std::for_each(faces.begin(), faces.end(),
+                [&](zview::Face &f) { f = {dist(gen), dist(gen), dist(gen)}; });
   return faces;
 }
 
@@ -32,9 +31,8 @@ std::vector<zview::Edge> generateRandomEdges(int n_vertices, int n_edges) {
   static std::uniform_int_distribution<std::uint32_t> dist(0, n_vertices - 1);
 
   std::vector<zview::Edge> edges{static_cast<std::size_t>(n_edges)};
-  std::for_each(edges.begin(), edges.end(), [&](zview::Edge &e) {
-    e = {dist(gen), dist(gen)};
-  });
+  std::for_each(edges.begin(), edges.end(),
+                [&](zview::Edge &e) { e = {dist(gen), dist(gen)}; });
   return edges;
 }
 std::vector<zview::Vertex> generateRandomVertices(int n_vertices,

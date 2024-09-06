@@ -1,0 +1,26 @@
+bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
+archive_override(
+    module_name = "rules_boost",
+    strip_prefix = "rules_boost-master",
+    urls = "https://github.com/nelhage/rules_boost/archive/refs/heads/master.tar.gz",
+    # It is recommended to edit the above URL and the below sha256 to point to a specific version of this repository.
+    # integrity = "sha256-...",
+)
+
+non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
+use_repo(
+    non_module_boost_repositories,
+    "boost",
+)
+
+bazel_dep(name = "catch2", version = "3.6.0")
+bazel_dep(name = "rules_python", version = "0.34.0")
+bazel_dep(name = "pybind11_bazel", version = "2.12.0")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "python_pip_deps",
+    python_version = "3.11",
+    requirements_lock = "//:requirements.txt",
+)
+use_repo(pip, "python_pip_deps")

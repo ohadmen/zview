@@ -36,6 +36,7 @@ cc_library(
         "//zview/drawables",
         "//zview/graphics_backend:frame_buffer",
         "//zview/io",
+        "//zview/io/shared_memory:server",
         "//zview/params",
         "//zview/ui:input_device_handler",
         "//zview/ui:tree_view",
