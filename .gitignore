@@ -3,5 +3,6 @@ build
 # bazel
 bazel-*
 MODULE.bazel.lock
-
+**/__pycache__
+venv/
 
