@@ -391,11 +391,12 @@ void ZviewInfImpl::plot(const std::string &name, std::vector<Vertex> &&vertices,
 void ZviewInfImpl::remove(const std::string &name) {
   if (name.empty()) {
     // delete all
-    auto keys = m_tree_view.removeAll();
-  }
-  std::uint32_t key = m_buffer.getKey(name);
-  if (key != 0) {
-    m_tree_view.remove(key);
+    m_tree_view.removeAll();
+  } else {
+    std::uint32_t key = m_buffer.getKey(name);
+    if (key != 0) {
+      m_tree_view.remove(key);
+    }
   }
 }
 }  // namespace zview
