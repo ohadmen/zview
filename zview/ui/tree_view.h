@@ -39,5 +39,6 @@ class TreeView {
   void push(std::string name, const std::uint32_t object_key);
   void draw(bool* showTreeP);
   void remove(std::uint32_t obj_key);
+  void removeAll();
 };
 }  // namespace zview
