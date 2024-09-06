@@ -1,6 +1,4 @@
-from typing import Union
-
-import pyzview_inf
+import pyzview.pyzview_inf
 import numpy as np
 
 
@@ -56,7 +54,7 @@ class Pyzview(metaclass=Singleton):
         try:
             self.zv = pyzview_inf.interface()  # get interface
             return True
-        except:
+        except RuntimeError:
             raise RuntimeWarning("Could not connect to zview")
             self.zv = None
             return False
