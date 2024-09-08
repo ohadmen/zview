@@ -1,5 +1,5 @@
 #! /bin/bash
-bz build //zview:zview_binary
+bazel build //zview:zview_binary
 ver=2.0.0 
 rm -rf pack
 mkdir pack 
