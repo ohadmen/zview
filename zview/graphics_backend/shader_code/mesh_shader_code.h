@@ -11,8 +11,8 @@ layout (location = 1) in vec4 a_rgb;
 out vec4 vertexColor;
 uniform mat4 u_transformation;
 
-varying vec3 v_xyz;
-varying vec3 v_eyeDir;
+out vec3 v_xyz;
+out vec3 v_eyeDir;
 
 
 void main()
@@ -35,8 +35,8 @@ in vec4 vertexColor;
 uniform int u_txt;
 uniform vec3 u_lightDir;
 
-varying vec3 v_xyz;
-varying vec3 v_eyeDir;
+in vec3 v_xyz;
+in vec3 v_eyeDir;
 
 void main()
 {	

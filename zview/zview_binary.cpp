@@ -95,7 +95,7 @@ GLFWwindow *initGL() {
   glEnable(GL_LINE_SMOOTH);
 
   glEnable(GL_MULTISAMPLE);
-  glEnable(GL_POLYGON_SMOOTH);
+
 
   glEnable(GL_BLEND);
 

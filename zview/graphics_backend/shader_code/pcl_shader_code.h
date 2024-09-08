@@ -15,8 +15,8 @@ uniform float u_ptsize;
 uniform float u_nearPlaneDist;
 
 
-varying vec3 v_eyeDir;
-varying float v_normDepth;
+out vec3 v_eyeDir;
+out float v_normDepth;
 
 
 void main()
@@ -48,8 +48,8 @@ uniform int u_txt;
 uniform vec3 u_lightDir;
 
 
-varying vec3 v_eyeDir;
-varying float v_normDepth;
+in vec3 v_eyeDir;
+in float v_normDepth;
 
 
 vec4 colormapParula(float x) {
