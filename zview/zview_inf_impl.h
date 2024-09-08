@@ -36,10 +36,14 @@ class ZviewInfImpl : public ZviewInf {
 
   std::array<int, 2> getWinSize() const;
 
+  // @brief Set the camera such that the shape with the selected key is in the
+  // center of the view
   void setCameraToViewSelectedKey(const std::vector<std::uint32_t> &keys);
 
+  // @brief Render the scene by drawing the backdrop, grid, axis and the shapes
   void renderPhase(const types::Matrix4x4 &mvp) const;
 
+  // @brief Read the picking texture and return the 3d point under the cursor
   std::optional<types::Vector3> pickingPhase(const types::Matrix4x4 &mvp);
 
   void drawParamsMenu();

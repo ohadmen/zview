@@ -238,6 +238,23 @@ std::optional<types::Vector3> ZviewInfImpl::pickingPhase(
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_picking.setTransform(mvp);
   auto &picking = m_picking;
+  // QUESTION: In m_buffer::draw we iterate over all shapes and call the
+  // preDrawFunction for each. Doesn't this mean that the object index in
+  // m_picking is set to the last object in the buffer? What even is the purpose
+  // of this function? Is this such that when we have overlapping shapes, the
+  // object index refers to the last shape drawn? If so, where in setObjectIndex
+  // do we use the dimension of the shape? This is what I was imagining how the
+  // mask in picking looks like if we have two overlapping shapes:
+  //
+  //   ..................       ......yyyy........      ......yyyy........
+  //   ...xxxxx..........       ......yyyy........      ...xxxyyyy........
+  //   ...xxxxx..........   +   ......yyyy........  =   ...xxxyyyy........
+  //   ...xxxxx..........       ..................      ...xxxxx..........
+  //   ...xxxxx..........       ..................      ...xxxxx..........
+  //   ..................       ..................      ..................
+  //
+  // Where x is the first shape and y is the second shape. Based on the
+  // resulting mask we would then know which shape is being hovered over.
   const auto preDrawFunction =
       [&picking](const std::pair<std::uint32_t, types::Shape> &s) {
         picking.setObjectIndex(s.first);
@@ -246,6 +263,7 @@ std::optional<types::Vector3> ZviewInfImpl::pickingPhase(
   m_picking.unbind();
   // get mouse position relative to the current window, reducing the window
   // offset
+  // QUESTION: What is the purpose of the 10, 10 offset?
   const auto mouse_rel =
       ImGui::GetMousePos() - ImGui::GetWindowPos() - ImVec2{10, 10};
 

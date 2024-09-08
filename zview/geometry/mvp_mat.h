@@ -34,6 +34,12 @@ class MVPmat {
     SCREEN = 2
   };
 
+  // @brief Get the ray from the origin to the point in the specified coordinate
+  // system
+  // @tparam Pt the type of the point
+  // @param pt the point
+  // @param s the coordinate system
+  // @return the ray as a start point and a direction vector
   template <typename Pt>
   std::array<types::Vector3, 2> getRay(const Pt &pt, CoordinateSystem s) const;
 

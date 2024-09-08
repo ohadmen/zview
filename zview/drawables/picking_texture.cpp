@@ -39,6 +39,11 @@ PickingTexture::PixelInfo PickingTexture::readPixel(int x, int y) const {
   glReadBuffer(GL_COLOR_ATTACHMENT0);
 
   PixelInfo Pixel;
+  // QUESTION: How does this correctly fill the PixelInfo struct? I would have
+  // expected this is setting: valid = R channel, object_id = G channel, prim_id
+  // = B channel
+  // Or are we setting a different mask somewhere such that RGB does not refer
+  // to color but valid, object_id and prim_id? Is this GL_COLOR_ATTACHMENT0?
   glReadPixels(x, height() - y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &Pixel);
 
   glReadBuffer(GL_NONE);

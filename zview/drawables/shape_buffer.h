@@ -48,13 +48,18 @@ class ShapeBuffer {
    * @brief draw all shapes in the shape buffer
    * @param tform the transformation matrix
    * @param preDrawFunction a function that is called before drawing each shape,
-   * recieving the shape key and the shape object
+   * receiving the shape key and the shape object
    */
   void draw(
       const float* tform,
       const std::function<void(const std::pair<std::uint32_t, types::Shape>&)>&
           preDrawFunction = []([[maybe_unused]] const auto& s) {}) const;
 
+  // @brief Get the 3d location where a ray intersects the primitive of a shape
+  // @param object_key The key of the shape
+  // @param prim_index The index of the primitive in the shape
+  // @param ray The ray to intersect with the primitive
+  // @return The 3d location where the ray intersects the primitive
   std::optional<types::Vector3> get3dLocation(
       const std::uint32_t& object_key, const std::uint32_t& prim_index,
       const std::array<types::Vector3, 2>& ray) const;

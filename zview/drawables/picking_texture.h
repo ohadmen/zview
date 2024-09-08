@@ -17,11 +17,13 @@ class PickingTexture : public FrameBuffer {
   void unbind();
 
   struct PixelInfo {
-    std::uint32_t valid{0};
-    std::uint32_t object_id{0};
-    std::uint32_t prim_id{0};
+    std::uint32_t valid{0};      // Whether there is an object at this pixel
+    std::uint32_t object_id{0};  // Index of the object at this pixel
+    std::uint32_t prim_id{
+        0};  // Index of the primitive structure in the shape at this pixel
   };
 
+  // @brief
   PixelInfo readPixel(int x, int y) const;
   void setObjectIndex(std::uint32_t object_index) const;
   void setDrawIndex(std::uint32_t draw_index) const;
