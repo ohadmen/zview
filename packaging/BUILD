@@ -1,6 +1,6 @@
-load("@rules_python//python:packaging.bzl",  "py_wheel")
 load("@rules_pkg//pkg:deb.bzl", "pkg_deb")
-load("@rules_pkg//pkg:tar.bzl",  "pkg_tar")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@rules_python//python:packaging.bzl", "py_wheel")
 
 VERSION = "1.0.0"
 
@@ -21,19 +21,17 @@ py_wheel(
     deps = ["//pyzview:pyzview_pkg"],
 )
 
-
 pkg_tar(
     name = "tarball",
-    srcs = [        "//zview:zview_binary"],
+    srcs = ["//zview:zview_binary"],
 )
 
 pkg_deb(
     name = "debian-data",
-    package = "zview",
-    data = 
+    data =
         ":tarball",
-    maintainer = "Ohad Menashe",
-    version = VERSION,
     description_file = "description.md",
-    
+    maintainer = "Ohad Menashe",
+    package = "zview",
+    version = VERSION,
 )
