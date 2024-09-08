@@ -38,6 +38,7 @@ SCENARIO("Shared Memory Test") {
     zview::SharedMemoryServer server{add_shape, remove_shape};
     bool stop_server = false;
     std::thread server_thread([&server, &stop_server]() {
+      // NOLINTNEXTLINE(bugprone-infinite-loop)
       while (!stop_server) {
         server.step();
       }
