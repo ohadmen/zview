@@ -255,6 +255,9 @@ std::optional<types::Vector3> ZviewInfImpl::pickingPhase(
   //
   // Where x is the first shape and y is the second shape. Based on the
   // resulting mask we would then know which shape is being hovered over.
+  //
+  // Ahh I think I get it now. Is m_buffer::draw in this context drawing the
+  // object index on the mask?
   const auto preDrawFunction =
       [&picking](const std::pair<std::uint32_t, types::Shape> &s) {
         picking.setObjectIndex(s.first);
