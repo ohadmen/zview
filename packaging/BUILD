@@ -30,7 +30,7 @@ pkg_deb(
     name = "debian-data",
     data =
         ":tarball",
-    description_file = "description.md",
+    description_file = "description.txt",
     maintainer = "Ohad Menashe",
     package = "zview",
     version = VERSION,
