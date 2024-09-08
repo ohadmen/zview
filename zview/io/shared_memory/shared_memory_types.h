@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <memory>
 
+#include "zview/utils/recast.h"
+
 namespace zview {
 
 enum class SharedMemMessageType : std::uint8_t {
