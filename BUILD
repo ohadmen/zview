@@ -1,4 +1,4 @@
-load("@rules_python//python:packaging.bzl",  "py_wheel")
+load("@rules_python//python:packaging.bzl", "py_wheel")
 
 py_wheel(
     name = "wheel",

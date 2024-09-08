@@ -41,6 +41,7 @@ class ZviewPyInf {
 
 }  // namespace zview
 
+// NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 PYBIND11_MODULE(pyzview_inf, m) {
   py::class_<zview::ZviewPyInf>(m, "interface")
       .def(py::init())

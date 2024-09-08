@@ -5,6 +5,7 @@ cc_binary(
     srcs = [
         "zview_binary.cpp",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//zview",
         "//zview/graphics_backend",
@@ -12,8 +13,6 @@ cc_binary(
         "@sysroot//:libglew",
         "@sysroot//:libglfw",
     ],
-      visibility = ["//visibility:public"],
-  
 )
 
 cc_library(

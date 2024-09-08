@@ -33,6 +33,7 @@ cc_library(
     hdrs = ["picking_texture.h"],
     visibility = ["//visibility:__pkg__"],
     deps = [
+        "//zview/graphics_backend:frame_buffer",
         "//zview/graphics_backend:shader",
         "//zview/types",
     ],

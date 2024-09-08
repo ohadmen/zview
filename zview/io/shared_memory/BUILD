@@ -39,6 +39,7 @@ cc_library(
     hdrs = ["shared_memory_types.h"],
     visibility = ["//visibility:__pkg__"],
     deps = [
+        "//zview/utils:recast",
         "@boost//:interprocess",
     ],
 )

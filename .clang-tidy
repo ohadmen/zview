@@ -1,6 +1,5 @@
 FormatStyle: file
-HeaderFilterRegex: "src/.*"
-UseColor: true
+HeaderFilterRegex: ""
 WarningsAsErrors: >
     *,
     -clang-diagnostic-builtin-macro-redefined,
