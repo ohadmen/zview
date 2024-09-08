@@ -80,8 +80,8 @@ SCENARIO("Shared Memory Test") {
         constexpr std::size_t n_points_mesh = 15U;
         constexpr std::size_t n_indices_mesh = 19U;
         constexpr std::size_t dim_points_mesh = 4U;
-        std::array<float, n_points_mesh * dim_points_mesh> vertices_mesh;
-        std::array<std::uint32_t, n_indices_mesh * 3> indices_mesh;
+        std::array<float, n_points_mesh * dim_points_mesh> vertices_mesh{};
+        std::array<std::uint32_t, n_indices_mesh * 3> indices_mesh{};
         const auto res_mesh = client.plot(
             name_mesh, vertices_mesh.data(), n_points_mesh, dim_points_mesh,
             indices_mesh.data(), n_indices_mesh, 3);
@@ -99,8 +99,8 @@ SCENARIO("Shared Memory Test") {
         constexpr std::size_t n_points_edge = 15U;
         constexpr std::size_t n_indices_edge = 19U;
         constexpr std::size_t dim_points_edge = 4U;
-        std::array<float, n_points_edge * dim_points_edge> vertices_edge;
-        std::array<std::uint32_t, n_indices_edge * 2> indices_edge;
+        std::array<float, n_points_edge * dim_points_edge> vertices_edge{};
+        std::array<std::uint32_t, n_indices_edge * 2> indices_edge{};
         const auto res_edge = client.plot(
             name_edge, vertices_edge.data(), n_points_edge, dim_points_edge,
             indices_edge.data(), n_indices_edge, 2);
