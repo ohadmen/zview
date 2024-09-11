@@ -21,7 +21,7 @@ ZviewInfImpl::ZviewInfImpl()
     : m_axis(m_mvp),
       m_idh{&m_mvp,
             std::bind(&ZviewInfImpl::plotShape, this, std::placeholders::_1),
-            std::bind(&ZviewInfImpl::remove, this, std::placeholders::_1),
+            std::bind(&ZviewInfImpl::remove_single_key, this, std::placeholders::_1),
             std::bind(&StatusBar::update, &m_status_bar, std::placeholders::_1,
                       std::placeholders::_2)},
       m_tree_view{
@@ -388,15 +388,16 @@ void ZviewInfImpl::plot(const std::string &name, std::vector<Vertex> &&vertices,
   plotShape(graph);
 }
 
-void ZviewInfImpl::remove(const std::string &name) {
-  if (name.empty()) {
-    // delete all
-    m_tree_view.removeAll();
-  } else {
+void ZviewInfImpl::remove_single_key(const std::string &name) {
+
     std::uint32_t key = m_buffer.getKey(name);
     if (key != 0) {
       m_tree_view.remove(key);
     }
-  }
+
+}
+
+void ZviewInfImpl::remove(const std::string &name) {
+  m_tree_view.remove(name);
 }
 }  // namespace zview

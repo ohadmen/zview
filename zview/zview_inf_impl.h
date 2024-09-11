@@ -54,6 +54,8 @@ class ZviewInfImpl : public ZviewInf {
 
   std::uint32_t plotShape(types::Shape &&shape);
 
+  void remove_single_key(const std::string &name);
+
  public:
   ZviewInfImpl();
 

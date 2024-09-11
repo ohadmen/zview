@@ -188,6 +188,38 @@ TreeView::TreeNode *TreeView::find(std::uint32_t key, TreeNode *root) {
   }
   return nullptr;
 }
+
+TreeView::TreeNode* TreeView::find(const std::string& name, TreeNode* root, const std::string& parent_name) {
+  if (!root) {
+    return nullptr;
+  }
+  if (parent_name+root->name == name) {
+    return root;
+  }
+  for (auto &ch : root->children) {
+    auto it = find(name, &ch,parent_name+root->name+"/");
+    if (it) {
+      return it;
+    }
+  }
+  return nullptr;
+}
+
+void TreeView::remove(const std::string& obj_name) 
+{
+  if(obj_name.empty()) {
+    removeAll();
+    return;
+  }
+  for (auto &ch : m_root.children) {
+    auto it = find(obj_name, &ch,"");
+    if (it) {
+      deleteNode(*it);
+      return;
+    }
+  }
+
+}
 void TreeView::remove(std::uint32_t obj_key) {
   auto it = find(obj_key, &m_root);
   if (!it) {

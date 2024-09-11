@@ -1,5 +1,6 @@
 #! /bin/bash
 bazel build //zview:zview_binary
+bazel build //packaging:wheel
 ver=2.0.0 
 rm -rf pack
 mkdir pack 
@@ -37,4 +38,4 @@ dpkg-deb -c $taget_base.deb
 
 rm -rf $taget_base
 
-bazel run --stamp --embed_label=$ver -- //packaging:wheel.publish --repository pypi
+# bazel run --stamp --embed_label=$ver -- //packaging:wheel.publish --repository pypi

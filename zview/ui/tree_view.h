@@ -30,6 +30,7 @@ class TreeView {
                            bool enabled_only) const;
   void deleteNode(TreeNode& node) const;
   static TreeNode* find(std::uint32_t key, TreeNode* root);
+  static TreeNode* find(const std::string& obj_name, TreeNode* root, const std::string& parent_name);
 
  public:
   TreeView(
@@ -39,6 +40,7 @@ class TreeView {
   void push(std::string name, const std::uint32_t object_key);
   void draw(bool* showTreeP);
   void remove(std::uint32_t obj_key);
+  void remove(const std::string& name);
   void removeAll();
 };
 }  // namespace zview
