@@ -30,7 +30,8 @@ class TreeView {
                            bool enabled_only) const;
   void deleteNode(TreeNode& node) const;
   static TreeNode* find(std::uint32_t key, TreeNode* root);
-  static TreeNode* find(const std::string& obj_name, TreeNode* root, const std::string& parent_name);
+  static TreeNode* find(const std::string& obj_name, TreeNode* root,
+                        const std::string& parent_name);
 
  public:
   TreeView(

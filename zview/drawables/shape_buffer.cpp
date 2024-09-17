@@ -2,11 +2,10 @@
 
 #include <iostream>
 #include <random>
+#include <regex>
 #include <string>
 #include <utility>
 #include <variant>
-#include <regex>
-
 
 #include "zview/drawables/shape_draw_visitor.h"
 #include "zview/drawables/shape_init_visitor.h"
@@ -18,7 +17,6 @@ ShapeBuffer::ShapeBuffer()
     : m_shape_init_visitor_p{std::make_unique<ShapeInitVisitor>()},
       m_shape_draw_visitor_p{std::make_unique<ShapeDrawVisitor>()},
       m_shape_update_visitor_p{std::make_unique<ShapeUpdateVisitor>()} {}
-ShapeBuffer::~ShapeBuffer() = default;
 
 ShapeBuffer::BaseTypeVector::iterator ShapeBuffer::begin() {
   return m_buffer.begin();
@@ -39,13 +37,6 @@ ShapeBuffer::BaseTypeVector::const_iterator ShapeBuffer::cend() const {
   return end();
 }
 
-std::uint32_t randomInt() {
-  std::random_device dev;
-  std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> dist6(1000, 9999);
-
-  return static_cast<std::uint32_t>(dist6(rng));
-}
 const std::string getName(const types::Shape &s) {
   return std::visit([](const auto &v) { return v.getName(); }, s);
 }
@@ -72,7 +63,7 @@ std::uint32_t ShapeBuffer::emplace(types::Shape &&s) {
   } else {
     // shape already there, update it
     auto &cur_shape = m_buffer.at(key);
-    bool ok =
+    const bool ok =
         std::visit(*m_shape_update_visitor_p.get(), cur_shape, std::move(s));
     if (!ok) {
       std::cout << "could not update shape" << std::endl;
@@ -147,7 +138,7 @@ std::optional<types::Vector3> ShapeBuffer::get3dLocation(
       it->second);
 }
 void ShapeBuffer::writeBufferToFile(const std::string &f) const {
-  std::vector<types::Shape> data;
+  std::vector<types::Shape> data{};
   for (const auto &s : m_buffer) {
     data.push_back(s.second);
   }
@@ -157,8 +148,8 @@ void ShapeBuffer::writeBufferToFile(const std::string &f) const {
 bool &ShapeBuffer::shapeVisibility(const std::uint32_t &object_key) {
   auto it = m_buffer.find(object_key);
   if (it == m_buffer.end()) {
-    //object key not found
-    
+    // object key not found
+
     return m_dummy_bool;
   }
   return std::visit([](auto &v) -> bool & { return v.enabled(); }, it->second);
@@ -176,19 +167,17 @@ void ShapeBuffer::erase(const std::uint32_t &key) {
   m_buffer.erase(key);
 }
 std::vector<std::uint32_t> ShapeBuffer::getKeys(const ::std::string &name) {
-  //iterate over all key, and add all the keys that contains the name
-  std::vector<std::uint32_t> ret;
+  // iterate over all key, and add all the keys that contains the name
+  std::vector<std::uint32_t> ret{};
   std::regex regex{name};
-  for(const auto &s : m_string2key) {
-    const auto& key_name = s.first;
-    //use regular expression to find the name in inside the key name
-    if(std::regex_search(key_name, regex)) {
+  for (const auto &s : m_string2key) {
+    const auto &key_name = s.first;
+    // use regular expression to find the name in inside the key name
+    if (std::regex_search(key_name, regex)) {
       ret.push_back(s.second);
     }
-
-
-    
   }
   return ret;
 }
+ShapeBuffer::~ShapeBuffer() = default;
 }  // namespace zview

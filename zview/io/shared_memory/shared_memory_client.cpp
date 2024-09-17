@@ -53,7 +53,6 @@ bool SharedMemoryClient::plot(const std::string &name, const float *xyz,
   const std::size_t req_size = n_points * dim_points * sizeof(float) +
                                n_indices * dim_indices * sizeof(std::uint32_t);
   if (available_size < req_size) {
-
     bool ok = sendServerResizeRequest(req_size);
     if (!ok) {
       return false;

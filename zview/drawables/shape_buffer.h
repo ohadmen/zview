@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -42,10 +43,11 @@ class ShapeBuffer {
    */
   void erase(const std::uint32_t& key);
 
-  //get the object key from the name if exists, otherwise return 0
+  // get the object key from the name if exists, otherwise return 0
   std::uint32_t getKey(const ::std::string& name);
 
-  //get the object key from the name if exists, otherwise the children keys, otherwise return empty vector
+  // get the object key from the name if exists, otherwise the children keys,
+  // otherwise return empty vector
   std::vector<std::uint32_t> getKeys(const ::std::string& name);
   /*
    * @brief draw all shapes in the shape buffer
@@ -74,13 +76,14 @@ class ShapeBuffer {
   void writeBufferToFile(const std::string& f) const;
 
  private:
-  BaseTypeVector m_buffer;
-  std::unordered_map<std::string, std::uint32_t> m_string2key;
+  BaseTypeVector m_buffer{};
+  std::unordered_map<std::string, std::uint32_t> m_string2key{};
   std::uint32_t m_next_key{1000};
-  bool m_dummy_bool{false};//in case of trying to change visibility of a non existing object
+  bool m_dummy_bool{false};  // in case of trying to change visibility of a non
+                             // existing object
 
-  std::unique_ptr<ShapeInitVisitor> m_shape_init_visitor_p;
-  std::unique_ptr<ShapeDrawVisitor> m_shape_draw_visitor_p;
-  std::unique_ptr<ShapeUpdateVisitor> m_shape_update_visitor_p;
+  std::unique_ptr<ShapeInitVisitor> m_shape_init_visitor_p{};
+  std::unique_ptr<ShapeDrawVisitor> m_shape_draw_visitor_p{};
+  std::unique_ptr<ShapeUpdateVisitor> m_shape_update_visitor_p{};
 };
 }  // namespace zview
