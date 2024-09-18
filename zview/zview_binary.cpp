@@ -10,6 +10,11 @@
 #include "zview/graphics_backend/imgui_impl_opengl3.h"
 #include "zview/zview_inf.h"
 
+// NOLINTNEXTLINE
+#define STR_(x) #x
+// NOLINTNEXTLINE
+#define STR(x) STR_(x)
+
 static void glfw_error_callback(int error, const char *description) {
   std::cerr << "Glfw Error " << error << ": " << description << std::endl;
 }
@@ -20,8 +25,9 @@ std::vector<zview::Face> generateRandomFaces(int n_vertices, int n_faces) {
   static std::uniform_int_distribution<std::uint32_t> dist(0, n_vertices - 1);
 
   std::vector<zview::Face> faces{static_cast<std::size_t>(n_faces)};
-  std::for_each(faces.begin(), faces.end(),
-                [&](zview::Face &f) { f = {dist(gen), dist(gen), dist(gen)}; });
+  std::for_each(faces.begin(), faces.end(), [&](zview::Face &f) {
+    f = {dist(gen), dist(gen), dist(gen)};
+  });
   return faces;
 }
 
@@ -31,8 +37,9 @@ std::vector<zview::Edge> generateRandomEdges(int n_vertices, int n_edges) {
   static std::uniform_int_distribution<std::uint32_t> dist(0, n_vertices - 1);
 
   std::vector<zview::Edge> edges{static_cast<std::size_t>(n_edges)};
-  std::for_each(edges.begin(), edges.end(),
-                [&](zview::Edge &e) { e = {dist(gen), dist(gen)}; });
+  std::for_each(edges.begin(), edges.end(), [&](zview::Edge &e) {
+    e = {dist(gen), dist(gen)};
+  });
   return edges;
 }
 std::vector<zview::Vertex> generateRandomVertices(int n_vertices,
@@ -71,7 +78,10 @@ GLFWwindow *initGL() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
   // Create window with graphics context
-  auto m_window = glfwCreateWindow(1280, 720, "zview", nullptr, nullptr);
+  const char *version_string = STR(ZVIEW_VERSION);
+  auto m_window = glfwCreateWindow(
+      1280, 720, (std::string("zview ") + version_string).c_str(), nullptr,
+      nullptr);
   if (m_window == nullptr) {
     std::cerr << "Failed to create window" << std::endl;
     return nullptr;
@@ -95,7 +105,6 @@ GLFWwindow *initGL() {
   glEnable(GL_LINE_SMOOTH);
 
   glEnable(GL_MULTISAMPLE);
-
 
   glEnable(GL_BLEND);
 

@@ -1,15 +1,15 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//packaging:zview_version.bzl", "ZVIEW_VERSION")
 
-cc_binary(
+cc_library(
     name = "zview_binary",
     srcs = [
         "zview_binary.cpp",
     ],
+    local_defines = ["ZVIEW_VERSION=" + ZVIEW_VERSION],
     visibility = ["//visibility:public"],
     deps = [
         "//zview",
-        "//zview/graphics_backend",
-        "//zview/types:external_types",
         "@sysroot//:libglew",
         "@sysroot//:libglfw",
     ],
