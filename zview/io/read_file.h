@@ -1,4 +1,9 @@
 #pragma once
 #include <string>
+#include <vector>
 
-std::string readFile(const std::string &filename);
+#include "zview/types/types.h"
+
+namespace zview::io {
+std::vector<types::Shape> read_file(const std::string &fn);
+}

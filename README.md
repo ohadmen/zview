@@ -1,16 +1,22 @@
 
-
-<h1><img src="packaging/zview.png" height=40 >Zview -Generic mesh&cloud visualization tool</h1>
-
+# ![logo](packaging/zview.png =40x) Zview -Generic mesh&cloud visualization tool
 
 ![Zview screenshot](res/screenshot.png "Zview screenshot")
 
+## how to install
 
-## how to run
+### apt
+
+`sudo add-apt-repository ppa:ohadmen/zview`
+`sudo apt update`
+
 ### precompiled binaries
+
 1. download `.deb` file from latest [release](https://github.com/ohadmen/zview/releases).
 2. run `sudo dpkg -i zview_x.x.x_all.deb`
-## Python extention:
+
+## Python extension
+
 Sending point clouds from python is easy
 
 ### Installation
@@ -58,7 +64,7 @@ Sending point clouds from python is easy
   * Nx6 xyzrgb
   * Nx7 xyzrgba
 * color should be [0-255]
-* indices - array of integers of size Mx2 indicating edge pair indices 
+* indices - array of integers of size Mx2 indicating edge pair indices
 * color (optional,defualt `w`) - color name (overides point cloud)
   * single cahr - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
   * 3/4 vector for rgb/rgba
@@ -69,16 +75,16 @@ Sending point clouds from python is easy
 * namehandle (optional) - removes a shape by name, empty string will remove all shapes.
   * Removing a shape with children will remove it and all of it's children
 
-
 ## Compile from source
 
 ### dependencies
 
 `sudo apt-get install libglfw3-dev libglew-dev clang-format clang-tidy cppcheck pre-commit cpplint`
 
-
 ### refresh `compile_commands.json`
+
  `bazel run @hedron_compile_commands//:refresh_all`
 
 ### compile&run
+
 `bazel run  //packaging:zview`

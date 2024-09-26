@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "zview/io/read_ply.h"
+#include "zview/io/read_file.h"
 #include "zview/params/params.h"
 #include "zview/utils/recast.h"
 
@@ -121,7 +121,7 @@ void ZviewInfImpl::loadFiles(const std::vector<std::string> &files) {
   for (const auto &f : files) {
     // temporary object to read the ply file
     try {
-      auto shape_vector = io::read_ply(f);
+      auto shape_vector = io::read_file(f);
 
       for (types::Shape &s : shape_vector) {
         plotShape(std::move(s));

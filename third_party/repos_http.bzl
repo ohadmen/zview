@@ -48,6 +48,7 @@ def fetch_http_repositories(name):
         url = "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
         build_file = "//third_party/eigen:eigen.BUILD",
     )
+
     # ImGui filedialog
     http_archive(
         name = "imgui_file_dialog",
@@ -62,4 +63,3 @@ def fetch_http_repositories(name):
         build_file = "@//third_party/internals:internals.BUILD",
         path = "/usr",
     )
-    

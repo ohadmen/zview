@@ -21,5 +21,4 @@ cc_library(
     ],
     include_prefix = "imgui",
     includes = ["."],
-
 )

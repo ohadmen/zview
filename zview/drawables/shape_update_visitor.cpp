@@ -36,7 +36,8 @@ bool ShapeUpdateVisitor::operator()(types::Pcl &obj,
 }
 bool ShapeUpdateVisitor::operator()(types::Edges &obj,
                                     types::Edges &&newObj) const {
-  bool ok = pclSwitch(obj.vao(), obj.vbo(), obj.v(), std::move(newObj.v()));
+  const bool ok =
+      pclSwitch(obj.vao(), obj.vbo(), obj.v(), std::move(newObj.v()));
   if (!ok) {
     return false;
   }
@@ -62,7 +63,8 @@ bool ShapeUpdateVisitor::operator()(types::Edges &obj,
 }
 bool ShapeUpdateVisitor::operator()(types::Mesh &obj,
                                     types::Mesh &&newObj) const {
-  bool ok = pclSwitch(obj.vao(), obj.vbo(), obj.v(), std::move(newObj.v()));
+  const bool ok =
+      pclSwitch(obj.vao(), obj.vbo(), obj.v(), std::move(newObj.v()));
 
   if (!ok) {
     return false;

@@ -1,20 +1,28 @@
 #include "zview/io/read_file.h"
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <filesystem>
+#include <memory>
 #include <string>
 
-std::string readFile(const std::string& filename) {
-  std::ifstream file;
-  file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-  std::stringstream file_stream;
-  try {
-    file.open(filename.c_str());
-    file_stream << file.rdbuf();
-    file.close();
-  } catch (const std::ifstream::failure& e) {
-    std::cout << "Error reading Shader File!" << std::endl;
+#include "zview/io/reader_pcd.h"
+#include "zview/io/reader_ply.h"
+
+namespace zview::io {
+
+std::vector<types::Shape> read_file(const std::string &fn) {
+  std::unique_ptr<ReaderAbstract> reader;
+
+  if (std::filesystem::path{fn}.extension() == ".ply") {
+    reader = std::make_unique<ReaderPly>();
+
+  } else if (std::filesystem::path{fn}.extension() == ".pcd") {
+    reader = std::make_unique<ReaderPcd>();
+
+  } else {
+    throw std::runtime_error("file is not readable");
   }
-  return file_stream.str();
+  const auto shapes = reader->read(fn);
+
+  return shapes;
 }
+}  // namespace zview::io

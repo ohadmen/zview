@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "server",
@@ -37,20 +37,9 @@ cc_library(
     name = "shared_memory_types",
     srcs = ["shared_memory_types.cpp"],
     hdrs = ["shared_memory_types.h"],
-    visibility = ["//visibility:__pkg__"],
+    visibility = ["//visibility:__subpackages__"],
     deps = [
         "//zview/utils:recast",
         "@boost//:interprocess",
-    ],
-)
-
-cc_test(
-    name = "shared_memory_test",
-    srcs = ["tests/shared_memory_test.cpp"],
-    defines = ["CATCH_CONFIG_MAIN"],
-    deps = [
-        ":client",
-        ":server",
-        "@catch2//:catch2_main",
     ],
 )

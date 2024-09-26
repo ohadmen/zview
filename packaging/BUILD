@@ -96,10 +96,10 @@ py_wheel(
 
 pkg_deb(
     name = "debian-package",
-    data =
-        ":tarball",
+    data = ":tarball",
     description_file = "description.txt",
-    maintainer = "Ohad Menashe",
+    distribution = "jammy",
+    maintainer = "Ohad.men@gmail.com",
     package = "zview",
     version = ZVIEW_VERSION,
 )
