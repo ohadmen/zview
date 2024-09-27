@@ -41,8 +41,10 @@ bool Grid::init() {
 
   return ShapeInitVisitor()(m_minor);
 }
-void Grid::draw(const types::Matrix4x4 &mvp, const types::Vector3 &model_loc,
-                const float d) const {
+void Grid::draw(const MVPmat& mvp)const{
+  const auto& mvp_mat = mvp.getMVPmatrix();
+  const auto model_loc = mvp.getModelTranslation().translation();
+  const float d = mvp.getViewDistance();
   static constexpr float fov_factor = 0.25f;
   const float camfov = std::tan(Params::i().camera_fov_rad / 2.0f) * d * 2;
   float q = std::pow(10.0f, std::floor(std::log10(camfov * fov_factor)));
@@ -55,12 +57,12 @@ void Grid::draw(const types::Matrix4x4 &mvp, const types::Vector3 &model_loc,
   m.scale(q);
   m.pretranslate(shift);
 
-  const types::Matrix4x4 mvp_grid = mvp * m.matrix();
+  const types::Matrix4x4 mvp_grid = mvp_mat * m.matrix();
 
   m_shader.use();
   m_shader.setUniform("u_transformation", mvp_grid.data());
   m_shader.setUniform("u_shift", shift.x(), shift.y());
   m_shader.setUniform("u_scale", q);
-  ShapeDrawVisitor()(m_minor, nullptr);
+  ShapeDrawVisitor()(m_minor);
 }
 }  // namespace zview

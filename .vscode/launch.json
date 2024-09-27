@@ -10,8 +10,8 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bazel-bin/packaging/zview.runfiles/_main/packaging//zview",
-            // "args": ["${workspaceFolder}/models/horse.ply","${workspaceFolder}/models/lucy_pcl.ply","${workspaceFolder}/models/lucy_mesh.ply"],
-            //"args": ["${workspaceFolder}/models/horse.ply"],
+            // "args": ["${workspaceFolder}/models/horse.ply","${workspaceFolder}/models/lucy.pcd"],
+            // "args": ["${workspaceFolder}/models/horse.ply"],
             
             "stopAtEntry": false,
             

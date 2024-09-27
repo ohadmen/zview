@@ -38,9 +38,9 @@ class ZviewInfImpl : public ZviewInf {
 
   void setCameraToViewSelectedKey(const std::vector<std::uint32_t> &keys);
 
-  void renderPhase(const types::Matrix4x4 &mvp) const;
+  void renderPhase() const;
 
-  std::optional<types::Vector3> pickingPhase(const types::Matrix4x4 &mvp);
+  std::optional<types::Vector3> pickingPhase();
 
   void drawParamsMenu();
 

@@ -56,6 +56,6 @@ void Backdrop::draw() const {
   shader().use();
   shader().setUniform("u_txt", 1);
   shader().setUniform("u_transformation", m_tformEye.data());
-  ShapeDrawVisitor()(*this, nullptr);
+  ShapeDrawVisitor()(*this);
 }
 }  // namespace zview

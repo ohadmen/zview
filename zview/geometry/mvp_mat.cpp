@@ -3,6 +3,7 @@
 
 #include <imgui.h>  // for Imvec2
 
+#include <iostream>
 #include <limits>
 
 #include "zview/params/params.h"
@@ -14,36 +15,34 @@ bool qFuzzyIsNull(float d) {
   return std::abs(d) < EPS;
 }
 
-MVPmat::MVPmat() { updatePmat(); }
+MVPmat::MVPmat() { update(); }
 
-types::Matrix4x4 MVPmat::getMVPmatrix() const {
-  const auto mv = Eigen::Translation3f(0, 0, -m_viewDistance) * m_viewRotation *
-                  m_modelTranslation;
-  return m_proj.matrix() * mv.matrix();
-}
-void MVPmat::updatePmat() {
+const types::Matrix4x4& MVPmat::getMVPmatrix() const {return m_mvp;}
+void MVPmat::update() {
   const float aspect = getAspect();
-
   const float h_angle_rad = zview::Params::i().camera_fov_rad / 2.0f;
   const float nearPlane = m_viewDistance * Params::i().zmin_factor;
   const float farPlane = m_viewDistance * Params::i().zmax_factor;
-
   const float cotan =
       std::abs(h_angle_rad) < std::numeric_limits<float>::epsilon() * 1e3
           ? 1e3f
           : 1.0f / tanf(h_angle_rad);
-
+  float clip = farPlane - nearPlane;
   // following
   // https://github.com/radekp/qt/blob/master/zview/gui/math3d/qmatrix4x4.cpp
-  float clip = farPlane - nearPlane;
+  
   m_proj << cotan / aspect, 0, 0, 0, 0, cotan, 0, 0, 0, 0,
       -(nearPlane + farPlane) / clip, -2.0f * nearPlane * farPlane / clip, 0, 0,
       -1, 0;
+  const auto mv = Eigen::Translation3f(0, 0, -m_viewDistance) * m_viewRotation *
+                  m_modelTranslation;
+  m_mvp =  m_proj.matrix() * mv.matrix();
+  m_heightOfNearPlane = m_wh.x*0.5f / std::tan(h_angle_rad);
 }
 float MVPmat::getAspect() const { return m_wh.x / m_wh.y; }
 void MVPmat::setWinSize(const ImVec2 &wh) {
   m_wh = wh;
-  updatePmat();
+  update();
 }
 ImVec2 MVPmat::getWinSize() const { return m_wh; }
 const Eigen::Quaternionf &MVPmat::getViewRotation() const {
@@ -52,13 +51,14 @@ const Eigen::Quaternionf &MVPmat::getViewRotation() const {
 
 void MVPmat::setViewRotation(const Eigen::Quaternionf &m) {
   m_viewRotation = m;
+  update();
 }
 
 float MVPmat::getViewDistance() const { return m_viewDistance; }
 
 void MVPmat::setViewDistance(float m) {
   m_viewDistance = m;
-  updatePmat();
+  update();
 }
 
 const Eigen::Translation3f &MVPmat::getModelTranslation() const {
@@ -67,6 +67,7 @@ const Eigen::Translation3f &MVPmat::getModelTranslation() const {
 
 void MVPmat::setModelTranslation(const Eigen::Translation3f &m) {
   m_modelTranslation = m;
+  update();
 }
 
 template <>
@@ -102,5 +103,9 @@ std::array<types::Vector3, 2> MVPmat::getRay(const ImVec2 &pt,
 }
 
 types::Matrix4x4 MVPmat::getProjectiveMatrix() const { return m_proj; }
+
+float MVPmat::getHeightOfNearPlane() const {
+  return m_heightOfNearPlane;
+}
 
 }  // namespace zview

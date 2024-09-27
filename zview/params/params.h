@@ -18,5 +18,7 @@ class Params {
   std::array<float, 3> light_dir{0.4f, 0.48f, 0.51f};
   static constexpr float zmin_factor{1e-2f};
   static constexpr float zmax_factor{1e4f};
+  float color_factor_shift{0.0f};
+  float color_factor_scale{1.0f};
 };
 }  // namespace zview

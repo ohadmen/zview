@@ -60,6 +60,6 @@ void Axis::draw() const {
   shader().use();
   shader().setUniform("u_txt", 2);
   shader().setUniform("u_transformation", m.data());
-  ShapeDrawVisitor()(*this, nullptr);
+  ShapeDrawVisitor()(*this);
 }
 }  // namespace zview

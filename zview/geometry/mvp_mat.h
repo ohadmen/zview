@@ -17,15 +17,17 @@ class MVPmat {
   Eigen::Translation3f m_modelTranslation{0, 0, 0};
   ImVec2 m_wh{1, 1};
   float m_viewDistance{1.0f};
+  types::Matrix4x4 m_mvp;
+  float m_heightOfNearPlane{1.0f};
 
  public:
   MVPmat();
 
-  types::Matrix4x4 getMVPmatrix() const;
+  const types::Matrix4x4& getMVPmatrix() const;
 
   void setWinSize(const ImVec2 &wh);
   ImVec2 getWinSize() const;
-  void updatePmat();
+  void update();
   float getAspect() const;
 
   enum class CoordinateSystem : std::uint8_t {
@@ -50,6 +52,8 @@ class MVPmat {
   void setModelTranslation(const Eigen::Translation3f &m);
 
   types::Matrix4x4 getProjectiveMatrix() const;
+
+  float getHeightOfNearPlane() const;
 };
 
 }  // namespace zview

@@ -190,7 +190,7 @@ bool ZviewInfImpl::draw() {
   }
   const auto sz = ImGui::GetContentRegionAvail();
 
-  const auto transformation = m_mvp.getMVPmatrix();
+  
   drawHelpMenu();
   drawParamsMenu();
   m_status_bar.draw(sz);
@@ -206,9 +206,9 @@ bool ZviewInfImpl::draw() {
   m_sms.step();
 
   m_fbo.bind();
-  renderPhase(transformation);
+  renderPhase();
   m_fbo.unbind();
-  m_hover_point = pickingPhase(transformation);
+  m_hover_point = pickingPhase();
 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::Image(
@@ -221,20 +221,19 @@ bool ZviewInfImpl::draw() {
   return true;
 }
 
-void ZviewInfImpl::renderPhase(const types::Matrix4x4 &mvp) const {
+void ZviewInfImpl::renderPhase() const {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+  
   m_backdrop.draw();
   if (m_show_grid) {
-    m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
-                m_mvp.getViewDistance());
+    m_grid.draw(m_mvp);
   }
   m_axis.draw();
 
-  m_buffer.draw(mvp.data());
+  m_buffer.draw(m_mvp);
 }
-std::optional<types::Vector3> ZviewInfImpl::pickingPhase(
-    const types::Matrix4x4 &mvp) {
+std::optional<types::Vector3> ZviewInfImpl::pickingPhase() {
+  const auto mvp = m_mvp.getMVPmatrix();
   m_picking.bind();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_picking.setTransform(mvp);
@@ -243,7 +242,7 @@ std::optional<types::Vector3> ZviewInfImpl::pickingPhase(
       [&picking](const std::pair<std::uint32_t, types::Shape> &s) {
         picking.setObjectIndex(s.first);
       };
-  m_buffer.draw(nullptr, preDrawFunction);
+  m_buffer.draw(std::nullopt, preDrawFunction);
   m_picking.unbind();
   // get mouse position relative to the current window, reducing the window
   // offset
@@ -335,7 +334,16 @@ void ZviewInfImpl::drawParamsMenu() {
 
   if (ImGui::SliderFloat("Field of view", &cam_fov_deg, 10, 90)) {
     params.camera_fov_rad = cam_fov_deg * deg2rad;
-    m_mvp.updatePmat();
+    m_mvp.update();
+  }
+  
+  if (ImGui::SliderFloat("Depth color shift", &params.color_factor_shift, -1.00, 1.00)) {
+    
+    m_mvp.update();
+  }
+  if (ImGui::SliderFloat("Depth color scale", &params.color_factor_scale, 1, 30)) {
+    
+    m_mvp.update();
   }
 
   if (ImGui::SliderInt("background color", &params.background_color, 0, 3)) {
@@ -343,6 +351,7 @@ void ZviewInfImpl::drawParamsMenu() {
   }
   ImGui::SliderInt("Texture type", &params.texture_type, 1, 6);
   ImGui::SliderFloat("Point size", &params.point_size, 0.01, 2.0);
+
 
   ImGui::End();
 }

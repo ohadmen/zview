@@ -1,4 +1,5 @@
 #pragma once
+#include "zview/geometry/mvp_mat.h"
 #include "zview/types/types.h"
 namespace zview {
 class Grid {
@@ -8,7 +9,6 @@ class Grid {
  public:
   Grid();
   bool init();
-  void draw(const types::Matrix4x4& mvp, const types::Vector3& model_loc,
-            const float d) const;
+  void draw(const MVPmat& mvp) const;
 };
 }  // namespace zview

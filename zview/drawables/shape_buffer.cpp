@@ -73,12 +73,12 @@ std::uint32_t ShapeBuffer::emplace(types::Shape &&s) {
 }
 
 void ShapeBuffer::draw(
-    const float *tform,
+    const std::optional<MVPmat>& mvp,
     const std::function<void(const std::pair<std::uint32_t, types::Shape> &)>
         &preDrawFunction) const {
   const auto &draw_func = m_shape_draw_visitor_p.get();
-  auto func = [&tform, &draw_func](const auto &v) {
-    draw_func->operator()(v, tform);
+  auto func = [&mvp, &draw_func](const auto &v) {
+    draw_func->operator()(v, mvp);
   };
   for (const auto &s : m_buffer) {
     bool enabled =

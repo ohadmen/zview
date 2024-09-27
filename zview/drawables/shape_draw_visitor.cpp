@@ -2,22 +2,22 @@
 
 #include <GL/glew.h>  // Initialize with glewInit()
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 #include "zview/graphics_backend/shader.h"
 #include "zview/params/params.h"
+
 namespace zview {
 void ShapeDrawVisitor::operator()(const types::Pcl& obj,
-                                  const float* tform) const {
-  if (tform) {
-    std::array<int, 4> viewport{};
-    glGetIntegerv(GL_VIEWPORT, viewport.data());
-
-    float hfovx = Params::i().camera_fov_rad * 0.5f;
-    float heightOfNearPlane =
-        (float)abs(viewport[2] - viewport[0]) * 0.5f / std::tan(hfovx);
+                                  const std::optional<MVPmat>& mvp) const {
+  if (mvp) {
     obj.shader().use();
-    obj.shader().setUniform("u_transformation", tform);
-    obj.shader().setUniform("u_nearPlaneDist", heightOfNearPlane);
+    obj.shader().setUniform("u_transformation", mvp.value().getMVPmatrix().data());
+    obj.shader().setUniform("u_nearPlaneDist", mvp.value().getHeightOfNearPlane());
+    obj.shader().setUniform("u_viewDistance", mvp.value().getViewDistance());
+
+    obj.shader().setUniform("u_color_factor_shift", zview::Params::i().color_factor_shift);
+    obj.shader().setUniform("u_color_factor_scale",zview::Params::i().color_factor_scale);
     obj.shader().setUniform("u_ptsize", zview::Params::i().point_size);
     obj.shader().setUniform("u_lightDir", zview::Params::i().light_dir);
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
@@ -28,10 +28,10 @@ void ShapeDrawVisitor::operator()(const types::Pcl& obj,
 }
 
 void ShapeDrawVisitor::operator()(const types::Edges& obj,
-                                  const float* tform) const {
-  if (tform) {
+                                  const std::optional<MVPmat>& mvp) const {
+  if (mvp) {
     obj.shader().use();
-    obj.shader().setUniform("u_transformation", tform);
+    obj.shader().setUniform("u_transformation", mvp.value().getMVPmatrix().data());
   }
   glBindVertexArray(obj.vao());
   glDrawElements(GL_LINES, static_cast<int>(obj.e().size() * 2),
@@ -40,11 +40,11 @@ void ShapeDrawVisitor::operator()(const types::Edges& obj,
 }
 
 void ShapeDrawVisitor::operator()(const types::Mesh& obj,
-                                  const float* tform) const {
+                                  const std::optional<MVPmat>& mvp) const {
   // rendering our geometries
-  if (tform) {
+  if (mvp) {
     obj.shader().use();
-    obj.shader().setUniform("u_transformation", tform);
+    obj.shader().setUniform("u_transformation", mvp.value().getMVPmatrix().data());
     obj.shader().setUniform("u_lightDir", zview::Params::i().light_dir);
     obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
   }

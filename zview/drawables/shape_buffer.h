@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "zview/types/types.h"
+#include "zview/geometry/mvp_mat.h"
 namespace zview {
 struct ShapeInitVisitor;    // fwddecl
 struct ShapeDrawVisitor;    // fwddecl
@@ -56,7 +57,7 @@ class ShapeBuffer {
    * recieving the shape key and the shape object
    */
   void draw(
-      const float* tform,
+      const std::optional<MVPmat>& mvp,
       const std::function<void(const std::pair<std::uint32_t, types::Shape>&)>&
           preDrawFunction = []([[maybe_unused]] const auto& s) {}) const;
 

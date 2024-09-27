@@ -22,6 +22,7 @@ cc_library(
     deps = [
         "//zview/drawables:shape_interface",
         "//zview/types",
+        "//zview/geometry:mvp_mat",
     ],
 )
 
@@ -60,6 +61,7 @@ cc_library(
         "//zview/params",
         "//zview/types",
         "//zview/utils:recast",
+        "//zview/geometry:mvp_mat",
     ],
 )
 

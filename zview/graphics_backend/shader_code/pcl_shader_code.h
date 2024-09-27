@@ -13,6 +13,7 @@ out vec4 vertexColor;
 uniform mat4 u_transformation;
 uniform float u_ptsize;
 uniform float u_nearPlaneDist;
+uniform float u_viewDistance;
 
 
 out vec3 v_eyeDir;
@@ -27,7 +28,7 @@ void main()
     
     
 	gl_PointSize = u_ptsize*u_nearPlaneDist / gl_Position.w;
-	v_normDepth = gl_Position.w/u_nearPlaneDist*2;
+	v_normDepth = gl_Position.z/u_viewDistance-1.0;
 
     v_eyeDir  =  -normalize(vec3(u_transformation[0]));
 
@@ -46,7 +47,9 @@ in vec4 vertexColor;
 
 uniform int u_txt;
 uniform vec3 u_lightDir;
-
+uniform float u_color_factor_shift;
+uniform float u_color_factor_scale;
+uniform float u_viewDistance;
 
 in vec3 v_eyeDir;
 in float v_normDepth;
@@ -488,19 +491,22 @@ void main()
 	}
 	case 2:
 	{	
-		float z = max(0,1-v_normDepth);
+		float z = ((v_normDepth-u_color_factor_shift)*u_color_factor_scale)*0.5+0.5;
+        z = max(min(1,z),0);
 		fragColor  =vec4(z,z,z,1.0);
 		break;
 	}
 	case 3:
 	{
-		float z = max(0,1-v_normDepth);
+		float z = ((v_normDepth-u_color_factor_shift)*u_color_factor_scale)*0.5+0.5;
+        z = max(min(1,z),0);
 		fragColor  =colormapJet(z);
 		break;
 	}
 	case 4:
 	{
-		float z = max(0,1-v_normDepth);
+		float z = ((v_normDepth-u_color_factor_shift)*u_color_factor_scale)*0.5+0.5;
+        z = max(min(1,z),0);
 		fragColor  =colormapParula(z);
 		break;
 	}
@@ -510,6 +516,7 @@ void main()
   		fragColor = glassColor;
 		break;
 	}
+    u_viewDistance
 	
 	default:
 	{
