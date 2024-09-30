@@ -1,0 +1,46 @@
+name: zview
+base: core22
+version: '1.0.0'
+summary: Example Snap package for Bazel project
+description: |
+  3d viewer for point clouds
+
+grade: stable # or devel
+confinement: strict # can be devmode for testing during development
+
+parts:
+  zview:
+    plugin: nil  
+    source: .    # The source code for your Bazel project is in the current directory
+    build-packages:
+      - build-essential
+      - apt-transport-https
+      - curl
+      - gnupg
+    override-build: |
+      curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
+      mv bazel-archive-keyring.gpg /usr/share/keyrings
+      echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
+      apt update && apt install  bazel libglfw3-dev libglew-dev -y 
+      bazel build packaging/zview
+      install -D bazel-bin/packaging/zview $SNAPCRAFT_PART_INSTALL/bin/zview
+
+    stage-packages:
+      - libstdc++6
+      - libglfw3-dev
+      - libglew-dev
+
+
+
+
+plugs:
+  shared-memory:
+    private: true
+
+apps:
+  zview:
+    command: bin/zview
+
+    plugs:
+      - shared-memory
+
