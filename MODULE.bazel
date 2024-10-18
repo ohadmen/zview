@@ -12,7 +12,6 @@ use_repo(
     non_module_boost_repositories,
     "boost",
 )
-
 bazel_dep(name = "catch2", version = "3.6.0")
 bazel_dep(name = "rules_python", version = "0.34.0")
 bazel_dep(name = "pybind11_bazel", version = "2.12.0")

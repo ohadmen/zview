@@ -19,6 +19,8 @@ write_file(
         "Terminal=false",
         "Type=Application",
         "Categories=Utility;Application;",
+        "StartupNotify=true",
+        "StartupWMClass=zview " + ZVIEW_VERSION,
     ],
 )
 
