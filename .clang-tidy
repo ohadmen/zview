@@ -3,7 +3,8 @@ HeaderFilterRegex: ""
 WarningsAsErrors: >
     *,
     -clang-diagnostic-builtin-macro-redefined,
-    -cppcoreguidelines-pro-type-reinterpret-cast
+    -cppcoreguidelines-pro-type-reinterpret-cast,
+    -clang-diagnostic-macro-redefined
 
 Checks: >
     bugprone-*,
@@ -12,6 +13,7 @@ Checks: >
     -cppcoreguidelines-avoid-magic-numbers,
     -cppcoreguidelines-pro-type-vararg,
     -cppcoreguidelines-pro-type-reinterpret-cast
+
     google-*,
     performance-*,
     { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }

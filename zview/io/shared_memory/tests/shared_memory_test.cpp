@@ -1,11 +1,13 @@
+#include <stddef.h>
+
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <string>
 #include <thread>
 #include <vector>
 
 #include "zview/io/shared_memory/shared_memory_client.h"
 #include "zview/io/shared_memory/shared_memory_server.h"
-#include "zview/io/shared_memory/shared_memory_types.h"
 
 SCENARIO("Shared Memory Test") {
   std::vector<std::string> added_shape_names{};
@@ -55,9 +57,9 @@ SCENARIO("Shared Memory Test") {
       zview::SharedMemoryClient client;
       // start server on a thread
 
-      const std::string name_pcl = "pcl";
-      const std::string name_mesh = "mesh";
-      const std::string name_edge = "edge";
+      const std::string name_pcl{"pcl"};
+      const std::string name_mesh{"mesh"};
+      const std::string name_edge{"edge"};
 
       WHEN("Plotting") {
         constexpr std::size_t n_points1 = 10U;

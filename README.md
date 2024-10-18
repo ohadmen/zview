@@ -79,7 +79,7 @@ Sending point clouds from python is easy
 
 ### dependencies
 
-`sudo apt-get install libglfw3-dev libglew-dev clang-format clang-tidy cppcheck pre-commit cpplint`
+`sudo apt-get install libglfw3-dev libglew-dev clang-format clang-tidy cppcheck pre-commit cpplint libstdc++-12-dev`
 
 ### refresh `compile_commands.json`
 

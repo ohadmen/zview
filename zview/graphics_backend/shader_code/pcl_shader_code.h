@@ -520,7 +520,6 @@ void main()
     
 }
 
-
 )";
 }  // namespace pcl
 }  // namespace shader_code

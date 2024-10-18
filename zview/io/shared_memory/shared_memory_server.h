@@ -4,7 +4,6 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <functional>
-#include <memory>
 
 #include "zview/io/shared_memory/shared_memory_types.h"
 #include "zview/types/types.h"

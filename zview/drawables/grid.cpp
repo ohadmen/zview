@@ -33,7 +33,7 @@ bool Grid::init() {
   for (unsigned int i{0}; i < m_minor.v().size(); i += 2) {
     m_minor.e().push_back({i, i + 1});
   }
-  bool ok = m_shader.init(Shader::ShaderType::GRID);
+  const bool ok = m_shader.init(Shader::ShaderType::GRID);
   if (!ok) {
     std::cerr << "Failed to init grid shader" << std::endl;
     return false;

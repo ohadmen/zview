@@ -20,9 +20,6 @@ SharedMemoryHandler::SharedMemoryHandler(bool is_server)
     : m_is_server{is_server} {
   if (is_server) {
     removeOldSharedMemory();
-  }
-
-  if (is_server) {
     m_cmd_shm = std::make_unique<boost::interprocess::shared_memory_object>(
         boost::interprocess::create_only, SHARED_MEMORY_CMD_NAME,
         boost::interprocess::read_write);

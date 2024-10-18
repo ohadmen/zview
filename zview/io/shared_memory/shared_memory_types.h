@@ -36,12 +36,12 @@ struct SharedMemoryInfo {
 };
 
 class SharedMemoryHandler {
-  bool m_is_server;
-  std::unique_ptr<boost::interprocess::shared_memory_object> m_data_shm;
-  boost::interprocess::mapped_region m_data_region;
+  bool m_is_server{};
+  std::unique_ptr<boost::interprocess::shared_memory_object> m_data_shm{};
+  boost::interprocess::mapped_region m_data_region{};
 
-  std::unique_ptr<boost::interprocess::shared_memory_object> m_cmd_shm;
-  boost::interprocess::mapped_region m_cmd_region;
+  std::unique_ptr<boost::interprocess::shared_memory_object> m_cmd_shm{};
+  boost::interprocess::mapped_region m_cmd_region{};
 
  public:
   explicit SharedMemoryHandler(bool is_server);

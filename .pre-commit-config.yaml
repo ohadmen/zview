@@ -3,7 +3,8 @@ exclude: |
       external|
       bazel-.*/|
       third_party/.*|
-      zview/graphics_backend/imgui_impl*
+      zview/graphics_backend/imgui_impl*|
+      /usr*
   )
 
 repos:

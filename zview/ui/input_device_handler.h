@@ -34,11 +34,10 @@ class InputDeviceHandler {
   types::Vector3 m_click_ray{};
   std::array<std::array<float, 2>, 1024> m_hit_screen_lut{};
   MVPmat &m_mvp;
-  const AddShape m_addShape;
-  const RemoveShape m_removeShape;
-  const StatusBarUpdate m_statusBarUpdate;
-
-  std::optional<types::Edges> m_measurement_edge;
+  const AddShape m_addShape{};
+  const RemoveShape m_removeShape{};
+  const StatusBarUpdate m_statusBarUpdate{};
+  std::optional<types::Edges> m_measurement_edge{};
 };
 
 }  // namespace zview

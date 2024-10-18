@@ -140,9 +140,9 @@ void InputDeviceHandler::step(
         m_addShape(s);
       } else {
         // existing measurement
-        float d = (types::Vector3(m_measurement_edge.value().v()[0]) -
-                   types::Vector3(m_measurement_edge.value().v()[1]))
-                      .squaredNorm();
+        const float d = (types::Vector3(m_measurement_edge.value().v()[0]) -
+                         types::Vector3(m_measurement_edge.value().v()[1]))
+                            .squaredNorm();
         const std::string new_name =
             "measurements/distance=" + std::to_string(d);
         m_measurement_edge.value().setName(new_name);

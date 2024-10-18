@@ -21,7 +21,7 @@ std::vector<types::Shape> read_file(const std::string &fn) {
   } else {
     throw std::runtime_error("file is not readable");
   }
-  const auto shapes = reader->read(fn);
+  auto shapes = reader->read(fn);
 
   return shapes;
 }
