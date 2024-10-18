@@ -1,5 +1,5 @@
 
-# ![logo](packaging/zview.png =40x) Zview -Generic mesh&cloud visualization tool
+<h1><img src="packaging/zview.png" height=40 >Zview -Generic mesh&cloud visualization tool</h1>
 
 ![Zview screenshot](res/screenshot.png "Zview screenshot")
 
