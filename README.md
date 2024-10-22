@@ -66,7 +66,7 @@ Sending point clouds from python is easy
 * color should be [0-255]
 * indices - array of integers of size Mx2 indicating edge pair indices
 * color (optional,defualt `w`) - color name (overides point cloud)
-  * single cahr - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
+  * single char - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
   * 3/4 vector for rgb/rgba
 * alpha (optional,default 255)
 

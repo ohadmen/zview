@@ -24,7 +24,6 @@ write_file(
     ],
 )
 
-
 cc_binary(
     name = "zview",
     deps = ["//zview:zview_binary"],
@@ -72,7 +71,6 @@ pkg_files(
     prefix = "/usr/share/applications",
     # Required, but why?: see #354
     strip_prefix = strip_prefix.from_pkg(),
-
 )
 
 pkg_tar(
@@ -82,8 +80,6 @@ pkg_tar(
         ":binary_desktoplink",
         ":binary_icon",
     ],
-    
-    
 )
 
 py_wheel(
@@ -97,7 +93,6 @@ py_wheel(
     python_tag = "cp311",
     twine = "@publish_deps//twine",
     version = ZVIEW_VERSION,
-    requires=[],
     deps = ["//pyzview:pyzview_pkg"],
 )
 
@@ -109,5 +104,4 @@ pkg_deb(
     maintainer = "Ohad.men@gmail.com",
     package = "zview",
     version = ZVIEW_VERSION,
-    
 )
