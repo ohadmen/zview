@@ -8,6 +8,7 @@ archive_override(
 )
 
 non_module_boost_repositories = use_extension("@com_github_nelhage_rules_boost//:boost/repositories.bzl", "non_module_dependencies")
+
 use_repo(
     non_module_boost_repositories,
     "boost",
@@ -16,10 +17,14 @@ bazel_dep(name = "catch2", version = "3.6.0")
 bazel_dep(name = "rules_python", version = "0.34.0")
 bazel_dep(name = "pybind11_bazel", version = "2.12.0")
 
+
+PYTHON_VERSION = "3.11"
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(python_version = PYTHON_VERSION, is_default = True)
 pip.parse(
     hub_name = "python_pip_deps",
-    python_version = "3.11",
+    python_version = PYTHON_VERSION,
     requirements_lock = "//:requirements.txt",
 )
 use_repo(pip, "python_pip_deps")
