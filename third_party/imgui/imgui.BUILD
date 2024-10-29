@@ -1,6 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
-
-package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "imgui",
@@ -21,4 +18,5 @@ cc_library(
     ],
     include_prefix = "imgui",
     includes = ["."],
+    visibility = ["//visibility:public"],
 )
