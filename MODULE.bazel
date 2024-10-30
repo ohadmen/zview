@@ -31,6 +31,9 @@ bazel_dep(name = "catch2", version = "3.6.0")
 bazel_dep(name = "rules_python", version = "0.34.0")
 bazel_dep(name = "pybind11_bazel", version = "2.12.0")
 bazel_dep(name = "eigen", version = "3.4.0.bcr.1")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
 
 repositories_impl = use_extension("//third_party:repositories.bzl", "repositories_impl")
 use_repo(repositories_impl, "imgui","implot","imgui_file_dialog","sysroot")
@@ -39,7 +42,7 @@ use_repo(repositories_impl, "imgui","implot","imgui_file_dialog","sysroot")
 PYTHON_VERSION = "3.11"
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(python_version = PYTHON_VERSION, is_default = True)
+python.toolchain(python_version = PYTHON_VERSION, is_default = True,ignore_root_user_error = True)
 pip.parse(
     hub_name = "python_pip_deps",
     python_version = PYTHON_VERSION,
@@ -47,4 +50,4 @@ pip.parse(
 )
 use_repo(pip, "python_pip_deps")
 
-bazel_dep(name = "rules_pkg", version = "1.0.1")
+
