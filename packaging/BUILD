@@ -82,6 +82,13 @@ pkg_tar(
     ],
 )
 
+genrule(
+    name = "foo",
+    srcs = [],
+    outs = ["python_version.bzl"],
+    cmd = "echo -n \"PYTHON_VERSION=\"> \"$@\" & (python -c 'import sys; print(\".\".join(map(str, sys.version_info[:3])))') >> \"$@\"",
+)
+
 py_wheel(
     name = "wheel",
     abi = None,
