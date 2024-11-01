@@ -39,7 +39,7 @@ repositories_impl = use_extension("//third_party:repositories.bzl", "repositorie
 use_repo(repositories_impl, "imgui","implot","imgui_file_dialog","sysroot")
 
 
-PYTHON_VERSION = "3.10"
+PYTHON_VERSION = "3.11"
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(python_version = PYTHON_VERSION, is_default = True,ignore_root_user_error = True)
