@@ -18,7 +18,7 @@ yum install -y bazel6 --allowerasing
 
 # # Compile wheels
 cd /io
-mkdir -p wheelhouse
+
 cp MODULE.bazel MODULE.bazel_save
 for FLDR in /opt/python/*; do
     
@@ -44,13 +44,11 @@ for FLDR in /opt/python/*; do
     bazel build packaging:wheel
     rename 'py3-none' $PY_TAG bazel-bin/packaging/*.whl
     
-    for whl in bazel-bin/packaging/*.whl; do
-        auditwheel repair "$whl" --plat $PLAT -w /io/wheelhouse/
-    done
-    #test
-    whl=`ls -Art wheelhouse/*.whl | tail -n 1` 
-    ${PYBIN}/pip3 install $whl
-    rm bazel-bin/packaging/*.whl
+    
+    
 done
+mkdir -p wheelhouse
+auditwheel repair bazel-bin/packaging/*.whl --plat $PLAT -w /io/wheelhouse/
 mv -f MODULE.bazel_save MODULE.bazel
-mv -f MODULE.bazel_save MODULE.bazel
+
+#twine upload wheelhouse/*
