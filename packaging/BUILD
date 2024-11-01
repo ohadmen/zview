@@ -82,13 +82,6 @@ pkg_tar(
     ],
 )
 
-genrule(
-    name = "foo",
-    srcs = [],
-    outs = ["python_version.bzl"],
-    cmd = "echo -n \"PYTHON_VERSION=\"> \"$@\" & (python -c 'import sys; print(\".\".join(map(str, sys.version_info[:3])))') >> \"$@\"",
-)
-
 py_wheel(
     name = "wheel",
     abi = None,
@@ -97,7 +90,7 @@ py_wheel(
     distribution = "pyzview",
     license = "Apache 2.0",
     python_requires = ">=3.9.0",
-    python_tag = "cp311",
+    python_tag = None,
     twine = "@publish_deps//twine",
     version = ZVIEW_VERSION,
     deps = ["//pyzview:pyzview_pkg"],
