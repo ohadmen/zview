@@ -1,9 +1,3 @@
-language: cpp
-os: linux
-compiler: gcc
-sudo: required
-dist: focal
-
 notifications:
   email: false
 
