@@ -88,4 +88,10 @@ class Pyzview(metaclass=Singleton):
         xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
         ok = self.zv.plot(namehandle, xyzrgba, indices[:,0:2])
         return ok
-         
+    def plot_marker(self,namehandle,shift,scale,rotation=np.eye(3), color=None, alpha=None):
+        xyz = (np.array([[0, 0, 0], [-2*scale, -scale/2, -scale/2], [-2*scale, scale/2, -scale/2], [-2*scale, 0,  scale/2]]) )@rotation.T+ shift
+        f = np.array([[0, 3, 1], [1, 3, 2], [0, 2, 3], [0, 2, 1]])
+        xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
+        ok = self.zv.plot(namehandle, xyzrgba, f)
+        return ok
+

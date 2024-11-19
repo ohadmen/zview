@@ -3,6 +3,7 @@ print(platform.python_version())
 import unittest
 import numpy as np
 from pyzview import Pyzview
+from scipy.spatial.transform import Rotation as R
 
 class TestBasic(unittest.TestCase):
 
@@ -25,7 +26,10 @@ class TestBasic(unittest.TestCase):
       pts = self.z_shifted(100)
       indices = np.random.permutation(np.arange(pts.shape[0]))[:pts.shape[0]-(pts.shape[0]%2)].reshape((-1,2))
       assert(Pyzview().plot_edges("interface_check_edges",pts,indices))
-
+  
+  def test_marker(self):
+      rot =R.from_euler('zyx', [10, 20, 30], degrees=True).as_matrix()
+      assert(Pyzview().plot_marker("interface_check_marker", [0,1,2],200,rot,color='r',alpha=50))
 
       
       

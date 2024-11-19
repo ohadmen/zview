@@ -1,6 +1,5 @@
 #!/bin/bash
-# DOCKER_IMAGE=quay.io/pypa/manylinux_2_28_x86_64
-# docker run  --rm -it -e PLAT=manylinux_2_28_x86_64 --entrypoint bash  -v $PWD:/io $DOCKER_IMAGE  /io/packaging/build_wheels.sh
+# docker run  --rm -it -e PLAT=manylinux_2_28_x86_64 --entrypoint bash  -v $PWD:/io quay.io/pypa/manylinux_2_28_x86_64  /io/packaging/build_wheels.sh
 
 set -e -u -x
 

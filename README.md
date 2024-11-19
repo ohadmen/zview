@@ -33,11 +33,11 @@ Sending point clouds from python is easy
   * Nx4 xyzi
   * Nx6 xyzrgb
   * Nx7 xyzrgba
-* color should be [0-255]
+    * color should be [0-255]
   
 * color (optional,defualt `w`) - color name (overides point cloud)
   * single cahr - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
-  * 3/4 vector for rgb/rgba
+  * 3 vector for rgb
 * alpha (optional,default 255)
 
 #### plot_mesh(namehandle, xyz, indices, color=None, alpha=None)
@@ -48,11 +48,11 @@ Sending point clouds from python is easy
   * Nx4 xyzi
   * Nx6 xyzrgb
   * Nx7 xyzrgba
-* color should be [0-255]
+    * color should be [0-255]
 * indices - array of integers of size Mx3 indicating tri mesh triplets indices
 * color (optional,defualt `w`) - color name (overides point cloud)
   * single cahr - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
-  * 3/4 vector for rgb/rgba
+  * 3 vector for rgb
 * alpha (optional,default 255)
 
 #### plot_edges(namehandle, xyz, indices, color=None, alpha=None)
@@ -63,12 +63,24 @@ Sending point clouds from python is easy
   * Nx4 xyzi
   * Nx6 xyzrgb
   * Nx7 xyzrgba
-* color should be [0-255]
+    * color should be [0-255]
 * indices - array of integers of size Mx2 indicating edge pair indices
 * color (optional,defualt `w`) - color name (overides point cloud)
   * single char - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
-  * 3/4 vector for rgb/rgba
+  * 3 vector for rgb
 * alpha (optional,default 255)
+
+#### plot_marker(namehandle,shift,scale,rotation=np.eye(3), color=None, alpha=None):
+* namehandle - unique shape name, with `/` to indicate tree hierarchy.
+* shift - marker tip location
+* scale - marker size
+* rotation - 3x3 rotation matrix
+* color (optional,defualt `w`) - color name (overides point cloud)
+  * single char - `r`/`g`/`b`/`k`/`c`/`m`/`y`/`k`/`w` or `R` for random color
+  * 3 vector for rgb
+* alpha (optional,default 255)
+
+
 
 #### remove_shape(namehandle="")
 

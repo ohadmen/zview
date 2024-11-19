@@ -32,6 +32,7 @@ py_test(
     srcs = ["tests/pyzview_test.py"],
     deps = [
         requirement("numpy"),
+        requirement("scipy"),
         ":pyzview",
     ],
 )
