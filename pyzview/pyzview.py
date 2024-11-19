@@ -16,6 +16,8 @@ class Pyzview(metaclass=Singleton):
  
     @staticmethod
     def _str2rgb(colorstr):
+        if (isinstance(colorstr, list) or isinstance(colorstr, np.ndarray) or isinstance(colorstr, tuple)) and len(colorstr) == 3:
+            return colorstr
         if colorstr == 'r':
             col = [255, 0, 0]
         elif colorstr == 'g':
