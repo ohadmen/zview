@@ -12,44 +12,46 @@ class Singleton(type):
 
 
 class Pyzview(metaclass=Singleton):
-
- 
     @staticmethod
     def _str2rgb(colorstr):
-        if (isinstance(colorstr, list) or isinstance(colorstr, np.ndarray) or isinstance(colorstr, tuple)) and len(colorstr) == 3:
+        if (
+            isinstance(colorstr, list)
+            or isinstance(colorstr, np.ndarray)
+            or isinstance(colorstr, tuple)
+        ) and len(colorstr) == 3:
             return colorstr
-        if colorstr == 'r':
+        if colorstr == "r":
             col = [255, 0, 0]
-        elif colorstr == 'g':
+        elif colorstr == "g":
             col = [0, 255, 0]
-        elif colorstr == 'b':
+        elif colorstr == "b":
             col = [0, 0, 255]
-        elif colorstr == 'c':
+        elif colorstr == "c":
             col = [0, 255, 255]
-        elif colorstr == 'm':
+        elif colorstr == "m":
             col = [255, 0, 255]
-        elif colorstr == 'y':
+        elif colorstr == "y":
             col = [255, 255, 0]
-        elif colorstr == 'w':
+        elif colorstr == "w":
             col = [255, 255, 255]
-        elif colorstr == 'k':
+        elif colorstr == "k":
             col = [0, 0, 0]
-        elif colorstr == 'R':
-            col = list(np.random.rand(3)*255)
+        elif colorstr == "R":
+            col = list(np.random.rand(3) * 255)
         else:
             raise RuntimeError("unknown color name")
         return col
 
     @staticmethod
-    def xyz2xyzrgba(xyz,color,alpha):
+    def xyz2xyzrgba(xyz, color, alpha):
         xyz_dim = xyz.shape[1]
-        xyzrgba = np.c_[xyz, np.ones((xyz.shape[0],7-xyz_dim))*255]
+        xyzrgba = np.c_[xyz, np.ones((xyz.shape[0], 7 - xyz_dim)) * 255]
         if color is not None:
-            xyzrgba[:,3:6] = Pyzview._str2rgb(color)
+            xyzrgba[:, 3:6] = Pyzview._str2rgb(color)
         if alpha is not None:
-            xyzrgba[:,6] = alpha
+            xyzrgba[:, 6] = alpha
         return xyzrgba
-    
+
     def connect(self):
         if self.zv is not None:
             return True
@@ -61,37 +63,48 @@ class Pyzview(metaclass=Singleton):
             self.zv = None
             return False
 
-
     def __init__(self):
         self.zv = None
         self.connect()
-        
-    
+
     def remove_shape(self, namehandle=""):
         self.zv.removeShape(namehandle)
-        
+
     def plot_points(self, namehandle, xyz, color=None, alpha=None):
         if not self.connect():
             return False
         xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
         ok = self.zv.plot(namehandle, xyzrgba)
         return ok
+
     def plot_mesh(self, namehandle, xyz, indices, color=None, alpha=None):
         if not self.connect():
             return False
         xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
-        ok = self.zv.plot(namehandle, xyzrgba, indices[:,0:3])
+        ok = self.zv.plot(namehandle, xyzrgba, indices[:, 0:3])
         return ok
+
     def plot_edges(self, namehandle, xyz, indices, color=None, alpha=None):
         if not self.connect():
             return False
         xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
-        ok = self.zv.plot(namehandle, xyzrgba, indices[:,0:2])
+        ok = self.zv.plot(namehandle, xyzrgba, indices[:, 0:2])
         return ok
-    def plot_marker(self,namehandle,shift,scale,rotation=np.eye(3), color=None, alpha=None):
-        xyz = (np.array([[0, 0, 0], [-2*scale, -scale/2, -scale/2], [-2*scale, scale/2, -scale/2], [-2*scale, 0,  scale/2]]) )@rotation.T+ shift
+
+    def plot_marker(
+        self, namehandle, shift, scale, rotation=np.eye(3), color=None, alpha=None
+    ):
+        xyz = (
+            np.array(
+                [
+                    [0, 0, 0],
+                    [-2 * scale, -scale / 2, -scale / 2],
+                    [-2 * scale, scale / 2, -scale / 2],
+                    [-2 * scale, 0, scale / 2],
+                ]
+            )
+        ) @ rotation.T + shift
         f = np.array([[0, 3, 1], [1, 3, 2], [0, 2, 3], [0, 2, 1]])
         xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
         ok = self.zv.plot(namehandle, xyzrgba, f)
         return ok
-

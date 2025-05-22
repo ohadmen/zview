@@ -1,9 +1,10 @@
 bazel_dep(name = "rules_cc", version = "0.0.17")
+bazel_dep(name = "platforms", version = "0.0.8")
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
 archive_override(
     module_name = "rules_boost",
-    urls = ["https://github.com/nelhage/rules_boost/archive/refs/heads/master.tar.gz"],
     strip_prefix = "rules_boost-master",
+    urls = ["https://github.com/nelhage/rules_boost/archive/refs/heads/master.tar.gz"],
     # It is recommended to edit the above URL and the below sha256 to point to a specific version of this repository.
     # integrity = "sha256-...",
 )
@@ -19,12 +20,11 @@ use_repo(
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     commit = "0e990032f3c5a866e72615cf67e5ce22186dcb97",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
 )
-
 
 bazel_dep(name = "catch2", version = "3.6.0")
 bazel_dep(name = "rules_python", version = "0.40.0")
@@ -33,20 +33,23 @@ bazel_dep(name = "eigen", version = "3.4.0.bcr.1")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 
-
 repositories_impl = use_extension("//third_party:repositories.bzl", "repositories_impl")
-use_repo(repositories_impl, "imgui","implot","imgui_file_dialog","sysroot")
+use_repo(repositories_impl, "imgui", "imgui_file_dialog", "implot", "sysroot")
 
+PYTHON_VERSION = "3.11"
 
-PYTHON_VERSION = "3.9" 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-python.toolchain(python_version = PYTHON_VERSION, is_default = True,ignore_root_user_error = True)
+python.toolchain(
+    ignore_root_user_error = True,
+    is_default = True,
+    python_version = PYTHON_VERSION,
+)
+
 pip.parse(
     hub_name = "python_pip_deps",
     python_version = PYTHON_VERSION,
     requirements_lock = "//:requirements.txt",
 )
 use_repo(pip, "python_pip_deps")
-
-
