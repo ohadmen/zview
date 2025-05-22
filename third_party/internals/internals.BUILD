@@ -1,8 +1,8 @@
 
 cc_library(
     name = "libglew",
-    srcs = glob(["local/lib64/libGLEW.*"]),
-    hdrs = glob(["local/include/GL/*.h"]),
+    srcs = glob(["lib/x86_64-linux-gnu/libGLEW.*"]),
+    hdrs = glob(["include/GL/*.h"]),
     linkopts = [
         "-lGLEW",
         "-lGL",
