@@ -34,5 +34,6 @@ py_test(
         requirement("numpy"),
         requirement("scipy"),
         ":pyzview",
+        "//packaging:zview"
     ],
 )

@@ -27,6 +27,7 @@ write_file(
 cc_binary(
     name = "zview",
     deps = ["//zview:zview_binary"],
+    visibility = ["//visibility:public"],
 )
 
 pkg_files(

@@ -1,6 +1,9 @@
+import os
 import platform
+from time import sleep
 
 print(platform.python_version())
+import subprocess
 import unittest
 import numpy as np
 from pyzview import Pyzview
@@ -8,6 +11,22 @@ from scipy.spatial.transform import Rotation as R
 
 
 class TestBasic(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        #run zview exectuable as recived from the //packaging:zview bazel target in a different process
+        # this is needed to test the interface
+        cls.zview_process = subprocess.Popen(["packaging/zview"], shell=True,
+                                              stdout=subprocess.PIPE,
+                                              stderr=subprocess.PIPE)
+        sleep(.1)
+    
+    @classmethod
+    def tearDownClass(cls):
+        # kill the zview process
+        cls.zview_process.kill()
+        cls.zview_process.wait()
+        
     def z_shifted(self, offset):
         n = 12345
         pts = (np.random.randn(n, 7)).astype(np.float32) * 10
@@ -38,7 +57,16 @@ class TestBasic(unittest.TestCase):
         assert Pyzview().plot_marker(
             "interface_check_marker", [0, 1, 2], 200, rot, color="r", alpha=50
         )
-
+    def test_cuboid(self):
+        rot = R.from_euler("zyx", [10, 20, 30], degrees=True).as_matrix()
+        assert Pyzview().plot_cuboid(
+            "interface_check_cuboid", [0, 0, 0], [.1,.2,.3], rot, color="r", alpha=25
+        )
+    def test_cuboid_edges(self):
+        rot = R.from_euler("zyx", [30, 60, 90], degrees=True).as_matrix()
+        assert Pyzview().plot_cuboid_edges(
+            "interface_check_cuboid_edges", [0, 0, 0], [.1,.2,.3], rot, color="g", alpha=128
+        )
 
 if __name__ == "__main__":
     unittest.main()
