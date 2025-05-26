@@ -108,7 +108,10 @@ class Pyzview(metaclass=Singleton):
         xyzrgba = self.xyz2xyzrgba(xyz, color, alpha)
         ok = self.zv.plot(namehandle, xyzrgba, f)
         return ok
-    def plot_cuboid(self,namehandle, shift, scale, rotation=np.eye(3), color=None, alpha=None):
+
+    def plot_cuboid(
+        self, namehandle, shift, scale, rotation=np.eye(3), color=None, alpha=None
+    ):
         xyz = (
             np.array(
                 [
@@ -122,13 +125,31 @@ class Pyzview(metaclass=Singleton):
                     [-1, 1, 1],
                 ]
             )
-        )* scale @ rotation.T  + shift
-        
-        f = np.array([[0, 3, 2], [0, 2, 1], [4, 5, 6], [4, 6, 7], [0, 4, 5], [0, 5, 1], [2, 3, 7], [2, 7, 6], [0, 3, 7], [0, 7, 4], [5, 6, 2], [5, 2 ,1]])
-        xyzrgba = self.xyz2xyzrgba(xyz,color= color , alpha=alpha)
-        ok = self.zv.plot(namehandle , xyzrgba , f)
+        ) * scale @ rotation.T + shift
+
+        f = np.array(
+            [
+                [0, 3, 2],
+                [0, 2, 1],
+                [4, 5, 6],
+                [4, 6, 7],
+                [0, 4, 5],
+                [0, 5, 1],
+                [2, 3, 7],
+                [2, 7, 6],
+                [0, 3, 7],
+                [0, 7, 4],
+                [5, 6, 2],
+                [5, 2, 1],
+            ]
+        )
+        xyzrgba = self.xyz2xyzrgba(xyz, color=color, alpha=alpha)
+        ok = self.zv.plot(namehandle, xyzrgba, f)
         return ok
-    def plot_cuboid_edges(self,namehandle, shift, scale, rotation=np.eye(3), color=None, alpha=None):
+
+    def plot_cuboid_edges(
+        self, namehandle, shift, scale, rotation=np.eye(3), color=None, alpha=None
+    ):
         xyz = (
             np.array(
                 [
@@ -142,9 +163,24 @@ class Pyzview(metaclass=Singleton):
                     [-1, 1, 1],
                 ]
             )
-        )* scale @ rotation.T  + shift
-        
-        e = np.array([[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]])
-        xyzrgba = self.xyz2xyzrgba(xyz,color= color , alpha=alpha)
-        ok = self.zv.plot(namehandle , xyzrgba , e)
+        ) * scale @ rotation.T + shift
+
+        e = np.array(
+            [
+                [0, 1],
+                [1, 2],
+                [2, 3],
+                [3, 0],
+                [4, 5],
+                [5, 6],
+                [6, 7],
+                [7, 4],
+                [0, 4],
+                [1, 5],
+                [2, 6],
+                [3, 7],
+            ]
+        )
+        xyzrgba = self.xyz2xyzrgba(xyz, color=color, alpha=alpha)
+        ok = self.zv.plot(namehandle, xyzrgba, e)
         return ok
