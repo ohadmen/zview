@@ -1,3 +1,7 @@
+"""
+Module dependencies and repository overrides for Bazel build.
+"""
+
 bazel_dep(name = "rules_cc", version = "0.0.17")
 bazel_dep(name = "platforms", version = "0.0.8")
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
@@ -36,7 +40,7 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 repositories_impl = use_extension("//third_party:repositories.bzl", "repositories_impl")
 use_repo(repositories_impl, "imgui", "imgui_file_dialog", "implot", "sysroot")
 
-PYTHON_VERSION = "3.11"
+PYTHON_VERSION = "3.10" 
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 

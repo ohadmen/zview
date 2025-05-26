@@ -3,19 +3,11 @@
 
 set -e -u -x
 
+dnf install dnf-plugins-core
+dnf copr enable ohadm/bazel -y
+dnf install bazel8 -y
 
-yum install -y wget
-# # Install a system package required by our library
-wget https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-9/vbatts-bazel-epel-9.repo
-mv vbatts-bazel-epel-9.repo /etc/yum.repos.d/
-dnf install -y dnf-plugins-core
-dnf copr enable -y vbatts/bazel
-dnf install -y bazel4
-
-
-yum install -y bazel6 --allowerasing
-
-# # Compile wheels
+ # Compile wheels
 cd /io
 
 cp MODULE.bazel MODULE.bazel_save
