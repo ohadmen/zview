@@ -1,10 +1,11 @@
 #!/usr/bin/make -f
+PACKAGE := zview
 
 %:
 	dh $@
 
 override_dh_auto_build:
-	bazel build packaging:zview --compilation_mode=opt
+	bazel build //packaging:zview --compilation_mode=opt
 	bazel build //packaging:gen_desktop_link
 
 override_dh_auto_install:

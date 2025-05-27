@@ -1,4 +1,4 @@
-zview (1.0.0) unstable; urgency=medium
+zview (2.0.6) unstable; urgency=medium
 
   * Initial release of the zview package.
   * Built using Bazel with target packaging:zview.
