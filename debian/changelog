@@ -1,4 +1,4 @@
-zview-debian-package (1.0.0) unstable; urgency=medium
+zview (1.0.0) unstable; urgency=medium
 
   * Initial release of the zview package.
   * Built using Bazel with target packaging:zview.

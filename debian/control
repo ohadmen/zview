@@ -1,12 +1,12 @@
-Source: zview-debian-package
+Source: zview
 Section: utils
 Priority: optional
 Maintainer: Ohad Menashe <ohad.men@gmail.com>
 Build-Depends: debhelper (>= 12)
-Standards-Version: 2.0.6
+Standards-Version: 4.5.0
 Homepage: https://github.com/ohadmen/zview/
 
-Package: zview-debian-package
+Package: zview
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: 3D viewer built with Bazel
