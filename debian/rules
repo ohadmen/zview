@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	bazel build packaging:zview --compilation_mode=opt
+
+override_dh_auto_install:
+	dh_auto_install -- DESTDIR=$(CURDIR)/debian/zview
+
+override_dh_clean:
+	dh_clean
+	bazel clean
