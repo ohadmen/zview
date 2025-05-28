@@ -1,0 +1,21 @@
+Format: 
+
+Source: zview
+Section: utils
+Priority: optional
+Maintainer: Ohad Menashe <ohad.men@gmail.com>
+Standards-Version: 4.5.0
+Homepage: https://github.com/ohadmen/zview/
+Vcs-Git: https://github.com/ohadmen/zview.git
+Vcs-Browser: https://github.com/ohadmen/zview/
+
+License: MIT
+License-File: /usr/share/common-licenses/MIT
+
+Files: *
+Copyright: 2025 Ohad Menashe <ohad.men@gmail.com>
+License: MIT
+
+Files: debian/*
+Copyright: 2025 Ohad Menashe <ohad.men@gmail.com>
+License: MIT

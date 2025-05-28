@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+PACKAGE := zview
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	bazel build //packaging:zview --compilation_mode=opt
+	bazel build //packaging:gen_desktop_link
+
+override_dh_auto_install:
+	install -d debian/$(PACKAGE)/usr/bin
+	install -m 0755 bazel-bin/packaging/zview debian/$(PACKAGE)/usr/bin/zview
+	install -D -m 0644 bazel-bin/packaging/zview.desktop debian/$(PACKAGE)/usr/share/applications/zview.desktop
+	install -D -m 0644 packaging/zview.png debian/$(PACKAGE)/usr/share/pixmaps/zview.png
+
+override_dh_clean:
+	dh_clean
+	bazel clean
