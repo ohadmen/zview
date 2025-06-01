@@ -1,7 +1,6 @@
-zview (2.0.6) unstable; urgency=medium
+zview (2.0.10) jammy; urgency=low
 
-  * Initial release of the zview package.
-  * Built using Bazel with target packaging:zview.
-  * Includes all necessary dependencies and configurations.
+  * use bazel binary
 
  -- Ohad Menashe <ohad.men@gmail.com>  Mon, 01 Jan 2024 00:00:00 +0000
+

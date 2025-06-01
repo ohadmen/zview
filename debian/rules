@@ -5,8 +5,8 @@ PACKAGE := zview
 	dh $@
 
 override_dh_auto_build:
-	bazel build //packaging:zview --compilation_mode=opt
-	bazel build //packaging:gen_desktop_link
+	./bazel-8.2.1-linux-x86_64 --output_user_root=/tmp/.bazel_output build //packag/tmp --compilation_mode=opt
+	./bazel-8.2.1-linux-x86_64 --output_user_root=/tmp/.bazel_output build //packaging:gen_desktop_link
 
 override_dh_auto_install:
 	install -d debian/$(PACKAGE)/usr/bin
@@ -16,4 +16,4 @@ override_dh_auto_install:
 
 override_dh_clean:
 	dh_clean
-	bazel clean
+	./bazel-8.2.1-linux-x86_64 --output_user_root=/tmp/.bazel_output clean
