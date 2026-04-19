@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include "zview/drawables/axis.h"
 #include "zview/drawables/backdrop.h"
 #include "zview/drawables/grid.h"
@@ -36,37 +38,33 @@ class ZviewInfImpl : public ZviewInf {
 
   std::array<int, 2> getWinSize() const;
 
-  void setCameraToViewSelectedKey(const std::vector<std::uint32_t> &keys);
+  void setCameraToViewSelectedKey(const std::vector<std::uint32_t>& keys);
 
-  void renderPhase(const types::Matrix4x4 &mvp) const;
+  void renderPhase(VkCommandBuffer cmd, const types::Matrix4x4& mvp) const;
 
-  std::optional<types::Vector3> pickingPhase(const types::Matrix4x4 &mvp);
+  void pickingPhase(VkCommandBuffer cmd, const types::Matrix4x4& mvp);
 
   void drawParamsMenu();
-
   void updateStatusBar();
-
   void drawHelpMenu();
-
   void processInput();
 
-  bool winResize(const ImVec2 &wh);
+  bool winResize(const ImVec2& wh);
 
-  std::uint32_t plotShape(types::Shape &&shape);
-
-  void remove_single_key(const std::string &name);
+  std::uint32_t plotShape(types::Shape&& shape);
+  void remove_single_key(const std::string& name);
 
  public:
   ZviewInfImpl();
 
   bool init() override;
   bool draw() override;
-  void loadFiles(const std::vector<std::string> &files) override;
-  void plot(const std::string &name, std::vector<Vertex> &&vertices,
-            std::vector<Face> &&faces) override;
-  void plot(const std::string &name, std::vector<Vertex> &&vertices) override;
-  void plot(const std::string &name, std::vector<Vertex> &&vertices,
-            std::vector<Edge> &&edges) override;
-  void remove(const std::string &name) override;
+  void loadFiles(const std::vector<std::string>& files) override;
+  void plot(const std::string& name, std::vector<Vertex>&& vertices,
+            std::vector<Face>&& faces) override;
+  void plot(const std::string& name, std::vector<Vertex>&& vertices) override;
+  void plot(const std::string& name, std::vector<Vertex>&& vertices,
+            std::vector<Edge>&& edges) override;
+  void remove(const std::string& name) override;
 };
 }  // namespace zview

@@ -2,18 +2,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "libglew",
-    srcs = glob(["lib/x86_64-linux-gnu/libGLEW.*"]),
-    hdrs = glob(["include/GL/*.h"]),
-    linkopts = [
-        "-lGLEW",
-        "-lGL",
-        "-ldl",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-cc_library(
     name = "libglfw",
     srcs = glob(["lib/x86_64-linux-gnu/libglfw.so.*"]),
     hdrs = glob(["include/GLFW/*.h"]),
@@ -23,6 +11,16 @@ cc_library(
 cc_library(
     name = "vulkan",
     srcs = glob(["lib/x86_64-linux-gnu/libvulkan.so.*"]),
-    hdrs = glob(["include/vulkan/*.h"]),
+    hdrs = glob([
+        "include/vulkan/*.h",
+        "include/vk_video/*.h",
+    ]),
+    linkopts = ["-lvulkan"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "glslangValidator",
+    srcs = ["bin/glslangValidator"],
     visibility = ["//visibility:public"],
 )

@@ -10,8 +10,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//zview",
-        "@sysroot//:libglew",
+        "//zview/graphics_backend:vulkan_context",
+        "@imgui//:imgui_glfw_backend",
+        "@imgui//:imgui_vulkan_backend",
         "@sysroot//:libglfw",
+        "@sysroot//:vulkan",
     ],
 )
 
@@ -36,11 +39,14 @@ cc_library(
     deps = [
         "//zview/drawables",
         "//zview/graphics_backend:frame_buffer",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/io",
         "//zview/io/shared_memory:server",
         "//zview/params",
         "//zview/ui:input_device_handler",
         "//zview/ui:tree_view",
+        "@imgui",
         "@imgui_file_dialog",
+        "@sysroot//:vulkan",
     ],
 )

@@ -1,4 +1,7 @@
 #pragma once
+#include <vk_mem_alloc.h>
+#include <vulkan/vulkan.h>
+
 #include <Eigen/Dense>
 #include <array>
 #include <cmath>
@@ -24,8 +27,7 @@ class Bbox3d {
   types::Vector3 m_max;
 
  public:
-  // ignore clang-tidy
-  //  NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Bbox3d(const types::Vector3 &mmin, const types::Vector3 &mmax)
       : m_min(mmin), m_max(mmax) {}
 
@@ -42,7 +44,6 @@ class VertData : public Vertex {
   constexpr VertData(float x_, float y_, float z_, uint8_t r_ = 255U,
                      uint8_t g_ = 255U, uint8_t b_ = 255U, uint8_t a_ = 255)
       : Vertex{x_, y_, z_, r_, g_, b_, a_} {}
-  // copy constructor from base class
   constexpr VertData(const Vertex &other) : Vertex(other) {}
 
   explicit VertData(const Vector3 &xyz,
@@ -55,17 +56,11 @@ class VertData : public Vertex {
   bool operator!=(const VertData &rhs) const {
     return x != rhs.x || y != rhs.y || z != rhs.z;
   }
-
   bool operator<(const VertData &rhs) const {
-    if (x != rhs.x) {
-      return x < rhs.x;
-    } else if (y != rhs.y) {
-      return y < rhs.y;
-    } else if (z != rhs.z) {
-      return z < rhs.z;
-    } else {
-      return false;
-    }
+    if (x != rhs.x) return x < rhs.x;
+    if (y != rhs.y) return y < rhs.y;
+    if (z != rhs.z) return z < rhs.z;
+    return false;
   }
 };
 using FaceIndx = std::array<uint32_t, 3U>;
@@ -74,31 +69,20 @@ using EdgeIndx = std::array<uint32_t, 2U>;
 class Pcl {
   std::string m_name{};
   std::vector<types::VertData> m_v{};
-  std::uint32_t m_vbo{0};
-  std::uint32_t m_vao{0};
-  // init shader
   Shader m_shader{};
   bool m_enabled{true};
 
  public:
-  std::uint32_t &vbo() { return m_vbo; }
-  std::uint32_t &vao() { return m_vao; }
-
-  std::uint32_t vbo() const { return m_vbo; }
-  std::uint32_t vao() const { return m_vao; }
+  VkBuffer vertexBuffer{VK_NULL_HANDLE};
+  VmaAllocation vertexAlloc{VK_NULL_HANDLE};
 
   explicit Pcl(const std::string &name) : m_name(name) {}
 
-  // default copy constructor
-  Pcl(const Pcl &other) = default;
-  // default assignment operator
-  Pcl &operator=(const Pcl &other) = default;
-  // default move constructor
-  Pcl(Pcl &&other) = default;
-  // default move assignment operator
-  Pcl &operator=(Pcl &&other) = default;
-  // default destructor
-  virtual ~Pcl() = default;
+  Pcl(const Pcl &) = delete;
+  Pcl &operator=(const Pcl &) = delete;
+  Pcl(Pcl &&) = default;
+  Pcl &operator=(Pcl &&) = default;
+  virtual ~Pcl();
 
   const std::string &getName() const { return m_name; }
   void setName(const std::string &name) { m_name = name; }
@@ -118,26 +102,21 @@ class Pcl {
 };
 
 class Mesh : public Pcl {
+ public:
+  VkBuffer indexBuffer{VK_NULL_HANDLE};
+  VmaAllocation indexAlloc{VK_NULL_HANDLE};
+
  private:
-  std::uint32_t m_ebo{0};
   std::vector<FaceIndx> m_f{};
 
  public:
-  std::uint32_t &ebo() { return m_ebo; }
-  std::uint32_t ebo() const { return m_ebo; }
-
   explicit Mesh(const std::string &name) : Pcl(name) {}
 
-  // default copy constructor
-  Mesh(const Mesh &other) = default;
-  // default assignment operator
-  Mesh &operator=(const Mesh &other) = default;
-  // default move constructor
-  Mesh(Mesh &&other) = default;
-  // default move assignment operator
-  Mesh &operator=(Mesh &&other) = default;
-  // default destructor
-  ~Mesh() override = default;
+  Mesh(const Mesh &) = delete;
+  Mesh &operator=(const Mesh &) = delete;
+  Mesh(Mesh &&) = default;
+  Mesh &operator=(Mesh &&) = default;
+  ~Mesh() override;
 
   std::vector<FaceIndx> &f() { return m_f; }
   const std::vector<FaceIndx> &f() const { return m_f; }
@@ -147,26 +126,21 @@ class Mesh : public Pcl {
 };
 
 class Edges : public Pcl {
+ public:
+  VkBuffer indexBuffer{VK_NULL_HANDLE};
+  VmaAllocation indexAlloc{VK_NULL_HANDLE};
+
  private:
-  std::uint32_t m_ebo{0};
   std::vector<EdgeIndx> m_e{};
 
  public:
-  std::uint32_t &ebo() { return m_ebo; }
-  std::uint32_t ebo() const { return m_ebo; }
-
   explicit Edges(const std::string &name) : Pcl(name) {}
 
-  // default copy constructor
-  Edges(const Edges &other) = default;
-  // default assignment operator
-  Edges &operator=(const Edges &other) = default;
-  // default move constructor
-  Edges(Edges &&other) = default;
-  // default move assignment operator
-  Edges &operator=(Edges &&other) = default;
-  // default destructor
-  ~Edges() override = default;
+  Edges(const Edges &) = delete;
+  Edges &operator=(const Edges &) = delete;
+  Edges(Edges &&) = default;
+  Edges &operator=(Edges &&) = default;
+  ~Edges() override;
 
   std::vector<EdgeIndx> &e() { return m_e; }
   const std::vector<EdgeIndx> &e() const { return m_e; }

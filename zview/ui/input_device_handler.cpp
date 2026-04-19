@@ -17,6 +17,13 @@ std::complex<float> gaussianFunc(const float x) {
 }
 namespace zview {
 
+static types::Edges cloneEdges(const types::Edges &src) {
+  types::Edges dst{src.getName()};
+  dst.v() = src.v();
+  dst.e() = src.e();
+  return dst;
+}
+
 void InputDeviceHandler::fillHitScreenLut() {
   for (size_t i{0}; i < m_hit_screen_lut.size(); ++i) {
     const auto z =
@@ -123,21 +130,18 @@ void InputDeviceHandler::step(
                     .squaredNorm();
       m_statusBarUpdate(StatusBar::StatusField::MEASURED_DISTANCE,
                         "measured distance: " + std::to_string(d));
-      auto s = m_measurement_edge.value();
-      m_addShape(s);
+      m_addShape(cloneEdges(m_measurement_edge.value()));
     }
     if (ImGui::IsKeyPressed(ImGuiKey_D)) {
       static const std::string name{"measurements/distance_measurement"};
       // pressing key
       if (!m_measurement_edge) {
         // new measurement
-
         m_measurement_edge = types::Edges{name};
         m_measurement_edge.value().e().push_back({0, 1});
         types::VertData v{hover_point.value(), {0, 255, 0, 128}};
         m_measurement_edge.value().v() = {v, v};
-        auto s = m_measurement_edge.value();
-        m_addShape(s);
+        m_addShape(cloneEdges(m_measurement_edge.value()));
       } else {
         // existing measurement
         const float d = (types::Vector3(m_measurement_edge.value().v()[0]) -
@@ -145,8 +149,9 @@ void InputDeviceHandler::step(
                             .squaredNorm();
         const std::string new_name =
             "measurements/distance=" + std::to_string(d);
-        m_measurement_edge.value().setName(new_name);
-        m_addShape(m_measurement_edge.value());
+        auto final_edge = cloneEdges(m_measurement_edge.value());
+        final_edge.setName(new_name);
+        m_addShape(std::move(final_edge));
         m_removeShape(name);
         m_measurement_edge = std::nullopt;
         m_statusBarUpdate(StatusBar::StatusField::MEASURED_DISTANCE, "");

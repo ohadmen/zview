@@ -127,7 +127,7 @@ std::vector<types::Shape> ReaderPcd::read(const std::string &fn) {
     auto elems = readVerts(ss);
     types::Pcl obj{name};
     obj.v() = elems;
-    container.emplace_back(obj);
+    container.emplace_back(std::move(obj));
   }
   return container;
 }

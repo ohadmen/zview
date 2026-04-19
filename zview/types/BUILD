@@ -21,5 +21,7 @@ cc_library(
         "//zview/graphics_backend:shader",
         "//zview/types:external_types",
         "@eigen",
+        "@sysroot//:vulkan",
+        "@vma",
     ],
 )

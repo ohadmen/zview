@@ -1,107 +1,63 @@
 #include "zview/drawables/shape_init_visitor.h"
 
-#include <GL/glew.h>  // Initialize with glewInit()
-#include <GLFW/glfw3.h>
+#include "zview/graphics_backend/vk_buffer_utils.h"
+#include "zview/graphics_backend/vulkan_context.h"
 
-#include "zview/utils/recast.h"
 namespace zview {
 
-bool ShapeInitVisitor::operator()(types::Pcl &obj) const {
-  if (!obj.shader().init(Shader::ShaderType::PCL)) {
+bool ShapeInitVisitor::operator()(types::Pcl& obj) const {
+  auto& ctx = VulkanContext::get();
+  if (!obj.shader().init(Shader::ShaderType::PCL, ctx.offscreenRenderPass,
+                         /*blend=*/true, /*depth=*/true,
+                         VK_PRIMITIVE_TOPOLOGY_POINT_LIST))
     return false;
-  }
-
-  const auto verts = obj.v();
-  glGenVertexArrays(1, &obj.vao());
-  glGenBuffers(1, &obj.vbo());
-
-  glBindVertexArray(obj.vao());
-  glBindBuffer(GL_ARRAY_BUFFER, obj.vbo());
-  glBufferData(
-      GL_ARRAY_BUFFER,
-      static_cast<std::int64_t>(verts.size() * sizeof(types::VertData)),
-      verts.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                        recast<void *>(std::uint64_t{0}));
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(
-      1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
-      recast<void *>(std::uint64_t{12}));  // 3 * sizeof(float)
-  glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  bool ok = glGetError() == GL_NO_ERROR;
-  return ok;
+  const auto& verts = obj.v();
+  if (verts.empty()) return true;
+  return uploadBuffer(verts.data(), verts.size() * sizeof(types::VertData),
+                      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, obj.vertexBuffer,
+                      obj.vertexAlloc);
 }
-bool ShapeInitVisitor::operator()(types::Edges &obj) const {
-  if (!obj.shader().init(Shader::ShaderType::EDGES)) {
+
+bool ShapeInitVisitor::operator()(types::Edges& obj) const {
+  auto& ctx = VulkanContext::get();
+  if (!obj.shader().init(Shader::ShaderType::EDGES, ctx.offscreenRenderPass,
+                         /*blend=*/true, /*depth=*/true,
+                         VK_PRIMITIVE_TOPOLOGY_LINE_LIST))
     return false;
-  }
-
-  const auto indices = obj.e();
-  const auto verts = obj.v();
-  glGenVertexArrays(1, &obj.vao());
-  glGenBuffers(1, &obj.vbo());
-  glGenBuffers(1, &obj.ebo());
-  glBindVertexArray(obj.vao());
-  glBindBuffer(GL_ARRAY_BUFFER, obj.vbo());
-  glBufferData(
-      GL_ARRAY_BUFFER,
-      static_cast<std::int64_t>(verts.size() * sizeof(types::VertData)),
-      verts.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.ebo());
-  glBufferData(
-      GL_ELEMENT_ARRAY_BUFFER,
-      static_cast<std::int64_t>(indices.size() * sizeof(types::EdgeIndx)),
-      indices.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                        recast<void *>(std::uint64_t{0}));
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(
-      1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
-      recast<void *>(std::uint64_t{12}));  // 3 * sizeof(float)
-  glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  bool ok = glGetError() == GL_NO_ERROR;
-  return ok;
-}
-bool ShapeInitVisitor::operator()(types::Mesh &obj) const {
-  if (!obj.shader().init(Shader::ShaderType::MESH)) {
+  const auto& verts = obj.v();
+  if (!verts.empty() &&
+      !uploadBuffer(verts.data(), verts.size() * sizeof(types::VertData),
+                    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, obj.vertexBuffer,
+                    obj.vertexAlloc))
     return false;
-  }
-
-  const auto indices = obj.f();
-  const auto verts = obj.v();
-
-  glGenVertexArrays(1, &obj.vao());
-
-  glGenBuffers(1, &obj.vbo());
-  glGenBuffers(1, &obj.ebo());
-  glBindVertexArray(obj.vao());
-  glBindBuffer(GL_ARRAY_BUFFER, obj.vbo());
-  glBufferData(
-      GL_ARRAY_BUFFER,
-      static_cast<std::int64_t>(verts.size() * sizeof(types::VertData)),
-      verts.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.ebo());
-
-  glBufferData(
-      GL_ELEMENT_ARRAY_BUFFER,
-      static_cast<std::int64_t>(indices.size() * sizeof(types::FaceIndx)),
-      indices.data(), GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-                        recast<void *>(std::uint64_t{0}));
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(
-      1, 4, GL_UNSIGNED_BYTE, GL_FALSE, 4 * sizeof(float),
-      recast<void *>(std::uint64_t{12}));  // 3 * sizeof(float)
-  glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  const auto err_num = glGetError();
-
-  return err_num == GL_NO_ERROR;
+  const auto& edges = obj.e();
+  if (!edges.empty() &&
+      !uploadBuffer(edges.data(), edges.size() * sizeof(types::EdgeIndx),
+                    VK_BUFFER_USAGE_INDEX_BUFFER_BIT, obj.indexBuffer,
+                    obj.indexAlloc))
+    return false;
+  return true;
 }
+
+bool ShapeInitVisitor::operator()(types::Mesh& obj) const {
+  auto& ctx = VulkanContext::get();
+  if (!obj.shader().init(Shader::ShaderType::MESH, ctx.offscreenRenderPass,
+                         /*blend=*/true, /*depth=*/true,
+                         VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST))
+    return false;
+  const auto& verts = obj.v();
+  if (!verts.empty() &&
+      !uploadBuffer(verts.data(), verts.size() * sizeof(types::VertData),
+                    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, obj.vertexBuffer,
+                    obj.vertexAlloc))
+    return false;
+  const auto& faces = obj.f();
+  if (!faces.empty() &&
+      !uploadBuffer(faces.data(), faces.size() * sizeof(types::FaceIndx),
+                    VK_BUFFER_USAGE_INDEX_BUFFER_BIT, obj.indexBuffer,
+                    obj.indexAlloc))
+    return false;
+  return true;
+}
+
 }  // namespace zview

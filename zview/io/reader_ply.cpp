@@ -211,8 +211,7 @@ std::vector<types::Shape> ReaderPly::read(const std::string &fn) {
       }
     }
     auto elems = readElems(elemHeaders, ss);
-    types::Shape obj = elemArrayToshape(elems, name);
-    container.emplace_back(obj);
+    container.emplace_back(elemArrayToshape(elems, name));
   }
   return container;
 }

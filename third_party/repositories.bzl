@@ -31,6 +31,14 @@ def _repositories_impl(ctx):
         build_file = "//third_party/imgui_file_dialog:imgui_file_dialog.BUILD",
     )
 
+    http_archive(
+        name = "vma",
+        sha256 = "ae134ecc37c55634f108e926f85d5d887b670360e77cd107affaf3a9539595f2",
+        strip_prefix = "VulkanMemoryAllocator-3.1.0",
+        url = "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.1.0.tar.gz",
+        build_file = "//third_party:vma.BUILD",
+    )
+
     new_local_repository(
         name = "sysroot",
         build_file = "@//third_party/internals:internals.BUILD",

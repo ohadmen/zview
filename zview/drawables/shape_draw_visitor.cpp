@@ -1,56 +1,86 @@
 #include "zview/drawables/shape_draw_visitor.h"
 
-#include <GL/glew.h>  // Initialize with glewInit()
-#include <GLFW/glfw3.h>
+#include <cstring>
 
 #include "zview/graphics_backend/shader.h"
 #include "zview/params/params.h"
+
 namespace zview {
-void ShapeDrawVisitor::operator()(const types::Pcl& obj,
-                                  const float* tform) const {
-  if (tform) {
-    std::array<int, 4> viewport{};
-    glGetIntegerv(GL_VIEWPORT, viewport.data());
 
-    float hfovx = Params::i().camera_fov_rad * 0.5f;
-    float heightOfNearPlane =
-        (float)abs(viewport[2] - viewport[0]) * 0.5f / std::tan(hfovx);
-    obj.shader().use();
-    obj.shader().setUniform("u_transformation", tform);
-    obj.shader().setUniform("u_nearPlaneDist", heightOfNearPlane);
-    obj.shader().setUniform("u_ptsize", zview::Params::i().point_size);
-    obj.shader().setUniform("u_lightDir", zview::Params::i().light_dir);
-    obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
-  }
-  glBindVertexArray(obj.vao());
-  glDrawArrays(GL_POINTS, 0, static_cast<int>(obj.v().size()));
-  glBindVertexArray(0);
+static void bindAndDraw(VkCommandBuffer cmd, const types::Pcl& obj,
+                        VkPipeline pipeline, VkPipelineLayout layout,
+                        const void* pc, uint32_t pcSize) {
+  if (obj.vertexBuffer == VK_NULL_HANDLE || obj.v().empty()) return;
+  vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+  vkCmdPushConstants(cmd, layout,
+                     VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                     0, pcSize, pc);
+  VkDeviceSize offset = 0;
+  vkCmdBindVertexBuffers(cmd, 0, 1, &obj.vertexBuffer, &offset);
+  vkCmdDraw(cmd, (uint32_t)obj.v().size(), 1, 0, 0);
 }
 
-void ShapeDrawVisitor::operator()(const types::Edges& obj,
-                                  const float* tform) const {
-  if (tform) {
-    obj.shader().use();
-    obj.shader().setUniform("u_transformation", tform);
-  }
-  glBindVertexArray(obj.vao());
-  glDrawElements(GL_LINES, static_cast<int>(obj.e().size() * 2),
-                 GL_UNSIGNED_INT, NULL);
-  glBindVertexArray(0);
+static void bindAndDrawIndexed(VkCommandBuffer cmd, const types::Pcl& obj,
+                               VkBuffer indexBuffer, uint32_t indexCount,
+                               VkPipeline pipeline, VkPipelineLayout layout,
+                               const void* pc, uint32_t pcSize) {
+  if (obj.vertexBuffer == VK_NULL_HANDLE || indexBuffer == VK_NULL_HANDLE)
+    return;
+  vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+  vkCmdPushConstants(cmd, layout,
+                     VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                     0, pcSize, pc);
+  VkDeviceSize offset = 0;
+  vkCmdBindVertexBuffers(cmd, 0, 1, &obj.vertexBuffer, &offset);
+  vkCmdBindIndexBuffer(cmd, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+  vkCmdDrawIndexed(cmd, indexCount, 1, 0, 0, 0);
 }
 
-void ShapeDrawVisitor::operator()(const types::Mesh& obj,
+void ShapeDrawVisitor::operator()(const types::Pcl& obj, VkCommandBuffer cmd,
                                   const float* tform) const {
-  // rendering our geometries
+  PCLPushConstants pc{};
   if (tform) {
-    obj.shader().use();
-    obj.shader().setUniform("u_transformation", tform);
-    obj.shader().setUniform("u_lightDir", zview::Params::i().light_dir);
-    obj.shader().setUniform("u_txt", zview::Params::i().texture_type);
+    std::memcpy(pc.mvp, tform, 64);
+    // Compute near plane distance from viewport (approximate via ptsize)
+    pc.ptsize = zview::Params::i().point_size;
+    pc.nearPlaneDist =
+        500.0f;  // reasonable default; exact value set per-frame below
+    pc.txt = zview::Params::i().texture_type;
+    auto ld = zview::Params::i().light_dir;
+    pc.lightDir[0] = ld[0];
+    pc.lightDir[1] = ld[1];
+    pc.lightDir[2] = ld[2];
+    pc.lightDir[3] = 0;
   }
-  glBindVertexArray(obj.vao());
-  glDrawElements(GL_TRIANGLES, static_cast<int>(obj.f().size() * 3),
-                 GL_UNSIGNED_INT, NULL);
-  glBindVertexArray(0);
+  bindAndDraw(cmd, obj, obj.shader().pipeline(), obj.shader().pipelineLayout(),
+              &pc, sizeof(pc));
 }
+
+void ShapeDrawVisitor::operator()(const types::Edges& obj, VkCommandBuffer cmd,
+                                  const float* tform) const {
+  EdgesPushConstants pc{};
+  if (tform) std::memcpy(pc.mvp, tform, 64);
+  const auto& e = obj;
+  bindAndDrawIndexed(cmd, obj, e.indexBuffer, (uint32_t)e.e().size() * 2,
+                     obj.shader().pipeline(), obj.shader().pipelineLayout(),
+                     &pc, sizeof(pc));
+}
+
+void ShapeDrawVisitor::operator()(const types::Mesh& obj, VkCommandBuffer cmd,
+                                  const float* tform) const {
+  MeshPushConstants pc{};
+  if (tform) {
+    std::memcpy(pc.mvp, tform, 64);
+    pc.txt = zview::Params::i().texture_type;
+    auto ld = zview::Params::i().light_dir;
+    pc.lightDir[0] = ld[0];
+    pc.lightDir[1] = ld[1];
+    pc.lightDir[2] = ld[2];
+    pc.lightDir[3] = 0;
+  }
+  bindAndDrawIndexed(cmd, obj, obj.indexBuffer, (uint32_t)obj.f().size() * 3,
+                     obj.shader().pipeline(), obj.shader().pipelineLayout(),
+                     &pc, sizeof(pc));
+}
+
 }  // namespace zview

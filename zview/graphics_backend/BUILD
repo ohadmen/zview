@@ -2,21 +2,37 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "graphics_backend",
-    srcs = [
-        "imgui_impl_glfw.cpp",
-        "imgui_impl_opengl3.cpp",
-    ],
-    hdrs = [
-        "imgui_impl_glfw.h",
-        "imgui_impl_opengl3.h",
-        "imgui_impl_opengl3_loader.h",
-    ],
     visibility = ["//visibility:public"],
     deps = [
-        "@eigen",
         "@imgui",
-        "@sysroot//:libglew",
+        "@imgui//:imgui_glfw_backend",
+        "@imgui//:imgui_vulkan_backend",
         "@sysroot//:libglfw",
+        "@sysroot//:vulkan",
+    ],
+)
+
+cc_library(
+    name = "vulkan_context",
+    srcs = ["vulkan_context.cpp"],
+    hdrs = ["vulkan_context.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@imgui//:imgui_vulkan_backend",
+        "@sysroot//:libglfw",
+        "@sysroot//:vulkan",
+        "@vma",
+    ],
+)
+
+cc_library(
+    name = "vk_buffer_utils",
+    hdrs = ["vk_buffer_utils.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":vulkan_context",
+        "@sysroot//:vulkan",
+        "@vma",
     ],
 )
 
@@ -26,8 +42,9 @@ cc_library(
     hdrs = ["shader.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//zview/graphics_backend",
-        "//zview/graphics_backend/shader_code",
+        ":vulkan_context",
+        "//zview/graphics_backend/shader_code:shader_spirv",
+        "@sysroot//:vulkan",
     ],
 )
 
@@ -37,6 +54,9 @@ cc_library(
     hdrs = ["frame_buffer.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//zview/graphics_backend",
+        ":vulkan_context",
+        "@imgui//:imgui_vulkan_backend",
+        "@sysroot//:vulkan",
+        "@vma",
     ],
 )

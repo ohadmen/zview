@@ -1,4 +1,6 @@
 #pragma once
+#include <vulkan/vulkan.h>
+
 #include "zview/types/types.h"
 namespace zview {
 class Backdrop : public types::Mesh {
@@ -9,6 +11,6 @@ class Backdrop : public types::Mesh {
   Backdrop();
 
   bool init(std::uint8_t background_color);
-  void draw() const;
+  void draw(VkCommandBuffer cmd) const;
 };
 }  // namespace zview

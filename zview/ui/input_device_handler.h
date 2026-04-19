@@ -1,6 +1,5 @@
 #pragma once
-#include <GL/glew.h>  // Initialize with glewInit()
-#include <GLFW/glfw3.h>
+#include <imgui.h>
 
 #include "zview/drawables/statusbar.h"
 #include "zview/geometry/mvp_mat.h"

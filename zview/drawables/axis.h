@@ -1,4 +1,6 @@
 #pragma once
+#include <vulkan/vulkan.h>
+
 #include "zview/geometry/mvp_mat.h"
 #include "zview/types/types.h"
 namespace zview {
@@ -11,6 +13,6 @@ class Axis : public types::Mesh {
  public:
   explicit Axis(const MVPmat &mvp);
   bool init();
-  void draw() const;
+  void draw(VkCommandBuffer cmd) const;
 };
 }  // namespace zview

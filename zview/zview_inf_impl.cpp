@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include "zview/graphics_backend/vulkan_context.h"
 #include "zview/io/read_file.h"
 #include "zview/params/params.h"
 #include "zview/utils/recast.h"
@@ -147,7 +148,6 @@ bool ZviewInfImpl::winResize(const ImVec2 &wh) {
     std::cerr << "frame buffer init failed" << std::endl;
     return false;
   }
-
   return true;
 }
 
@@ -196,6 +196,10 @@ bool ZviewInfImpl::draw() {
   m_status_bar.draw(sz);
   updateStatusBar();
 
+  if (sz.x <= 0 || sz.y <= 0) {
+    return true;  // window not laid out yet — skip rendering this frame
+  }
+
   if (!winResize(sz)) {
     return false;
   }
@@ -205,63 +209,59 @@ bool ZviewInfImpl::draw() {
   }
   m_sms.step();
 
-  m_fbo.bind();
-  renderPhase(transformation);
-  m_fbo.unbind();
-  m_hover_point = pickingPhase(transformation);
+  // The command buffer for the current frame is recorded externally in the
+  // Vulkan main loop (zview_binary.cpp). Here we only record into it.
+  auto &ctx = VulkanContext::get();
+  VkCommandBuffer cmd = ctx.cmdBuffers[ctx.currentFrame];
 
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-  ImGui::Image(
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,performance-no-int-to-ptr)
-      reinterpret_cast<void *>(m_fbo.txt()),
-      ImVec2{static_cast<float>(sz[0]), static_cast<float>(sz[1])},
-      ImVec2(0, 1), ImVec2{1, 0});
-  ImGui::PopStyleVar();
+  m_fbo.bind(cmd);
+  renderPhase(cmd, transformation);
+  m_fbo.unbind(cmd);
+
+  m_picking.bind(cmd);
+  pickingPhase(cmd, transformation);
+  m_picking.unbind(cmd);
+
+  // readPixel uses the readback buffer written during unbind (same cmd buffer).
+  // The fence is waited in the main loop before we get here.
+  const auto mouse_rel =
+      ImGui::GetMousePos() - ImGui::GetWindowPos() - ImVec2{10, 10};
+  const auto pix = m_picking.readPixel(static_cast<int>(mouse_rel.x),
+                                       static_cast<int>(mouse_rel.y));
+  if (pix.valid == 1) {
+    const auto r = m_mvp.getRay(mouse_rel, MVPmat::CoordinateSystem::GLOBAL);
+    m_hover_point = m_buffer.get3dLocation(pix.object_id, pix.prim_id, r);
+  } else {
+    m_hover_point.reset();
+  }
+
+  if (m_fbo.imguiTexture() != VK_NULL_HANDLE) {
+    ImGui::Image(reinterpret_cast<void *>(m_fbo.imguiTexture()),
+                 ImVec2{sz.x, sz.y}, ImVec2(0, 1), ImVec2{1, 0});
+  }
 
   return true;
 }
 
-void ZviewInfImpl::renderPhase(const types::Matrix4x4 &mvp) const {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  m_backdrop.draw();
+void ZviewInfImpl::renderPhase(VkCommandBuffer cmd,
+                               const types::Matrix4x4 &mvp) const {
+  m_backdrop.draw(cmd);
   if (m_show_grid) {
-    m_grid.draw(mvp, m_mvp.getModelTranslation().translation(),
+    m_grid.draw(cmd, mvp, m_mvp.getModelTranslation().translation(),
                 m_mvp.getViewDistance());
   }
-  m_axis.draw();
-
-  m_buffer.draw(mvp.data());
+  m_axis.draw(cmd);
+  m_buffer.draw(cmd, mvp.data());
 }
-std::optional<types::Vector3> ZviewInfImpl::pickingPhase(
-    const types::Matrix4x4 &mvp) {
-  m_picking.bind();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  m_picking.setTransform(mvp);
-  auto &picking = m_picking;
-  const auto preDrawFunction =
-      [&picking](const std::pair<std::uint32_t, types::Shape> &s) {
-        picking.setObjectIndex(s.first);
-      };
-  m_buffer.draw(nullptr, preDrawFunction);
-  m_picking.unbind();
-  // get mouse position relative to the current window, reducing the window
-  // offset
-  const auto mouse_rel =
-      ImGui::GetMousePos() - ImGui::GetWindowPos() - ImVec2{10, 10};
 
-  const auto pix = m_picking.readPixel(static_cast<int>(mouse_rel.x),
-                                       static_cast<int>(mouse_rel.y));
-
-  if (pix.valid == 1) {
-    const auto r = m_mvp.getRay(mouse_rel, MVPmat::CoordinateSystem::GLOBAL);
-
-    auto pt = m_buffer.get3dLocation(pix.object_id, pix.prim_id, r);
-
-    return pt;
+void ZviewInfImpl::pickingPhase(VkCommandBuffer cmd,
+                                const types::Matrix4x4 &mvp) {
+  for (const auto &[key, shape] : m_buffer) {
+    const bool enabled =
+        std::visit([](const auto &v) { return v.enabled(); }, shape);
+    if (!enabled) continue;
+    m_picking.drawShapeForPicking(cmd, shape, key, mvp);
   }
-
-  return {};
 }
 void ZviewInfImpl::updateStatusBar() {
   {
@@ -363,7 +363,7 @@ void ZviewInfImpl::plot(const std::string &name,
                         std::vector<Vertex> &&vertices) {
   types::Pcl pcl{name};
   pcl.v() = std::move(*recast<std::vector<types::VertData> *>(&vertices));
-  plotShape(pcl);
+  plotShape(std::move(pcl));
 }
 void ZviewInfImpl::plot(const std::string &name, std::vector<Vertex> &&vertices,
                         std::vector<Face> &&faces) {
@@ -373,7 +373,7 @@ void ZviewInfImpl::plot(const std::string &name, std::vector<Vertex> &&vertices,
   // To save copying, we can reinterpret_cast the vector of faces to a vector of
   // types::FaceIndx NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   mesh.f() = std::move(*recast<std::vector<types::FaceIndx> *>(&faces));
-  plotShape(mesh);
+  plotShape(std::move(mesh));
 }
 void ZviewInfImpl::plot(const std::string &name, std::vector<Vertex> &&vertices,
                         std::vector<Edge> &&edges) {
@@ -386,7 +386,7 @@ void ZviewInfImpl::plot(const std::string &name, std::vector<Vertex> &&vertices,
   // To save copying, we can reinterpret_cast the vector of edges to a vector of
   // types::EdgeIndx NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   graph.e() = std::move(*recast<std::vector<types::EdgeIndx> *>(&edges));
-  plotShape(graph);
+  plotShape(std::move(graph));
 }
 
 void ZviewInfImpl::remove_single_key(const std::string &name) {

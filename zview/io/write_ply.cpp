@@ -82,16 +82,22 @@ struct Writer {
   }
 };
 
-void io::writePly(std::string fn, const std::vector<types::Shape> &shapes) {
+static std::string ensurePlyExtension(std::string fn) {
   auto pos = fn.find_last_of('.');
-  std::string suffix =
-      pos == std::string::npos ? fn : fn.substr(pos, std::string::npos);
+  std::string suffix = pos == std::string::npos ? fn : fn.substr(pos);
   if (suffix != ".ply") fn += ".ply";
+  return fn;
+}
 
-  Writer w(fn);
+void io::writePly(std::string fn, const std::vector<types::Shape> &shapes) {
+  Writer w(ensurePlyExtension(std::move(fn)));
+  for (const auto &objv : shapes) std::visit(w, objv);
+}
 
-  for (const auto &objv : shapes) {
-    std::visit(w, objv);
-  }
+void io::writePly(
+    std::string fn,
+    const std::unordered_map<std::uint32_t, types::Shape> &shapes) {
+  Writer w(ensurePlyExtension(std::move(fn)));
+  for (const auto &kv : shapes) std::visit(w, kv.second);
 }
 };  // namespace zview

@@ -2,8 +2,29 @@
 
 #include <limits>
 #include <string>
+
+#include "zview/graphics_backend/vulkan_context.h"
+
 namespace zview {
 namespace types {
+
+Pcl::~Pcl() {
+  auto &ctx = VulkanContext::get();
+  if (ctx.allocator == VK_NULL_HANDLE) return;
+  if (vertexBuffer) vmaDestroyBuffer(ctx.allocator, vertexBuffer, vertexAlloc);
+}
+
+Mesh::~Mesh() {
+  auto &ctx = VulkanContext::get();
+  if (ctx.allocator == VK_NULL_HANDLE) return;
+  if (indexBuffer) vmaDestroyBuffer(ctx.allocator, indexBuffer, indexAlloc);
+}
+
+Edges::~Edges() {
+  auto &ctx = VulkanContext::get();
+  if (ctx.allocator == VK_NULL_HANDLE) return;
+  if (indexBuffer) vmaDestroyBuffer(ctx.allocator, indexBuffer, indexAlloc);
+}
 Bbox3d Pcl::getBbox() const {
   static const float e = 0.001f;
   if (m_v.size() == 0) {

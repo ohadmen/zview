@@ -7,6 +7,7 @@ cc_library(
         ":axis",
         ":backdrop",
         ":grid",
+        ":picking_texture",
         ":shape_buffer",
         ":statusbar",
     ],
@@ -21,6 +22,7 @@ cc_library(
     visibility = ["//visibility:__pkg__"],
     deps = [
         "//zview/drawables:shape_interface",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/types",
     ],
 )
@@ -31,24 +33,26 @@ cc_library(
         "picking_texture.cpp",
     ],
     hdrs = ["picking_texture.h"],
-    visibility = ["//visibility:__pkg__"],
+    visibility = ["//visibility:public"],
     deps = [
+        "//zview/drawables:shape_interface",
         "//zview/graphics_backend:frame_buffer",
         "//zview/graphics_backend:shader",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/types",
+        "@sysroot//:vulkan",
+        "@vma",
     ],
 )
 
 cc_library(
     name = "shape_interface",
     srcs = [
-        "picking_texture.cpp",
         "shape_draw_visitor.cpp",
         "shape_init_visitor.cpp",
         "shape_update_visitor.cpp",
     ],
     hdrs = [
-        "picking_texture.h",
         "shape_draw_visitor.h",
         "shape_init_visitor.h",
         "shape_update_visitor.h",
@@ -56,10 +60,15 @@ cc_library(
     visibility = ["//visibility:__pkg__"],
     deps = [
         "//zview/graphics_backend:frame_buffer",
+        "//zview/graphics_backend:shader",
+        "//zview/graphics_backend:vk_buffer_utils",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/io",
         "//zview/params",
         "//zview/types",
         "//zview/utils:recast",
+        "@sysroot//:vulkan",
+        "@vma",
     ],
 )
 
@@ -72,6 +81,8 @@ cc_library(
     visibility = ["//visibility:__pkg__"],
     deps = [
         "//zview/drawables:shape_interface",
+        "//zview/graphics_backend:shader",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/types",
     ],
 )
@@ -86,6 +97,8 @@ cc_library(
     deps = [
         "//zview/drawables:shape_interface",
         "//zview/geometry:mvp_mat",
+        "//zview/graphics_backend:shader",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/params",
         "//zview/types",
     ],
@@ -101,6 +114,8 @@ cc_library(
     deps = [
         "//zview/drawables:shape_interface",
         "//zview/geometry:mvp_mat",
+        "//zview/graphics_backend:shader",
+        "//zview/graphics_backend:vulkan_context",
         "//zview/params",
         "//zview/types",
     ],

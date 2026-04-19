@@ -1,166 +1,233 @@
 #include "zview/graphics_backend/shader.h"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "zview/graphics_backend/vulkan_context.h"
 
-#include <array>
+// Generated SPIR-V headers
 #include <iostream>
 
-#include "zview/graphics_backend/shader_code/edges_shader_code.h"
-#include "zview/graphics_backend/shader_code/grid_shader_code.h"
-#include "zview/graphics_backend/shader_code/mesh_shader_code.h"
-#include "zview/graphics_backend/shader_code/pcl_shader_code.h"
-#include "zview/graphics_backend/shader_code/picking_shader_code.h"
+#include "zview/graphics_backend/shader_code/edges.frag.spv.h"
+#include "zview/graphics_backend/shader_code/edges.vert.spv.h"
+#include "zview/graphics_backend/shader_code/grid.frag.spv.h"
+#include "zview/graphics_backend/shader_code/grid.vert.spv.h"
+#include "zview/graphics_backend/shader_code/mesh.frag.spv.h"
+#include "zview/graphics_backend/shader_code/mesh.vert.spv.h"
+#include "zview/graphics_backend/shader_code/pcl.frag.spv.h"
+#include "zview/graphics_backend/shader_code/pcl.vert.spv.h"
+#include "zview/graphics_backend/shader_code/picking.frag.spv.h"
+#include "zview/graphics_backend/shader_code/picking.vert.spv.h"
 
 namespace zview {
 
-Shader::Shader() {}
-std::int32_t Shader::getLocation(const std::string &name) const {
-  const auto ret = m_location_key.find(name);
-  if (ret != m_location_key.end()) {
-    return ret->second;
-  }
-  const auto location = glGetUniformLocation(m_id, name.c_str());
-  m_location_key[name] = location;
-  return location;
+// Vertex input: binding 0, stride 16 (3 floats xyz + 4 bytes rgba packed)
+static const VkVertexInputBindingDescription kBinding{
+    0, 16, VK_VERTEX_INPUT_RATE_VERTEX};
+
+static const VkVertexInputAttributeDescription kAttribs[2] = {
+    {0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0},  // a_xyz
+    {1, 0, VK_FORMAT_R8G8B8A8_UNORM, 12},   // a_rgb (normalized bytes)
+};
+
+Shader::~Shader() {
+  auto& ctx = VulkanContext::get();
+  if (m_pipeline != VK_NULL_HANDLE)
+    vkDestroyPipeline(ctx.device, m_pipeline, nullptr);
+  if (m_layout != VK_NULL_HANDLE)
+    vkDestroyPipelineLayout(ctx.device, m_layout, nullptr);
 }
 
-bool Shader::init(const ShaderType &shader_type) {
-  std::string vertex_code;
-  std::string fragment_code;
-  switch (shader_type) {
-    case ShaderType::PCL: {
-      vertex_code = shader_code::pcl::vertex_shader;
-      fragment_code = shader_code::pcl::fragment_shader;
+Shader::Shader(Shader&& o) noexcept
+    : m_pipeline(o.m_pipeline), m_layout(o.m_layout), m_type(o.m_type) {
+  o.m_pipeline = VK_NULL_HANDLE;
+  o.m_layout = VK_NULL_HANDLE;
+}
+
+Shader& Shader::operator=(Shader&& o) noexcept {
+  if (this != &o) {
+    auto& ctx = VulkanContext::get();
+    if (m_pipeline) vkDestroyPipeline(ctx.device, m_pipeline, nullptr);
+    if (m_layout) vkDestroyPipelineLayout(ctx.device, m_layout, nullptr);
+    m_pipeline = o.m_pipeline;
+    o.m_pipeline = VK_NULL_HANDLE;
+    m_layout = o.m_layout;
+    o.m_layout = VK_NULL_HANDLE;
+    m_type = o.m_type;
+  }
+  return *this;
+}
+
+VkShaderModule Shader::createModule(const uint32_t* code, uint32_t len) const {
+  VkShaderModuleCreateInfo ci{};
+  ci.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+  ci.codeSize = len * sizeof(uint32_t);
+  ci.pCode = code;
+  VkShaderModule mod;
+  if (vkCheck(
+          vkCreateShaderModule(VulkanContext::get().device, &ci, nullptr, &mod),
+          "vkCreateShaderModule") != VK_SUCCESS)
+    return VK_NULL_HANDLE;
+  return mod;
+}
+
+bool Shader::init(ShaderType type, VkRenderPass renderPass, bool enableBlend,
+                  bool enableDepth, VkPrimitiveTopology topology) {
+  m_type = type;
+  auto& ctx = VulkanContext::get();
+
+  // Select SPIR-V blobs and push constant size
+  const uint32_t *vertCode = nullptr, *fragCode = nullptr;
+  uint32_t vertLen = 0, fragLen = 0, pcSize = 0;
+  switch (type) {
+    case ShaderType::PCL:
+      vertCode = pcl_vert;
+      vertLen = pcl_vert_len;
+      fragCode = pcl_frag;
+      fragLen = pcl_frag_len;
+      pcSize = sizeof(PCLPushConstants);
       break;
-    }
-    case ShaderType::EDGES: {
-      vertex_code = shader_code::edges::vertex_shader;
-      fragment_code = shader_code::edges::fragment_shader;
+    case ShaderType::MESH:
+      vertCode = mesh_vert;
+      vertLen = mesh_vert_len;
+      fragCode = mesh_frag;
+      fragLen = mesh_frag_len;
+      pcSize = sizeof(MeshPushConstants);
       break;
-    }
-    case ShaderType::MESH: {
-      vertex_code = shader_code::mesh::vertex_shader;
-      fragment_code = shader_code::mesh::fragment_shader;
+    case ShaderType::EDGES:
+      vertCode = edges_vert;
+      vertLen = edges_vert_len;
+      fragCode = edges_frag;
+      fragLen = edges_frag_len;
+      pcSize = sizeof(EdgesPushConstants);
       break;
-    }
-    case ShaderType::PICKING: {
-      vertex_code = shader_code::picking::vertex_shader;
-      fragment_code = shader_code::picking::fragment_shader;
+    case ShaderType::PICKING:
+      vertCode = picking_vert;
+      vertLen = picking_vert_len;
+      fragCode = picking_frag;
+      fragLen = picking_frag_len;
+      pcSize = sizeof(PickingPushConstants);
       break;
-    }
-    case ShaderType::GRID: {
-      vertex_code = shader_code::grid::vertex_shader;
-      fragment_code = shader_code::grid::fragment_shader;
+    case ShaderType::GRID:
+      vertCode = grid_vert;
+      vertLen = grid_vert_len;
+      fragCode = grid_frag;
+      fragLen = grid_frag_len;
+      pcSize = sizeof(GridPushConstants);
       break;
-    }
-    default: {
-      std::cerr << "Failed to init shader: " << static_cast<int>(shader_type)
-                << std::endl;
-      return false;
-    }
   }
 
-  bool ok = compile(vertex_code, fragment_code) && link();
+  VkShaderModule vertMod = createModule(vertCode, vertLen);
+  VkShaderModule fragMod = createModule(fragCode, fragLen);
+  if (vertMod == VK_NULL_HANDLE || fragMod == VK_NULL_HANDLE) {
+    if (vertMod) vkDestroyShaderModule(ctx.device, vertMod, nullptr);
+    if (fragMod) vkDestroyShaderModule(ctx.device, fragMod, nullptr);
+    return false;
+  }
+
+  VkPushConstantRange pcRange{
+      VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, pcSize};
+  VkPipelineLayoutCreateInfo plci{};
+  plci.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  plci.pushConstantRangeCount = 1;
+  plci.pPushConstantRanges = &pcRange;
+  if (vkCheck(vkCreatePipelineLayout(ctx.device, &plci, nullptr, &m_layout),
+              "vkCreatePipelineLayout") != VK_SUCCESS) {
+    vkDestroyShaderModule(ctx.device, vertMod, nullptr);
+    vkDestroyShaderModule(ctx.device, fragMod, nullptr);
+    return false;
+  }
+
+  VkPipelineShaderStageCreateInfo stages[2]{};
+  stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+  stages[0].module = vertMod;
+  stages[0].pName = "main";
+  stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+  stages[1].module = fragMod;
+  stages[1].pName = "main";
+
+  VkPipelineVertexInputStateCreateInfo vi{};
+  vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+  vi.vertexBindingDescriptionCount = 1;
+  vi.pVertexBindingDescriptions = &kBinding;
+  vi.vertexAttributeDescriptionCount = 2;
+  vi.pVertexAttributeDescriptions = kAttribs;
+
+  VkPipelineInputAssemblyStateCreateInfo ia{};
+  ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+  ia.topology = topology;
+
+  VkPipelineViewportStateCreateInfo vs{};
+  vs.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+  vs.viewportCount = 1;
+  vs.scissorCount = 1;
+
+  VkPipelineRasterizationStateCreateInfo rs{};
+  rs.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+  rs.polygonMode = VK_POLYGON_MODE_FILL;
+  rs.cullMode = VK_CULL_MODE_NONE;
+  rs.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+  rs.lineWidth = 1.0f;
+
+  VkPipelineMultisampleStateCreateInfo ms{};
+  ms.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  ms.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+  VkPipelineDepthStencilStateCreateInfo ds{};
+  ds.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+  ds.depthTestEnable = enableDepth ? VK_TRUE : VK_FALSE;
+  ds.depthWriteEnable = enableDepth ? VK_TRUE : VK_FALSE;
+  ds.depthCompareOp = VK_COMPARE_OP_LESS;
+
+  VkPipelineColorBlendAttachmentState cba{};
+  cba.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                       VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+  if (enableBlend) {
+    cba.blendEnable = VK_TRUE;
+    cba.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    cba.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    cba.colorBlendOp = VK_BLEND_OP_ADD;
+    cba.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    cba.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    cba.alphaBlendOp = VK_BLEND_OP_ADD;
+  }
+  VkPipelineColorBlendStateCreateInfo cb{};
+  cb.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+  cb.attachmentCount = 1;
+  cb.pAttachments = &cba;
+
+  VkDynamicState dynStates[] = {VK_DYNAMIC_STATE_VIEWPORT,
+                                VK_DYNAMIC_STATE_SCISSOR};
+  VkPipelineDynamicStateCreateInfo dyn{};
+  dyn.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+  dyn.dynamicStateCount = 2;
+  dyn.pDynamicStates = dynStates;
+
+  VkGraphicsPipelineCreateInfo pci{};
+  pci.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+  pci.stageCount = 2;
+  pci.pStages = stages;
+  pci.pVertexInputState = &vi;
+  pci.pInputAssemblyState = &ia;
+  pci.pViewportState = &vs;
+  pci.pRasterizationState = &rs;
+  pci.pMultisampleState = &ms;
+  pci.pDepthStencilState = &ds;
+  pci.pColorBlendState = &cb;
+  pci.pDynamicState = &dyn;
+  pci.layout = m_layout;
+  pci.renderPass = renderPass;
+  pci.subpass = 0;
+
+  bool ok = vkCheck(vkCreateGraphicsPipelines(ctx.device, VK_NULL_HANDLE, 1,
+                                              &pci, nullptr, &m_pipeline),
+                    "vkCreateGraphicsPipelines") == VK_SUCCESS;
+  vkDestroyShaderModule(ctx.device, vertMod, nullptr);
+  vkDestroyShaderModule(ctx.device, fragMod, nullptr);
   if (!ok) {
-    std::cerr << "Failed to init shader: " << static_cast<int>(shader_type)
-              << std::endl;
+    vkDestroyPipelineLayout(ctx.device, m_layout, nullptr);
+    m_layout = VK_NULL_HANDLE;
   }
   return ok;
 }
 
-bool Shader::compile(const std::string &vertex_code,
-                     const std::string &fragment_code) {
-  const char *vcode = vertex_code.c_str();
-  m_vertex_id = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(m_vertex_id, 1, &vcode, NULL);
-  glCompileShader(m_vertex_id);
-
-  const char *fcode = fragment_code.c_str();
-  m_fragment_id = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(m_fragment_id, 1, &fcode, NULL);
-  glCompileShader(m_fragment_id);
-  return checkCompileErr();
-}
-
-bool Shader::link() {
-  m_id = glCreateProgram();
-  glAttachShader(m_id, m_vertex_id);
-  glAttachShader(m_id, m_fragment_id);
-  glLinkProgram(m_id);
-  bool ok = checkLinkingErr();
-  glDeleteShader(m_vertex_id);
-  glDeleteShader(m_fragment_id);
-  return ok;
-}
-
-void Shader::use() const { glUseProgram(m_id); }
-void Shader::unuse() const { glUseProgram(0); }
-
-template <>
-void Shader::setUniform<>(const char *name, const int val) const {
-  glUniform1i(getLocation(name), val);
-}
-template <>
-void Shader::setUniform<>(const char *name, const std::uint32_t val) const {
-  glUniform1ui(getLocation(name), val);
-}
-
-template <>
-void Shader::setUniform<>(const char *name, const bool val) const {
-  glUniform1i(getLocation(name), val);
-}
-
-template <>
-void Shader::setUniform<>(const char *name, const float val) const {
-  glUniform1f(getLocation(name), val);
-}
-
-void Shader::setUniform(const char *name,
-                        const std::array<float, 3U> &val) const {
-  glUniform3f(getLocation(name), val.at(0), val.at(1), val.at(2));
-}
-template <>
-void Shader::setUniform(const char *name, const float val1,
-                        const float val2) const {
-  glUniform2f(getLocation(name), val1, val2);
-}
-
-template <>
-void Shader::setUniform<>(const char *name, const float *val) const {
-  glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, val);
-}
-
-bool Shader::checkCompileErr() {
-  int success{0};
-  std::array<char, 1024> infoLog{};
-  glGetShaderiv(m_vertex_id, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(m_vertex_id, 1024, NULL, infoLog.data());
-    std::cout << "Error compiling Vertex Shader:\n"
-              << std::string(infoLog.data()) << std::endl;
-    return false;
-  }
-  glGetShaderiv(m_fragment_id, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(m_fragment_id, 1024, NULL, infoLog.data());
-    std::cout << "Error compiling Fragment Shader:\n"
-              << std::string(infoLog.data()) << std::endl;
-    return false;
-  }
-  return true;
-}
-
-bool Shader::checkLinkingErr() {
-  int success{0};
-  std::array<char, 1024> infoLog{};
-  glGetProgramiv(m_id, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(m_id, 1024, NULL, infoLog.data());
-    std::cout << "Error Linking Shader Program:\n"
-              << std::string(infoLog.data()) << std::endl;
-    return false;
-  }
-  return true;
-}
 }  // namespace zview

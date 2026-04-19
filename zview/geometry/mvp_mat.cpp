@@ -36,9 +36,9 @@ void MVPmat::updatePmat() {
   // following
   // https://github.com/radekp/qt/blob/master/zview/gui/math3d/qmatrix4x4.cpp
   float clip = farPlane - nearPlane;
-  m_proj << cotan / aspect, 0, 0, 0, 0, cotan, 0, 0, 0, 0,
-      -(nearPlane + farPlane) / clip, -2.0f * nearPlane * farPlane / clip, 0, 0,
-      -1, 0;
+  // Vulkan depth range [0,1]; no Y-flip (ImGui UV flip in Image() handles it)
+  m_proj << cotan / aspect, 0, 0, 0, 0, cotan, 0, 0, 0, 0, -farPlane / clip,
+      -farPlane * nearPlane / clip, 0, 0, -1, 0;
 }
 float MVPmat::getAspect() const { return m_wh.x / m_wh.y; }
 void MVPmat::setWinSize(const ImVec2 &wh) {

@@ -10,6 +10,7 @@
 #include "zview/drawables/shape_draw_visitor.h"
 #include "zview/drawables/shape_init_visitor.h"
 #include "zview/drawables/shape_update_visitor.h"
+#include "zview/graphics_backend/vulkan_context.h"
 #include "zview/io/write_ply.h"
 namespace zview {
 
@@ -73,12 +74,12 @@ std::uint32_t ShapeBuffer::emplace(types::Shape &&s) {
 }
 
 void ShapeBuffer::draw(
-    const float *tform,
-    const std::function<void(const std::pair<std::uint32_t, types::Shape> &)>
-        &preDrawFunction) const {
+    VkCommandBuffer cmd, const float *tform,
+    const std::function<void(const std::pair<const std::uint32_t, types::Shape>
+                                 &)> &preDrawFunction) const {
   const auto &draw_func = m_shape_draw_visitor_p.get();
-  auto func = [&tform, &draw_func](const auto &v) {
-    draw_func->operator()(v, tform);
+  auto func = [&cmd, &tform, &draw_func](const auto &v) {
+    draw_func->operator()(v, cmd, tform);
   };
   for (const auto &s : m_buffer) {
     bool enabled =
@@ -138,11 +139,7 @@ std::optional<types::Vector3> ShapeBuffer::get3dLocation(
       it->second);
 }
 void ShapeBuffer::writeBufferToFile(const std::string &f) const {
-  std::vector<types::Shape> data{};
-  for (const auto &s : m_buffer) {
-    data.push_back(s.second);
-  }
-  io::writePly(f, data);
+  io::writePly(f, m_buffer);
 }
 
 bool &ShapeBuffer::shapeVisibility(const std::uint32_t &object_key) {
@@ -161,8 +158,30 @@ std::uint32_t ShapeBuffer::getKey(const ::std::string &name) {
   }
   return it->second;
 }
+static void freeShapeGPU(types::Shape &s) {
+  auto &ctx = VulkanContext::get();
+  if (ctx.allocator == VK_NULL_HANDLE) return;
+  std::visit(
+      [&ctx](auto &v) {
+        if (v.vertexBuffer) {
+          vmaDestroyBuffer(ctx.allocator, v.vertexBuffer, v.vertexAlloc);
+          v.vertexBuffer = VK_NULL_HANDLE;
+        }
+        // Downcast to check for index buffer (Mesh / Edges)
+        using T = std::decay_t<decltype(v)>;
+        if constexpr (!std::is_same_v<T, types::Pcl>) {
+          if (v.indexBuffer) {
+            vmaDestroyBuffer(ctx.allocator, v.indexBuffer, v.indexAlloc);
+            v.indexBuffer = VK_NULL_HANDLE;
+          }
+        }
+      },
+      s);
+}
+
 void ShapeBuffer::erase(const std::uint32_t &key) {
   const std::string s_name = getName(m_buffer.at(key));
+  freeShapeGPU(m_buffer.at(key));
   m_string2key.erase(s_name);
   m_buffer.erase(key);
 }

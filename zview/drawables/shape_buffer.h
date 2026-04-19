@@ -1,4 +1,6 @@
 #pragma once
+#include <vulkan/vulkan.h>
+
 #include <functional>
 #include <memory>
 #include <optional>
@@ -56,8 +58,9 @@ class ShapeBuffer {
    * recieving the shape key and the shape object
    */
   void draw(
-      const float* tform,
-      const std::function<void(const std::pair<std::uint32_t, types::Shape>&)>&
+      VkCommandBuffer cmd, const float* tform,
+      const std::function<
+          void(const std::pair<const std::uint32_t, types::Shape>&)>&
           preDrawFunction = []([[maybe_unused]] const auto& s) {}) const;
 
   std::optional<types::Vector3> get3dLocation(
