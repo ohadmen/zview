@@ -2,8 +2,8 @@
 Module dependencies and repository overrides for Bazel build.
 """
 
-bazel_dep(name = "rules_cc", version = "0.0.17")
-bazel_dep(name = "platforms", version = "0.0.8")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_boost", repo_name = "com_github_nelhage_rules_boost")
 archive_override(
     module_name = "rules_boost",
@@ -31,11 +31,15 @@ git_override(
 )
 
 bazel_dep(name = "catch2", version = "3.6.0")
-bazel_dep(name = "rules_python", version = "0.40.0")
-bazel_dep(name = "pybind11_bazel", version = "2.12.0")
+bazel_dep(name = "rules_python", version = "1.7.0")
+bazel_dep(name = "pybind11_bazel", version = "2.13.6")
 bazel_dep(name = "eigen", version = "3.4.0.bcr.1")
+local_path_override(
+    module_name = "eigen",
+    path = "packaging/bazel_modules/eigen",
+)
 bazel_dep(name = "rules_pkg", version = "1.0.1")
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
 
 repositories_impl = use_extension("//third_party:repositories.bzl", "repositories_impl")
 use_repo(repositories_impl, "imgui", "imgui_file_dialog", "implot", "sysroot")

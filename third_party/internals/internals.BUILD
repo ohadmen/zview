@@ -1,4 +1,6 @@
 
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "libglew",
     srcs = glob(["lib/x86_64-linux-gnu/libGLEW.*"]),

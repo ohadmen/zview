@@ -166,6 +166,10 @@ int main(int argc, char *argv[]) {
 
   auto window = initGL();
 
+  if (window == nullptr) {
+    return 1;
+  }
+
   if (!app.init()) {
     return 1;
   }

@@ -2,7 +2,16 @@
 build
 # bazel
 bazel-*
+.bazel_output
+.bazel-out
 MODULE.bazel.lock
+
+# generated packaging/debian artifacts
+debian/files
+debian/usr/
+packaging/bazel_modules/
+imgui.ini
+
 **/__pycache__
 venv/
 *.wheel
